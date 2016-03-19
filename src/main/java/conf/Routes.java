@@ -29,8 +29,14 @@ public class Routes implements ApplicationRoutes {
         
         router.GET().route("/").with(ApplicationController.class, "index");
         router.GET().route("/hello_world.json").with(ApplicationController.class, "helloWorldJson");
-        
- 
+
+        /**
+         * Routes for VOTD CRUD
+         */
+        router.GET().route("/votd/create").with(ApplicationController.class, "Create VOTD");
+
+
+
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)
         ///////////////////////////////////////////////////////////////////////    
