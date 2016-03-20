@@ -17,6 +17,7 @@
 package conf;
 
 
+import controllers.VotdController;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
@@ -33,7 +34,7 @@ public class Routes implements ApplicationRoutes {
         /**
          * Routes for VOTD CRUD
          */
-        router.GET().route("/votd/create").with(ApplicationController.class, "Create VOTD");
+        router.GET().route("/votd/create").with(VotdController.class, "createVotd");
 
 
 

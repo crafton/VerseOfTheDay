@@ -1,5 +1,7 @@
 package controllers;
 
+import ninja.Result;
+import ninja.Results;
 import com.google.inject.Singleton;
 
 /**
@@ -8,4 +10,9 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class VotdController {
+
+    public Result createVotd() {
+        return Results.html();
+    }
+
 }
