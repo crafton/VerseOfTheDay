@@ -4,3 +4,9 @@
 .panel {
     margin-top: 30px;
 }
+
+#loadingDiv {
+    width: 100px;
+    height: 100px;
+    margin: auto;
+}

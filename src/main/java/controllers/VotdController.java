@@ -15,4 +15,10 @@ public class VotdController {
         return Results.html();
     }
 
+    public Result getVerse() {
+        Result result = Results.html();
+
+        return result.text().render("God is super good!");
+    }
+
 }
