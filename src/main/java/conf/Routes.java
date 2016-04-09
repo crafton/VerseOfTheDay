@@ -35,7 +35,7 @@ public class Routes implements ApplicationRoutes {
          * Routes for VOTD CRUD
          */
         router.GET().route("/votd/create").with(VotdController.class, "createVotd");
-        router.GET().route("/votd/getverse").with(VotdController.class, "getVerse");
+        router.GET().route("/votd/getverse/{verses}").with(VotdController.class, "getVerse");
 
 
 

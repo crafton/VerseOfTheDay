@@ -2,12 +2,10 @@
  * Created by craft on 25/03/2016.
  */
 
-/**Scripts for create VoTD view**/
 //Retrieve the verses
 $("#verifyVerseButton").click(function () {
     $.ajax({
-        //  url: "/votd/getverse/" + $("#verseField").val(),
-        url: "/votd/getverse",
+        url: "/votd/getverse/" + encodeURIComponent($("#verseField").val()),
         cache: false,
         success: function (data) {
             $("#verseRetrieved").html(data);
@@ -30,5 +28,3 @@ jQuery.ajaxSetup({
     success: function () {
     }
 });
-
-/**End scripts for create VoTD view**/
