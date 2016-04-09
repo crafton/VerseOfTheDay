@@ -68,8 +68,7 @@ public class VotdController {
                 .getAsJsonObject("search")
                 .getAsJsonObject("result")
                 .getAsJsonArray("passages").get(0)
-                .getAsJsonObject().get("text").toString();
-        logger.info(verseText);
+                .getAsJsonObject().get("text").getAsString();
 
         return result.text().render(verseText);
     }
