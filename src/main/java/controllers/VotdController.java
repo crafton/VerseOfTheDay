@@ -1,26 +1,15 @@
 package controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import ninja.Result;
 import ninja.Results;
 import com.google.inject.Singleton;
 import ninja.params.PathParam;
-import ninja.utils.NinjaProperties;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utilities.VotdControllerUtils;
+import utilities.ControllerUtils;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
-import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_PASSWORD;
-import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_USERNAME;
+import java.util.Optional;
 
 /**
  * Created by Crafton Williams on 19/03/2016.
@@ -30,8 +19,7 @@ import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeatu
 public class VotdController {
 
     @Inject
-    NinjaProperties ninjaProperties;
-
+    ControllerUtils controllerUtils;
     final static Logger logger = LoggerFactory.getLogger(VotdController.class);
 
     public Result createVotd() {
@@ -40,35 +28,35 @@ public class VotdController {
 
     public Result getVerse(@PathParam("verses") String verses) {
 
-        Integer maxVerses = ninjaProperties.getIntegerWithDefault("votd.maxverses", 0);
-
-        String versesTrimmed = verses.trim();
         Result result = Results.html();
 
-        logger.info(versesTrimmed);
+        Integer maxVerses = controllerUtils.getMaxVerses();
 
-        if (!VotdControllerUtils.isVerseLengthValid(versesTrimmed, maxVerses)) {
+        if (maxVerses == 0) {
+            logger.error("Max verses has not been set in application.conf");
+            return result.text().render("An error has occurred. Contact the administrator to fix it.");
+        }
+
+        Optional<String> optionalVerses = Optional.ofNullable(verses);
+
+        if (!optionalVerses.isPresent()) {
+            logger.warn("Client didn't submit a verse range to retrieve.");
+            return result.text().render("A verse range must be submitted to proceed.");
+        }
+        String versesTrimmed = verses.trim();
+
+        if (!controllerUtils.isVerseFormatValid(versesTrimmed)) {
+            logger.warn("Verse format of " + versesTrimmed + " is incorrect.");
+            return result.text().render("Verse format of '" + versesTrimmed + "' is incorrect.");
+        }
+
+        if (!controllerUtils.isVerseLengthValid(versesTrimmed)) {
+            logger.info("You can only select a maximum of " + maxVerses + " verses.");
             return result.text().render("You can only select a maximum of " + maxVerses + " verses.");
         }
 
-        HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(ninjaProperties.get("biblesearch.key"), "");
-        Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.register(authenticationFeature)
-                .target("https://bibles.org/v2/passages.js");
-
-        String verseTextJson = webTarget
-                .queryParam("q[]", versesTrimmed)
-                .queryParam("version", "eng-ESV")
-                .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
-
-        JsonParser parser = new JsonParser();
-        JsonObject verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
-        String verseText = verseJsonObject
-                .getAsJsonObject("response")
-                .getAsJsonObject("search")
-                .getAsJsonObject("result")
-                .getAsJsonArray("passages").get(0)
-                .getAsJsonObject().get("text").getAsString();
+        /*Call web service to retrieve verses.*/
+        String verseText = controllerUtils.restGetVerses(versesTrimmed);
 
         return result.text().render(verseText);
     }

@@ -134,7 +134,7 @@
   <dependencies>
     <dependency>
       <groupId>org.ninjaframework</groupId>
-      <artifactId>ninja-test-utilities</artifactId>
+      <artifactId>ninja-test-controllers.utilities</artifactId>
       <version>5.4.0</version>
       <scope>test</scope>
       <exclusions>
