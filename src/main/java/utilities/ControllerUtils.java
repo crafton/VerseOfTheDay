@@ -1,5 +1,6 @@
 package utilities;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
@@ -114,12 +115,23 @@ public class ControllerUtils {
 
         JsonParser parser = new JsonParser();
         JsonObject verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
-        return "<h3>" + verseRange + "</h3>" + verseJsonObject
+
+        JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")
                 .getAsJsonObject("search")
                 .getAsJsonObject("result")
-                .getAsJsonArray("passages").get(0)
-                .getAsJsonObject().get("text").getAsString();
+                .getAsJsonArray("passages");
+
+        /*Ensure verses are returned before returning anything.*/
+        if (passages.size() == 0){
+            logger.warn("Biblesearch could not find verses matching the range supplied.");
+            return "Verse(s) do not exist. Please ensure Book, Chapter and Verse are valid.";
+        }
+
+        return "<h3>" + verseRange + "</h3>" + passages.get(0)
+                .getAsJsonObject()
+                .get("text")
+                .getAsString();
 
     }
 

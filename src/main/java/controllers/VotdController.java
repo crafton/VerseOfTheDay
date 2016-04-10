@@ -46,7 +46,7 @@ public class VotdController {
         String versesTrimmed = verses.trim();
 
         if (!controllerUtils.isVerseFormatValid(versesTrimmed)) {
-            logger.warn("Verse format of " + versesTrimmed + " is incorrect.");
+            logger.warn("Verse format of '" + versesTrimmed + "' is incorrect.");
             return result.text().render("Verse format of '" + versesTrimmed + "' is incorrect.");
         }
 
