@@ -93,7 +93,7 @@ public class ControllerUtils {
      * @return
      */
     public boolean isVerseFormatValid(String verseRange) {
-        return verseRange.matches("(\\d\\s)?\\w+\\s(\\d{1,2}):(\\d{1,3})(\\s?-\\s?\\d{1,3})?");
+        return verseRange.matches("(\\d\\s)?\\w+\\s(\\d{1,2}):(\\d{1,3})(\\S?-\\S?\\d{1,3})?");
     }
 
     /**
@@ -125,7 +125,7 @@ public class ControllerUtils {
         /*Ensure verses are returned before returning anything.*/
         if (passages.size() == 0){
             logger.warn("Biblesearch could not find verses matching the range supplied.");
-            return "Verse(s) do not exist. Please ensure Book, Chapter and Verse are valid.";
+            return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
         }
 
         return "<h3>" + verseRange + "</h3>" + passages.get(0)
