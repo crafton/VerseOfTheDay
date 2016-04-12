@@ -123,15 +123,22 @@ public class ControllerUtils {
                 .getAsJsonArray("passages");
 
         /*Ensure verses are returned before returning anything.*/
-        if (passages.size() == 0){
+        if (passages.size() == 0) {
             logger.warn("Biblesearch could not find verses matching the range supplied.");
             return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
         }
 
-        return "<h3>" + verseRange + "</h3>" + passages.get(0)
+        String verseTitle = passages.get(0)
+                .getAsJsonObject()
+                .get("display")
+                .getAsString();
+
+        String verseText = passages.get(0)
                 .getAsJsonObject()
                 .get("text")
                 .getAsString();
+
+        return "<h3>" + verseTitle + "</h3>" + verseText;
 
     }
 
