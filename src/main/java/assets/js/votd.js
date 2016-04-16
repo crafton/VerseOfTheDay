@@ -28,3 +28,8 @@ jQuery.ajaxSetup({
     success: function () {
     }
 });
+
+<!-- Initialize the multiselect plugin: -->
+    $(document).ready(function() {
+        $('#themeField').multiselect();
+    });
