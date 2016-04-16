@@ -30,6 +30,6 @@ jQuery.ajaxSetup({
 });
 
 <!-- Initialize the multiselect plugin: -->
-    $(document).ready(function() {
-        $('#themeField').multiselect();
-    });
+$(document).ready(function () {
+    $('#themesDropdown').multiselect();
+});

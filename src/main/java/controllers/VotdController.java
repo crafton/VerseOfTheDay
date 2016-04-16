@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.ControllerUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,7 +25,18 @@ public class VotdController {
     final static Logger logger = LoggerFactory.getLogger(VotdController.class);
 
     public Result createVotd() {
-        return Results.html();
+
+        Result result = Results.html();
+
+        List<String> themes = new ArrayList<>();
+        themes.add("Love");
+        themes.add("Faith");
+        themes.add("Kindness");
+        themes.add("Grace");
+
+        result.render("themes", themes);
+
+        return result;
     }
 
     public Result getVerse(@PathParam("verses") String verses) {

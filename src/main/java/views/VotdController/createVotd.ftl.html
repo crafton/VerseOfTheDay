@@ -14,12 +14,14 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="themeField" class="col-sm-2 control-label">Themes</label>
+                    <label for="themesDropdown" class="col-sm-2 control-label">Themes</label>
                     <div class="col-sm-4">
-                        <select id="themeField" multiple="multiple">
-                            <option value="Love">Love</option>
-                            <option value="Faith">Faith</option>
-                            <option value="Kindness">Kindness</option>
+                        <select id="themesDropdown" multiple="multiple">
+                            <#list themes as theme>
+                                <option value="${theme}">${theme}</option>
+                                <#else>
+                                    <option value="0">No themes in database</option>
+                            </#list>
                         </select>
                     </div>
                 </div>
