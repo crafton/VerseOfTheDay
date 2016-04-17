@@ -1,3 +1,75 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
+table {
+	width: 100%;
+	table-layout: fixed;
+}
 
+.tbl-header {
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.tbl-content {
+	height: 400px;
+	overflow-x: auto;
+	margin-top: 0px;
+}
+
+th {
+	padding: 20px 15px;
+	text-align: left;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: inherit;
+	color: #1260AF;
+	text-transform: uppercase;
+}
+
+td {
+	padding: 15px;
+	text-align: left;
+	font-size: 14px;
+	font-family: inherit;
+	color: #4B0082;
+}
+
+.table-hover tbody tr:hover td {
+	background-color: #87CEEB;
+}
+
+#tblContentId {
+	
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+/*
+For Campaign Form */
+#campaignModalHeader {
+	padding: 9px 15px;
+	border-bottom: 1px solid #eee;
+	background-color: #0480be;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	color: rgba(255, 255, 255, 1);
+}
+
+.campaignForm {
+	font-size: 14px;
+	font-family: inherit;
+	color: #1260AF;
+}

@@ -21,6 +21,7 @@ import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
 import controllers.ApplicationController;
+import controllers.CampaignController;
 
 public class Routes implements ApplicationRoutes {
 
@@ -28,6 +29,7 @@ public class Routes implements ApplicationRoutes {
     public void init(Router router) {  
         
         router.GET().route("/").with(ApplicationController.class, "index");
+        router.GET().route("/campaign").with(CampaignController.class, "campaign");
         router.GET().route("/hello_world.json").with(ApplicationController.class, "helloWorldJson");
         
  
