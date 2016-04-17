@@ -9,14 +9,15 @@ $("#verifyVerseButton").click(function () {
         cache: false,
         success: function (data) {
             $("#verseRetrieved").html(data);
-            $("#isValidButton").show()
         },
         error: function (xhr, status, errorThrown) {
             $("#verseretrieved").html("<strong>" + xhr.responseText + "</strong> ");
-            $("#isValidButton").hide()
         }
     });
 });
+
+
+
 //Show a nice loader when verses are being retrieved
 jQuery.ajaxSetup({
     beforeSend: function () {

@@ -22,7 +22,8 @@ public class VotdController {
 
     @Inject
     ControllerUtils controllerUtils;
-    final static Logger logger = LoggerFactory.getLogger(VotdController.class);
+    @Inject
+    Logger logger;
 
     public Result createVotd() {
 
@@ -52,7 +53,7 @@ public class VotdController {
 
         Optional<String> optionalVerses = Optional.ofNullable(verses);
 
-        if (!optionalVerses.isPresent()) {
+        if (!optionalVerses.isPresent() || optionalVerses.get().contentEquals("")) {
             logger.warn("Client didn't submit a verse range to retrieve.");
             return result.text().render("A verse range must be submitted to proceed.");
         }
@@ -60,6 +61,7 @@ public class VotdController {
 
         if (!controllerUtils.isVerseFormatValid(versesTrimmed)) {
             logger.warn("Verse format of '" + versesTrimmed + "' is incorrect.");
+
             return result.text().render("Verse format of '" + versesTrimmed + "' is incorrect.");
         }
 
@@ -72,6 +74,10 @@ public class VotdController {
         String verseText = controllerUtils.restGetVerses(versesTrimmed);
 
         return result.text().render(verseText);
+    }
+
+    public Result saveVotd(){
+        return Results.html();
     }
 
 }

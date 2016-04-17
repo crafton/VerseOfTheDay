@@ -36,6 +36,7 @@ public class Routes implements ApplicationRoutes {
          */
         router.GET().route("/votd/create").with(VotdController.class, "createVotd");
         router.GET().route("/votd/getverse/{verses}").with(VotdController.class, "getVerse");
+        router.POST().route("/votd/save").with(VotdController.class, "saveVotd");
 
 
 

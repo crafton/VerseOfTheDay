@@ -60,15 +60,10 @@ public class ControllerUtils {
      */
     public boolean isVerseLengthValid(String verseRange) {
 
-        /*Get string after the colon*/
-        String verses = verseRange.split(":")[1];
-
-        if (!verses.contains("-")) {
+        if (!verseRange.contains("-")) {
             return true;
         }
-
-        /*Get numbers on either side of the -*/
-        String[] verseArray = verses.split("-");
+        String[] verseArray = getVerseNumbers(verseRange);
         String startVerseStr = verseArray[0];
         String endVerseStr = verseArray[1];
 
@@ -78,7 +73,7 @@ public class ControllerUtils {
             Integer startVerseInt = Integer.parseInt(startVerseStr);
             Integer endVerseInt = Integer.parseInt(endVerseStr);
 
-            return this.maxVerses > (endVerseInt - startVerseInt);
+            return this.maxVerses > Math.abs(endVerseInt - startVerseInt);
 
         } catch (NumberFormatException ne) {
             logger.info("Invalid integer formats submitted within verse range.");
@@ -93,7 +88,36 @@ public class ControllerUtils {
      * @return
      */
     public boolean isVerseFormatValid(String verseRange) {
+
+        if(verseRange.contains("-")) {
+            String[] verses = getVerseNumbers(verseRange);
+
+            String verseStart = verses[0];
+            String verseEnd = verses[1];
+
+            try {
+                Integer verseStartInt = Integer.parseInt(verseStart);
+                Integer verseEndInt = Integer.parseInt(verseEnd);
+
+                if (verseStartInt >= verseEndInt) {
+                    return false;
+                }
+
+            } catch (NumberFormatException ne) {
+                logger.info("Invalid integer formats submitted within verse range.");
+                return false;
+            }
+        }
+
         return verseRange.matches("(\\d\\s)?\\w+\\s(\\d{1,2}):(\\d{1,3})(\\S?-\\S?\\d{1,3})?");
+    }
+
+    private String[] getVerseNumbers(String verseRange) {
+        /*Get string after the colon*/
+        String verses = verseRange.split(":")[1];
+
+        /*Get verse numbers -*/
+        return verses.split("-");
     }
 
     /**
