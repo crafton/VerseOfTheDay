@@ -5,7 +5,7 @@
 //Retrieve the verses
 $("#verifyVerseButton").click(function () {
     $.ajax({
-        url: "/votd/getverse/" + encodeURIComponent($("#verseField").val()),
+        url: "/votd/getverse/" + encodeURIComponent($("#verses").val()),
         cache: false,
         success: function (data) {
             $("#verseRetrieved").html(data);
@@ -32,5 +32,5 @@ jQuery.ajaxSetup({
 
 <!-- Initialize the multiselect plugin: -->
 $(document).ready(function () {
-    $('#themesDropdown').multiselect();
+    $('#themes').multiselect();
 });

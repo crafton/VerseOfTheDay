@@ -1,14 +1,21 @@
 package controllers;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.persist.Transactional;
+import models.Votd;
+import ninja.Context;
 import ninja.Result;
 import ninja.Results;
 import com.google.inject.Singleton;
+import ninja.jpa.UnitOfWork;
 import ninja.params.PathParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.ControllerUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +29,8 @@ public class VotdController {
 
     @Inject
     ControllerUtils controllerUtils;
+    @Inject
+    Provider<EntityManager> entityManagerProvider;
     @Inject
     Logger logger;
 
@@ -76,8 +85,16 @@ public class VotdController {
         return result.text().render(verseText);
     }
 
-    public Result saveVotd(){
-        return Results.html();
+    @Transactional
+    public Result saveVotd(Votd votd){
+
+        logger.info(votd.getVerses());
+
+        EntityManager entityManager = entityManagerProvider.get();
+        entityManager.persist(votd);
+
+        return Results.redirect("/votd/create");
+
     }
 
 }

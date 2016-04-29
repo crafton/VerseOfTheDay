@@ -6,17 +6,17 @@
             <h2 class="panel-title">Create a new VoTD</h2>
         </div>
         <div class="panel-body">
-            <form class="form-horizontal" data-toggle="validator" role="form">
+            <form action="/votd/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
                 <div class="form-group">
-                    <label for="verseField" class="col-sm-2 control-label">Verses</label>
+                    <label for="verses" class="col-sm-2 control-label">Verses</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="verseField" placeholder="Matthew 6:24-26" pattern="(\d\s)?\w+\s(\d{1,2}):(\d{1,3})(\S?-\S?\d{1,3})?" required>
+                        <input type="text" class="form-control" id="verses" name="verses" placeholder="Matthew 6:24-26" pattern="(\d\s)?\w+\s(\d{1,2}):(\d{1,3})(\S?-\S?\d{1,3})?" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="themesDropdown" class="col-sm-2 control-label">Themes</label>
+                    <label for="themes" class="col-sm-2 control-label">Themes</label>
                     <div class="col-sm-4">
-                        <select id="themesDropdown" multiple="multiple">
+                        <select id="themes" name="themes" multiple="multiple">
                             <#list themes as theme>
                                 <option value="${theme}">${theme}</option>
                                 <#else>
@@ -30,7 +30,7 @@
                         <button id="verifyVerseButton" type="button" class="btn btn-primary" data-toggle="modal"
                                 data-target="#verseVerificationModal">Verify
                         </button>
-                        <button class="btn btn-default" type="submit">Save</button>
+                        <button id="formSubmitButton" class="btn btn-default" type="submit">Save</button>
                     </div>
                 </div>
             </form>
