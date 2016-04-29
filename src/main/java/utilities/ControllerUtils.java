@@ -14,6 +14,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -89,7 +90,7 @@ public class ControllerUtils {
      */
     public boolean isVerseFormatValid(String verseRange) {
 
-        if(verseRange.contains("-")) {
+        if (verseRange.contains("-")) {
             String[] verses = getVerseNumbers(verseRange);
 
             String verseStart = verses[0];
@@ -163,6 +164,61 @@ public class ControllerUtils {
                 .getAsString();
 
         return "<h3>" + verseTitle + "</h3>" + verseText;
+
+    }
+
+    public List<String> findClashes(String verseRange) {
+
+    }
+
+    private String getMatchCandidates(String bookChapter) {
+
+    }
+
+    /**
+     * Given two sets of verse ranges or individual verses, determine if they intersect.
+     *
+     * @param range1 A string representation of a verse range separated by a '-'. Or a single verse
+     *               without a dash.
+     * @param range2 A string representation of a verse range separated by a '-'. Or a single verse
+     *               without a dash.
+     * @return whether or not the ranges intersect.
+     */
+    private boolean doesVerseRangeIntersect(String range1, String range2) {
+        String[] range1Array;
+        String[] range2Array;
+        Integer range1Lower;
+        Integer range1Upper;
+        Integer range2Lower;
+        Integer range2Upper;
+
+        if (range1.contains("-")) {
+            range1Array = range1.split("-");
+        } else {
+            range1Array = new String[]{range1, range1};
+        }
+
+        if (range2.contains("-")) {
+            range2Array = range2.split("-");
+        } else {
+            range2Array = new String[]{range2, range2};
+        }
+
+        try {
+            range1Lower = Integer.parseInt(range1Array[0]);
+            range1Upper = Integer.parseInt(range1Array[1]);
+            range2Lower = Integer.parseInt(range2Array[0]);
+            range2Upper = Integer.parseInt(range2Array[1]);
+
+            if (range1Lower <= range2Upper && range2Lower <= range1Upper) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (NumberFormatException nex) {
+            logger.error("Problem with number range format. Verses don't appear to be integers.");
+            return false;
+        }
 
     }
 
