@@ -4,16 +4,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import ninja.jpa.UnitOfWork;
 import ninja.utils.NinjaProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +29,9 @@ public class ControllerUtils {
 
     private String bibleSearchKey;
     private Integer maxVerses;
+
+    @Inject
+    Provider<EntityManager> entityManagerProvider;
 
     final static Logger logger = LoggerFactory.getLogger(ControllerUtils.class);
 
@@ -167,12 +175,62 @@ public class ControllerUtils {
 
     }
 
-    public List<String> findClashes(String verseRange) {
+    /**
+     * Find all verses in the database that intersect with verses provided.
+     *
+     * @param verseToMatch
+     * @return list of verses that intersect with the given range.
+     */
+    public List<String> findClashes(String verseToMatch) {
+        String[] chapterVerseArray = verseToMatch.split(":");
+        String bookChapter = chapterVerseArray[0];
+        String verseRange = chapterVerseArray[1];
+        List<String> potentialClashes = getMatchCandidates(bookChapter);
+        List<String> actualClashes = new ArrayList<>();
 
+        if (potentialClashes.isEmpty()) {
+            return actualClashes;
+        }
+
+        for (String potentialClash : potentialClashes) {
+            if (doesVerseRangeIntersect(verseRange, potentialClash.split(":")[1])) {
+                actualClashes.add(potentialClash);
+            }
+        }
+
+        return actualClashes;
     }
 
-    private String getMatchCandidates(String bookChapter) {
+    /**
+     * Format a list of strings to an html list
+     *
+     * @param items
+     * @return an html representation of a java list.
+     */
+    public String formatListToHtml(List<String> items) {
 
+        String formattedList = "";
+
+        for (String item : items) {
+            formattedList += "<li>" + item + "</li>";
+        }
+
+        return "<p><ul>" + formattedList + "</ul></p>";
+    }
+
+    /**
+     * Get all verses in the database that match the chapter provided.
+     *
+     * @param bookChapter A chapter in the bible
+     * @return a list of verse ranges that already exist for the given chapter.
+     */
+    @UnitOfWork
+    private List<String> getMatchCandidates(String bookChapter) {
+        EntityManager entityManager = entityManagerProvider.get();
+
+        Query q = entityManager.createQuery("SELECT verses FROM Votd WHERE verses LIKE '" + bookChapter + "%%'");
+
+        return (List<String>) q.getResultList();
     }
 
     /**

@@ -80,13 +80,22 @@ public class VotdController {
         }
 
         /*Call web service to retrieve verses.*/
-        String verseText = controllerUtils.restGetVerses(versesTrimmed);
+        String verseVerificationResult = controllerUtils.restGetVerses(versesTrimmed);
 
-        return result.text().render(verseText);
+        /*Find all verses that clash with what we're trying to add to the database*/
+        List<String> verseClashes = controllerUtils.findClashes(versesTrimmed);
+        if (!verseClashes.isEmpty()) {
+            verseVerificationResult += "<h4 id='clash' class='text-danger'>Verse Clashes</h4>" +
+                    "<small>Verses that already exist in the database which " +
+                    "intersect with the verses being entered.</small>"
+                    + controllerUtils.formatListToHtml(verseClashes);
+        }
+
+        return result.text().render(verseVerificationResult);
     }
 
     @Transactional
-    public Result saveVotd(Votd votd){
+    public Result saveVotd(Votd votd) {
 
         logger.info(votd.getVerses());
 
