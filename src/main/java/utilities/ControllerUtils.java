@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import ninja.Results;
 import ninja.jpa.UnitOfWork;
 import ninja.utils.NinjaProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -57,8 +58,42 @@ public class ControllerUtils {
      *
      * @return
      */
-    public Integer getMaxVerses() {
+    private Integer getMaxVerses() {
         return this.maxVerses;
+    }
+
+    public String verifyVerses(String verseSubmitted) {
+
+        Integer maxVerses = getMaxVerses();
+
+        if (maxVerses == 0) {
+            logger.error("Max verses has not been set in application.conf");
+            return "An error has occurred. Contact the administrator to fix it.";
+        }
+
+        Optional<String> optionalVerses = Optional.ofNullable(verseSubmitted);
+
+        if (!optionalVerses.isPresent() || optionalVerses.get().contentEquals("")) {
+            logger.warn("Client didn't submit a verse range to retrieve.");
+            return "A verse range must be submitted to proceed.";
+        }
+        String versesTrimmed = verseSubmitted.trim();
+
+        if (!isVerseFormatValid(versesTrimmed)) {
+            logger.warn("Verse format of '" + versesTrimmed + "' is incorrect.");
+            return "Verse format of '" + versesTrimmed + "' is incorrect.";
+        }
+
+        if (!isVerseLengthValid(versesTrimmed)) {
+            logger.warn("You can only select a maximum of " + maxVerses + " verses.");
+            return "You can only select a maximum of " + maxVerses + " verses.";
+        }
+
+        if (restGetVerses(versesTrimmed).isEmpty()) {
+            return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
+        }
+
+        return "";
     }
 
     /**
@@ -67,7 +102,7 @@ public class ControllerUtils {
      * @param verseRange of the format 'Matthew 6:24' or 'Matthew 6:24-28'
      * @return true of the number of verses in the verse range is less than maxVerses, false otherwise.
      */
-    public boolean isVerseLengthValid(String verseRange) {
+    private boolean isVerseLengthValid(String verseRange) {
 
         if (!verseRange.contains("-")) {
             return true;
@@ -96,7 +131,7 @@ public class ControllerUtils {
      * @param verseRange of the format 'Matthew 6:24' or 'Matthew 6:24-28'
      * @return
      */
-    public boolean isVerseFormatValid(String verseRange) {
+    private boolean isVerseFormatValid(String verseRange) {
 
         if (verseRange.contains("-")) {
             String[] verses = getVerseNumbers(verseRange);
@@ -155,10 +190,10 @@ public class ControllerUtils {
                 .getAsJsonObject("result")
                 .getAsJsonArray("passages");
 
-        /*Ensure verses are returned before returning anything.*/
+        /*Ensure verses are retrieved before returning anything.*/
         if (passages.size() == 0) {
             logger.warn("Biblesearch could not find verses matching the range supplied.");
-            return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
+            return "";
         }
 
         String verseTitle = passages.get(0)

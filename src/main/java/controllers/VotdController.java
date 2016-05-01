@@ -51,53 +51,37 @@ public class VotdController {
 
     public Result getVerse(@PathParam("verses") String verses) {
 
-        Result result = Results.html();
+        String verificationErrorMessage = controllerUtils.verifyVerses(verses);
 
-        Integer maxVerses = controllerUtils.getMaxVerses();
-
-        if (maxVerses == 0) {
-            logger.error("Max verses has not been set in application.conf");
-            return result.text().render("An error has occurred. Contact the administrator to fix it.");
+        if(!verificationErrorMessage.isEmpty()){
+            return Results.badRequest().text().render(verificationErrorMessage);
         }
 
-        Optional<String> optionalVerses = Optional.ofNullable(verses);
-
-        if (!optionalVerses.isPresent() || optionalVerses.get().contentEquals("")) {
-            logger.warn("Client didn't submit a verse range to retrieve.");
-            return result.text().render("A verse range must be submitted to proceed.");
-        }
         String versesTrimmed = verses.trim();
 
-        if (!controllerUtils.isVerseFormatValid(versesTrimmed)) {
-            logger.warn("Verse format of '" + versesTrimmed + "' is incorrect.");
-
-            return result.text().render("Verse format of '" + versesTrimmed + "' is incorrect.");
-        }
-
-        if (!controllerUtils.isVerseLengthValid(versesTrimmed)) {
-            logger.info("You can only select a maximum of " + maxVerses + " verses.");
-            return result.text().render("You can only select a maximum of " + maxVerses + " verses.");
-        }
-
         /*Call web service to retrieve verses.*/
-        String verseVerificationResult = controllerUtils.restGetVerses(versesTrimmed);
+        String versesRetrieved = controllerUtils.restGetVerses(versesTrimmed);
 
         /*Find all verses that clash with what we're trying to add to the database*/
         List<String> verseClashes = controllerUtils.findClashes(versesTrimmed);
         if (!verseClashes.isEmpty()) {
-            verseVerificationResult += "<h4 id='clash' class='text-danger'>Verse Clashes</h4>" +
+            versesRetrieved += "<h4 id='clash' class='text-danger'>Verse Clashes</h4>" +
                     "<small>Verses that already exist in the database which " +
                     "intersect with the verses being entered.</small>"
                     + controllerUtils.formatListToHtml(verseClashes);
         }
 
-        return result.text().render(verseVerificationResult);
+        return Results.ok().text().render(versesRetrieved);
     }
 
     @Transactional
     public Result saveVotd(Votd votd) {
 
-        logger.info(votd.getVerses());
+        String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
+
+        if(!verificationErrorMessage.isEmpty()){
+            return Results.badRequest().text().render(verificationErrorMessage);
+        }
 
         EntityManager entityManager = entityManagerProvider.get();
         entityManager.persist(votd);

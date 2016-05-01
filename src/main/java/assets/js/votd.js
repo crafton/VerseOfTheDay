@@ -10,8 +10,8 @@ $("#verifyVerseButton").click(function () {
         success: function (data) {
             $("#verseRetrieved").html(data);
         },
-        error: function (xhr, status, errorThrown) {
-            $("#verseretrieved").html("<strong>" + xhr.responseText + "</strong> ");
+        error: function (xhr, status, errorThro) {
+            $("#verseRetrieved").html("<strong>" + xhr.responseText + "</strong> ");
         }
     });
 });
