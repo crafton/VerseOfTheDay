@@ -95,6 +95,10 @@ public class ControllerUtils {
             return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
         }
 
+        if (doesVotdExist(versesTrimmed)) {
+            return "The verse '" + versesTrimmed + "' already exists in the database.";
+        }
+
         return "";
     }
 
