@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import models.Votd;
 import ninja.Results;
 import ninja.jpa.UnitOfWork;
 import ninja.utils.NinjaProperties;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -263,9 +265,26 @@ public class ControllerUtils {
     private List<String> getMatchCandidates(String bookChapter) {
         EntityManager entityManager = entityManagerProvider.get();
 
-        Query q = entityManager.createQuery("SELECT verses FROM Votd WHERE verses LIKE '" + bookChapter + "%%'");
+        Query q = entityManager.createNamedQuery("Votd.findVersesInChapter");
+        q.setParameter("bookchapter", bookChapter + "%%");
 
         return (List<String>) q.getResultList();
+    }
+
+    @UnitOfWork
+    private boolean doesVotdExist(String verse) {
+        EntityManager entityManager = entityManagerProvider.get();
+
+        Query q = entityManager.createNamedQuery("Votd.findExistingVerse");
+        q.setParameter("verse", verse);
+
+        try {
+            q.getSingleResult();
+            logger.info("Verse already exists in the database.");
+            return true;
+        } catch (NoResultException nr) {
+            return false;
+        }
     }
 
     /**

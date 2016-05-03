@@ -1,5 +1,8 @@
 package models;
 
+import com.google.inject.Inject;
+import ninja.jpa.UnitOfWork;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -9,6 +12,10 @@ import java.util.List;
  */
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Votd.findVersesInChapter", query = "SELECT verses FROM Votd WHERE verses LIKE :bookchapter"),
+        @NamedQuery(name = "Votd.findExistingVerse", query = "SELECT verses FROM Votd WHERE verses = :verse")
+})
 public class Votd {
 
     @Id
@@ -38,4 +45,5 @@ public class Votd {
     public void setThemes(List<String> themes) {
         this.themes = themes;
     }
+
 }
