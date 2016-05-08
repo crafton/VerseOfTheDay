@@ -10,6 +10,7 @@ import ninja.Results;
 import com.google.inject.Singleton;
 import ninja.jpa.UnitOfWork;
 import ninja.params.PathParam;
+import ninja.session.FlashScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.ControllerUtils;
@@ -75,17 +76,19 @@ public class VotdController {
     }
 
     @Transactional
-    public Result saveVotd(Votd votd) {
+    public Result saveVotd(Votd votd, FlashScope flashScope) {
 
         String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
 
         if(!verificationErrorMessage.isEmpty()){
-            return Results.badRequest().text().render(verificationErrorMessage);
+            flashScope.error(verificationErrorMessage);
+            return Results.redirect("/votd/create");
         }
 
         EntityManager entityManager = entityManagerProvider.get();
         entityManager.persist(votd);
 
+        flashScope.success("Successfully created a new VoTD entry.");
         return Results.redirect("/votd/create");
 
     }
