@@ -19,7 +19,7 @@
                     <div class="col-sm-4">
                         <select id="themes" name="themes" multiple="multiple">
                             <#list themes as theme>
-                                <option value="${theme}">${theme}</option>
+                                <option value="${theme.getId()}">${theme.getThemeName()}</option>
                                 <#else>
                                     <option value="0">No themes in database</option>
                             </#list>

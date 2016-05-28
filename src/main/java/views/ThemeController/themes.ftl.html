@@ -8,9 +8,9 @@
         <div class="panel-body">
             <form action="/theme/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
                 <div class="form-group">
-                    <label for="theme" class="col-sm-2 control-label">Theme</label>
+                    <label for="themeName" class="col-sm-2 control-label">Theme</label>
                     <div class="col-sm-2">
-                        <input type="text" class="form-control" id="theme" name="theme" required>
+                        <input type="text" class="form-control" id="themeName" name="themeName" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -23,14 +23,14 @@
     </div>
 
     <hr/>
-
-    <#if (themes?size-1) gt 0>
+    <#if (themes?size) gt 0>
         <table class="table table-responsive">
         <#list themes?chunk(maxCols) as row>
             <tr>
             <#list row as theme>
                 <td>
-                ${theme.getThemeName()}
+                <span class="themeText text-left">${theme.getThemeName()}</span>
+                    <a href="/theme/delete/${theme.getId()}"> <i class="fa fa-trash-o" aria-hidden="true"></i></a>
                 </td>
             </#list>
             </tr>

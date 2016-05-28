@@ -3,6 +3,7 @@ package controllers;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
+import models.Theme;
 import models.Votd;
 import ninja.Context;
 import ninja.Result;
@@ -37,17 +38,15 @@ public class VotdController {
 
     public Result createVotd() {
 
-        Result result = Results.html();
+        EntityManager entityManager = entityManagerProvider.get();
 
-        List<String> themes = new ArrayList<>();
-        themes.add("Love");
-        themes.add("Faith");
-        themes.add("Kindness");
-        themes.add("Grace");
+        Query q = entityManager.createNamedQuery("Theme.findAll");
+        List<Theme> themes = (List<Theme>)q.getResultList();
 
-        result.render("themes", themes);
-
-        return result;
+        return Results
+                .ok()
+                .html()
+                .render("themes", themes);
     }
 
     public Result getVerse(@PathParam("verses") String verses) {
