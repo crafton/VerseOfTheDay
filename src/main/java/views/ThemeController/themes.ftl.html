@@ -1,0 +1,24 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Themes">
+
+
+
+    <hr/>
+
+    <#if (themes?size-1) gt 0>
+        <table class="table table-responsive">
+        <#list themes?chunk(maxCols) as row>
+            <tr>
+            <#list row as theme>
+                <td>
+                ${theme.getThemeName()}
+                </td>
+            </#list>
+            </tr>
+        </#list>
+        </table>
+        <#else>
+            <p class="text-center text-warning"> No themes added to the database yet. </p>
+    </#if>
+
+</@layout.myLayout>

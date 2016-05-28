@@ -24,8 +24,8 @@ public class Votd {
 
     private String verses;
 
-    @ElementCollection
-    private List<String> themes;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Theme> themes;
 
     public Votd() {
     }
@@ -38,11 +38,11 @@ public class Votd {
         this.verses = verses;
     }
 
-    public List<String> getThemes() {
+    public List<Theme> getThemes() {
         return themes;
     }
 
-    public void setThemes(List<String> themes) {
+    public void setThemes(List<Theme> themes) {
         this.themes = themes;
     }
 

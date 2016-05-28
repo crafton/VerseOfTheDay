@@ -17,7 +17,9 @@
 package conf;
 
 
+import controllers.ThemeController;
 import controllers.VotdController;
+import models.Theme;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
@@ -38,6 +40,14 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/votd/getverse/{verses}").with(VotdController.class, "getVerse");
         router.POST().route("/votd/save").with(VotdController.class, "saveVotd");
 
+        /**
+         * Routes for Theme CRUD
+         */
+
+        router.GET().route("/theme/list").with(ThemeController.class, "themes");
+        router.GET().route("/theme/create").with(ThemeController.class, "createTheme");
+        router.POST().route("/theme/save").with(ThemeController.class, "saveTheme");
+        router.DELETE().route("/theme/delete").with(ThemeController.class, "deleteTheme");
 
 
         ///////////////////////////////////////////////////////////////////////

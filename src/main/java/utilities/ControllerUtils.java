@@ -32,6 +32,7 @@ public class ControllerUtils {
 
     private String bibleSearchKey;
     private Integer maxVerses;
+    private Integer themesMaxCols;
 
     @Inject
     Provider<EntityManager> entityManagerProvider;
@@ -40,12 +41,8 @@ public class ControllerUtils {
 
     @Inject
     private ControllerUtils(NinjaProperties ninjaProperties) {
-        Optional<Integer> optionalMaxVerses = Optional.ofNullable(ninjaProperties.getIntegerWithDefault("votd.maxverses", 0));
-        if (optionalMaxVerses.isPresent()) {
-            this.maxVerses = optionalMaxVerses.get();
-        } else {
-            this.maxVerses = 0;
-        }
+        Optional<Integer> optionalMaxVerses = Optional.of(ninjaProperties.getIntegerWithDefault("votd.maxverses", 0));
+        this.maxVerses = optionalMaxVerses.get();
 
         Optional<String> optionalBibleKey = Optional.ofNullable(ninjaProperties.get("biblesearch.key"));
         if (optionalBibleKey.isPresent()) {
@@ -53,6 +50,9 @@ public class ControllerUtils {
         } else {
             this.bibleSearchKey = "";
         }
+
+        Optional<Integer> optionalThemeMaxCols = Optional.of(ninjaProperties.getIntegerWithDefault("themes.maxcols", 7));
+        this.themesMaxCols = optionalThemeMaxCols.get();
     }
 
     /**
@@ -62,6 +62,10 @@ public class ControllerUtils {
      */
     private Integer getMaxVerses() {
         return this.maxVerses;
+    }
+
+    public Integer getThemesMaxCols() {
+        return this.themesMaxCols;
     }
 
     public String verifyVerses(String verseSubmitted) {
@@ -275,6 +279,10 @@ public class ControllerUtils {
         return (List<String>) q.getResultList();
     }
 
+    /**
+     * @param verse
+     * @return
+     */
     @UnitOfWork
     private boolean doesVotdExist(String verse) {
         EntityManager entityManager = entityManagerProvider.get();
