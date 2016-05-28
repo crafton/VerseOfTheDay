@@ -30,7 +30,7 @@ public class ThemeController {
     @Inject
     Logger logger;
 
-    @UnitOfWork
+    @Transactional
     public Result themes(){
         EntityManager entityManager = entityManagerProvider.get();
 

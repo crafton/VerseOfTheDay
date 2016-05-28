@@ -36,8 +36,8 @@ public class VotdController {
     @Inject
     Logger logger;
 
+    @Transactional
     public Result createVotd() {
-
         EntityManager entityManager = entityManagerProvider.get();
 
         Query q = entityManager.createNamedQuery("Theme.findAll");
