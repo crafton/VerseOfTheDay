@@ -32,8 +32,12 @@ public class Votd {
     public Votd() {
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getVerses() {
-        return verses;
+        return this.verses;
     }
 
     public void setVerses(String verses) {
@@ -46,10 +50,6 @@ public class Votd {
 
     public void setThemes(List<Theme> themes) {
         this.themes = themes;
-    }
-
-    public Long getId() {
-        return this.id;
     }
 
 }

@@ -38,11 +38,24 @@ public class VotdController {
     Logger logger;
 
     @Transactional
+    public Result viewVotds() {
+        EntityManager entityManager = entityManagerProvider.get();
+
+        Query q = entityManager.createNamedQuery("Votd.findAll");
+        List<Votd> votds = (List<Votd>) q.getResultList();
+
+        return Results
+                .ok()
+                .html()
+                .render("votds", votds);
+    }
+
+    @Transactional
     public Result createVotd() {
         EntityManager entityManager = entityManagerProvider.get();
 
         Query q = entityManager.createNamedQuery("Theme.findAll");
-        List<Theme> themes = (List<Theme>)q.getResultList();
+        List<Theme> themes = (List<Theme>) q.getResultList();
 
         return Results
                 .ok()
@@ -54,7 +67,7 @@ public class VotdController {
 
         String verificationErrorMessage = controllerUtils.verifyVerses(verses);
 
-        if(!verificationErrorMessage.isEmpty()){
+        if (!verificationErrorMessage.isEmpty()) {
             return Results.badRequest().text().render(verificationErrorMessage);
         }
 
@@ -80,21 +93,21 @@ public class VotdController {
 
         String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
 
-        if(!verificationErrorMessage.isEmpty()){
+        if (!verificationErrorMessage.isEmpty()) {
             flashScope.error(verificationErrorMessage);
             return Results.redirect("/votd/create");
         }
 
         List<String> themeIds = context.getParameterValues("themes");
 
-        if(themeIds.isEmpty()){
+        if (themeIds.isEmpty()) {
             votd.setThemes(new ArrayList<Theme>());
         }
 
         EntityManager entityManager = entityManagerProvider.get();
 
         List<Theme> themeList = new ArrayList<>();
-        for(String themeId : themeIds){
+        for (String themeId : themeIds) {
             Theme theme = entityManager.find(Theme.class, Long.parseLong(themeId));
             themeList.add(theme);
         }
@@ -104,6 +117,26 @@ public class VotdController {
         flashScope.success("Successfully created a new VoTD entry.");
         return Results.redirect("/votd/create");
 
+    }
+
+    @Transactional
+    public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
+        if (verseid == null) {
+            flashScope.error("You must supply a votd Id");
+            return Results.redirect("/votd/list");
+        }
+
+        EntityManager entityManager = entityManagerProvider.get();
+        Votd votd = entityManager.find(Votd.class, verseid);
+
+        if (votd == null) {
+            flashScope.error("Tried to delete a Votd that doesn't exist");
+            return Results.redirect("/votd/list");
+        }
+
+        entityManager.remove(votd);
+        flashScope.success("Successfully deleted Votd: " + votd.getVerses());
+        return Results.redirect("/votd/list");
     }
 
 }
