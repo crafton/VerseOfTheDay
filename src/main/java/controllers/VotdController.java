@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -75,7 +76,7 @@ public class VotdController {
     }
 
     @Transactional
-    public Result saveVotd(Votd votd, FlashScope flashScope) {
+    public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
 
         String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
 
@@ -84,7 +85,20 @@ public class VotdController {
             return Results.redirect("/votd/create");
         }
 
+        List<String> themeIds = context.getParameterValues("themes");
+
+        if(themeIds.isEmpty()){
+            votd.setThemes(new ArrayList<Theme>());
+        }
+
         EntityManager entityManager = entityManagerProvider.get();
+
+        List<Theme> themeList = new ArrayList<>();
+        for(String themeId : themeIds){
+            Theme theme = entityManager.find(Theme.class, Long.parseLong(themeId));
+            themeList.add(theme);
+        }
+        votd.setThemes(themeList);
         entityManager.persist(votd);
 
         flashScope.success("Successfully created a new VoTD entry.");

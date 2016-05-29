@@ -28,10 +28,8 @@
         <#list themes?chunk(maxCols) as row>
             <tr>
             <#list row as theme>
-                <td>
-                <span class="themeText text-left">${theme.getThemeName()}</span>
-                    <a href="/theme/delete/${theme.getId()}"> <i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                </td>
+                <td class="text-left col-md-1">${theme.getThemeName()}</td>
+                <td class="text-left"><a href="/theme/delete/${theme.getId()}"> <i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
             </#list>
             </tr>
         </#list>
