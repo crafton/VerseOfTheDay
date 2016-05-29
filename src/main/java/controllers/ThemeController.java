@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import models.Theme;
+import models.Votd;
 import ninja.Result;
 import ninja.Results;
 import ninja.jpa.UnitOfWork;
@@ -84,12 +85,22 @@ public class ThemeController {
         EntityManager entityManager = entityManagerProvider.get();
         Theme theme = entityManager.find(Theme.class, themeId);
 
+        if (theme.getVotds().size() > 0) {
+            logger.warn("Attempting to delete a theme that is being used.");
+            flashScope.error("This theme is being used by other Votds. You cannot remove it until it is " +
+                    "removed from those Votds.");
+            return Results.redirect("/theme/list");
+        }
+
         if (theme == null) {
+            logger.warn("Tried to delete a theme that doesn't exist.");
             flashScope.error("No theme found with the supplied ID");
             return Results.redirect("/theme/list");
         }
 
         entityManager.remove(theme);
+        logger.info("Successfully deleted theme " + theme.getThemeName());
+        flashScope.success("Successfully deleted theme: " + theme.getThemeName());
 
         return Results.redirect("/theme/list");
     }
