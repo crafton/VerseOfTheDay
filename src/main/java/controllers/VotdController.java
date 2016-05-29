@@ -120,9 +120,31 @@ public class VotdController {
     }
 
     @Transactional
+    public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope){
+
+        if (verseid == null) {
+            flashScope.error("You must supply a valid verse Id.");
+            return Results.redirect("/votd/list");
+        }
+
+        EntityManager entityManager = entityManagerProvider.get();
+        Votd votd = entityManager.find(Votd.class, verseid);
+
+        if (votd == null) {
+            flashScope.error("Tried to update a Votd that doesn't exist.");
+            return Results.redirect("/votd/list");
+        }
+
+        return Results
+                .ok()
+                .html()
+                .render("votd", votd);
+    }
+
+    @Transactional
     public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
         if (verseid == null) {
-            flashScope.error("You must supply a votd Id");
+            flashScope.error("You must supply a votd Id.");
             return Results.redirect("/votd/list");
         }
 
