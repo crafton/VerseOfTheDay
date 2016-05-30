@@ -130,6 +130,10 @@ public class VotdController {
         EntityManager entityManager = entityManagerProvider.get();
         Votd votd = entityManager.find(Votd.class, verseid);
 
+        //Get all themes
+        Query q = entityManager.createNamedQuery("Theme.findAll");
+        List<Theme> themes = (List<Theme>) q.getResultList();
+
         if (votd == null) {
             flashScope.error("Tried to update a Votd that doesn't exist.");
             return Results.redirect("/votd/list");
@@ -138,7 +142,8 @@ public class VotdController {
         return Results
                 .ok()
                 .html()
-                .render("votd", votd);
+                .render("votd", votd)
+                .render("themes", themes);
     }
 
     @Transactional

@@ -32,5 +32,8 @@ jQuery.ajaxSetup({
 
 <!-- Initialize the multiselect plugin: -->
 $(document).ready(function () {
-    $('#themes').multiselect();
+    $('#themes').multiselect({
+        disableIfEmpty: true,
+        enableFiltering: true
+    });
 });

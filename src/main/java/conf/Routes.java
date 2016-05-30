@@ -40,7 +40,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/votd/create").with(VotdController.class, "createVotd");
         router.GET().route("/votd/getverse/{verses}").with(VotdController.class, "getVerse");
         router.POST().route("/votd/save").with(VotdController.class, "saveVotd");
-        router.GET().route("/votd/update/${verseid}").with(VotdController.class, "updateVotd");
+        router.GET().route("/votd/update/{verseid}").with(VotdController.class, "updateVotd");
         router.GET().route("/votd/delete/{verseid}").with(VotdController.class, "deleteVotd");
 
         /**
