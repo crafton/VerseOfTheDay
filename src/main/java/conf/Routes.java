@@ -20,6 +20,7 @@ package conf;
 import controllers.ThemeController;
 import controllers.VotdController;
 import models.Theme;
+import models.Votd;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
@@ -41,6 +42,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/votd/getverse/{verses}").with(VotdController.class, "getVerse");
         router.POST().route("/votd/save").with(VotdController.class, "saveVotd");
         router.GET().route("/votd/update/{verseid}").with(VotdController.class, "updateVotd");
+        router.POST().route("/votd/saveupdate").with(VotdController.class, "saveVotdUpdate");
         router.GET().route("/votd/delete/{verseid}").with(VotdController.class, "deleteVotd");
 
         /**

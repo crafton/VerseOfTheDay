@@ -98,6 +98,7 @@ public class VotdController {
             return Results.redirect("/votd/create");
         }
 
+        //Retrieve the themeIDs selected and convert to list of themes
         List<String> themeIds = context.getParameterValues("themes");
 
         if (themeIds.isEmpty()) {
@@ -144,6 +145,37 @@ public class VotdController {
                 .html()
                 .render("votd", votd)
                 .render("themes", themes);
+    }
+
+    @Transactional
+    public Result saveVotdUpdate(Context context, FlashScope flashScope){
+
+        EntityManager entityManager = entityManagerProvider.get();
+        Votd votd = entityManager.find(Votd.class, Long.parseLong(context.getParameter("verseid")));
+
+        if(votd == null){
+            flashScope.error("The VOTD you're trying to update does not exist.");
+            return Results.redirect("/votd/list");
+        }
+
+        //Retrieve the themeIDs selected and convert to list of theme objects
+        List<String> themeIds = context.getParameterValues("themes");
+
+        if (themeIds.isEmpty()) {
+            votd.setThemes(new ArrayList<Theme>());
+        }
+
+        List<Theme> themeList = new ArrayList<>();
+        for (String themeId : themeIds) {
+            Theme theme = entityManager.find(Theme.class, Long.parseLong(themeId));
+            themeList.add(theme);
+        }
+
+        votd.setThemes(themeList);
+        entityManager.persist(votd);
+
+        flashScope.success("Successfullt updated verse(s): "+ votd.getVerses());
+        return Results.redirect("/votd/list");
     }
 
     @Transactional

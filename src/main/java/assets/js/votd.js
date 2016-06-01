@@ -34,6 +34,8 @@ jQuery.ajaxSetup({
 $(document).ready(function () {
     $('#themes').multiselect({
         disableIfEmpty: true,
-        enableFiltering: true
+        enableFiltering: true,
+        numberDisplayed: 6,
+        maxHeight: 400
     });
 });
