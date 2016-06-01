@@ -18,6 +18,8 @@ package conf;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import daos.ThemeDao;
+import models.Theme;
 
 @Singleton
 public class Module extends AbstractModule {

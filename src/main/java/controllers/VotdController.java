@@ -3,6 +3,8 @@ package controllers;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
+import daos.ThemeDao;
+import daos.VotdDao;
 import models.Theme;
 import models.Votd;
 import ninja.Context;
@@ -33,16 +35,15 @@ public class VotdController {
     @Inject
     ControllerUtils controllerUtils;
     @Inject
-    Provider<EntityManager> entityManagerProvider;
+    VotdDao votdDao;
+    @Inject
+    ThemeDao themeDao;
     @Inject
     Logger logger;
 
-    @Transactional
     public Result viewVotds() {
-        EntityManager entityManager = entityManagerProvider.get();
 
-        Query q = entityManager.createNamedQuery("Votd.findAll");
-        List<Votd> votds = (List<Votd>) q.getResultList();
+        List<Votd> votds = votdDao.findAll();
 
         return Results
                 .ok()
@@ -50,12 +51,8 @@ public class VotdController {
                 .render("votds", votds);
     }
 
-    @Transactional
     public Result createVotd() {
-        EntityManager entityManager = entityManagerProvider.get();
-
-        Query q = entityManager.createNamedQuery("Theme.findAll");
-        List<Theme> themes = (List<Theme>) q.getResultList();
+        List<Theme> themes = themeDao.findAll();
 
         return Results
                 .ok()
@@ -88,7 +85,6 @@ public class VotdController {
         return Results.ok().text().render(versesRetrieved);
     }
 
-    @Transactional
     public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
 
         String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
@@ -105,22 +101,19 @@ public class VotdController {
             votd.setThemes(new ArrayList<Theme>());
         }
 
-        EntityManager entityManager = entityManagerProvider.get();
-
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = entityManager.find(Theme.class, Long.parseLong(themeId));
+            Theme theme = themeDao.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         votd.setThemes(themeList);
-        entityManager.persist(votd);
+        votdDao.save(votd);
 
         flashScope.success("Successfully created a new VoTD entry.");
         return Results.redirect("/votd/create");
 
     }
 
-    @Transactional
     public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope){
 
         if (verseid == null) {
@@ -128,12 +121,10 @@ public class VotdController {
             return Results.redirect("/votd/list");
         }
 
-        EntityManager entityManager = entityManagerProvider.get();
-        Votd votd = entityManager.find(Votd.class, verseid);
+        Votd votd = votdDao.findById(verseid);
 
         //Get all themes
-        Query q = entityManager.createNamedQuery("Theme.findAll");
-        List<Theme> themes = (List<Theme>) q.getResultList();
+        List<Theme> themes = themeDao.findAll();
 
         if (votd == null) {
             flashScope.error("Tried to update a Votd that doesn't exist.");
@@ -147,11 +138,10 @@ public class VotdController {
                 .render("themes", themes);
     }
 
-    @Transactional
     public Result saveVotdUpdate(Context context, FlashScope flashScope){
 
-        EntityManager entityManager = entityManagerProvider.get();
-        Votd votd = entityManager.find(Votd.class, Long.parseLong(context.getParameter("verseid")));
+        Long votdId = Long.parseLong(context.getParameter("verseid"));
+        Votd votd = votdDao.findById(votdId);
 
         if(votd == null){
             flashScope.error("The VOTD you're trying to update does not exist.");
@@ -161,18 +151,16 @@ public class VotdController {
         //Retrieve the themeIDs selected and convert to list of theme objects
         List<String> themeIds = context.getParameterValues("themes");
 
-        if (themeIds.isEmpty()) {
-            votd.setThemes(new ArrayList<Theme>());
-        }
-
         List<Theme> themeList = new ArrayList<>();
-        for (String themeId : themeIds) {
-            Theme theme = entityManager.find(Theme.class, Long.parseLong(themeId));
-            themeList.add(theme);
+        if (!themeIds.isEmpty()) {
+            for (String themeId : themeIds) {
+                Theme theme = themeDao.findById(Long.parseLong(themeId));
+                themeList.add(theme);
+            }
+
         }
 
-        votd.setThemes(themeList);
-        entityManager.persist(votd);
+        votdDao.update(votdId, themeList);
 
         flashScope.success("Successfullt updated verse(s): "+ votd.getVerses());
         return Results.redirect("/votd/list");
@@ -185,15 +173,14 @@ public class VotdController {
             return Results.redirect("/votd/list");
         }
 
-        EntityManager entityManager = entityManagerProvider.get();
-        Votd votd = entityManager.find(Votd.class, verseid);
+        Votd votd = votdDao.findById(verseid);
 
         if (votd == null) {
             flashScope.error("Tried to delete a Votd that doesn't exist");
             return Results.redirect("/votd/list");
         }
 
-        entityManager.remove(votd);
+        votdDao.delete(verseid);
         flashScope.success("Successfully deleted Votd: " + votd.getVerses());
         return Results.redirect("/votd/list");
     }

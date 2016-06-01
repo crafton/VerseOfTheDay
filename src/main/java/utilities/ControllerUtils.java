@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import daos.VotdDao;
 import models.Votd;
 import ninja.Results;
 import ninja.jpa.UnitOfWork;
@@ -35,7 +36,8 @@ public class ControllerUtils {
     private Integer themesMaxCols;
 
     @Inject
-    Provider<EntityManager> entityManagerProvider;
+    VotdDao votdDao;
+
 
     final static Logger logger = LoggerFactory.getLogger(ControllerUtils.class);
 
@@ -269,29 +271,19 @@ public class ControllerUtils {
      * @param bookChapter A chapter in the bible
      * @return a list of verse ranges that already exist for the given chapter.
      */
-    @UnitOfWork
     private List<String> getMatchCandidates(String bookChapter) {
-        EntityManager entityManager = entityManagerProvider.get();
 
-        Query q = entityManager.createNamedQuery("Votd.findVersesInChapter");
-        q.setParameter("bookchapter", bookChapter + "%%");
-
-        return (List<String>) q.getResultList();
+        return votdDao.findVersesInChapter(bookChapter);
     }
 
     /**
      * @param verse
      * @return
      */
-    @UnitOfWork
     private boolean doesVotdExist(String verse) {
-        EntityManager entityManager = entityManagerProvider.get();
-
-        Query q = entityManager.createNamedQuery("Votd.findExistingVerse");
-        q.setParameter("verse", verse);
 
         try {
-            q.getSingleResult();
+            votdDao.findByVerse(verse);
             logger.info("Verse already exists in the database.");
             return true;
         } catch (NoResultException nr) {
