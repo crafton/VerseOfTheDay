@@ -7,6 +7,7 @@
             <tr>
                 <th>Verses</th>
                 <th>Themes</th>
+                <th>Created By</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -16,6 +17,7 @@
                 <tr>
                     <td>${votd.getVerses()}</td>
                     <td>${votd.getThemes()?join(", ")}</td>
+                    <td></td>
                     <td><a href="/votd/delete/${votd.getId()}"> <i class="fa fa-trash" aria-hidden="true"></i></a></td>
                     <td><a href="/votd/update/${votd.getId()}"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
                 </tr>

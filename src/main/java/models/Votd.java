@@ -26,6 +26,8 @@ public class Votd {
 
     private String verses;
 
+    private String createdBy;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Theme> themes;
 
@@ -52,4 +54,11 @@ public class Votd {
         this.themes = themes;
     }
 
+    public String getCreatedBy() {
+        return this.createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 }

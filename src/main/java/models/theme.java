@@ -22,6 +22,8 @@ public class Theme {
     @Column(unique = true)
     private String themeName;
 
+    private String createdBy;
+
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "themes")
     private List<Votd> votds;
 
@@ -47,6 +49,14 @@ public class Theme {
 
     public void setVotds(List<Votd> votds) {
         this.votds = votds;
+    }
+
+    public String getCreatedBy() {
+        return this.createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     @Override
