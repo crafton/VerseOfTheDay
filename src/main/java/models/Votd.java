@@ -26,6 +26,10 @@ public class Votd {
 
     private String verses;
 
+    private boolean isApproved = false;
+
+    private boolean approvedBy;
+
     private String createdBy;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -60,5 +64,21 @@ public class Votd {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public boolean isApproved() {
+        return this.isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.isApproved = approved;
+    }
+
+    public boolean isApprovedBy() {
+        return this.approvedBy;
+    }
+
+    public void setApprovedBy(boolean approvedBy) {
+        this.approvedBy = approvedBy;
     }
 }

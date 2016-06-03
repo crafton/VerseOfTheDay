@@ -131,11 +131,15 @@ public class VotdController {
             return Results.redirect("/votd/list");
         }
 
+        //Get verse text
+        String verseText = controllerUtils.restGetVerses(votd.getVerses());
+
         return Results
                 .ok()
                 .html()
                 .render("votd", votd)
-                .render("themes", themes);
+                .render("themes", themes)
+                .render("verseText", verseText);
     }
 
     public Result saveVotdUpdate(Context context, FlashScope flashScope){
@@ -166,7 +170,24 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
-    @Transactional
+    public Result approveVotd(@PathParam("votdid") Long votdId, FlashScope flashScope){
+        if (votdId == null){
+            flashScope.error("You must supply a valid votdid.");
+            return Results.redirect("/votd/list");
+        }
+
+        Votd votd = votdDao.findById(votdId);
+
+        if(votd == null){
+            flashScope.error("You can't approve a votd that doesn't exist.");
+            return Results.redirect("/votd/list");
+        }
+
+        votdDao.approve(votdId);
+        flashScope.success("Successfully approved: " + votd.getVerses());
+        return Results.redirect("/votd/list");
+    }
+
     public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
         if (verseid == null) {
             flashScope.error("You must supply a votd Id.");

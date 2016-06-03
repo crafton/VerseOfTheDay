@@ -186,7 +186,7 @@ public class ControllerUtils {
         HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(this.bibleSearchKey, "");
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.register(authenticationFeature)
-                .target("https://bibles.org/v2/passages.js");
+                .target("http://bibles.org/v2/passages.js");
 
         String verseTextJson = webTarget
                 .queryParam("q[]", verseRange)

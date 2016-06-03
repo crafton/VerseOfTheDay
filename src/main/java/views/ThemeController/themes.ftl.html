@@ -30,7 +30,7 @@
             <tr>
             <#list row as theme>
                 <td class="text-left col-md-1">${theme.getThemeName()}</td>
-                <td class="text-left"><a href="/theme/delete/${theme.getId()}"> <i class="fa fa-trash" aria-hidden="true"></i></a></td>
+                <td class="text-left"><a class="fa fa-trash" aria-hidden="true" href="/theme/delete/${theme.getId()}"></a></td>
             </#list>
             </tr>
         </#list>

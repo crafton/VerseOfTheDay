@@ -44,6 +44,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/votd/update/{verseid}").with(VotdController.class, "updateVotd");
         router.POST().route("/votd/saveupdate").with(VotdController.class, "saveVotdUpdate");
         router.GET().route("/votd/delete/{verseid}").with(VotdController.class, "deleteVotd");
+        router.GET().route("/votd/approve/{votdid}").with(VotdController.class, "approveVotd");
 
         /**
          * Routes for Theme CRUD
