@@ -28,7 +28,7 @@ public class Votd {
 
     private boolean isApproved = false;
 
-    private boolean approvedBy;
+    private String approvedBy;
 
     private String createdBy;
 
@@ -74,11 +74,11 @@ public class Votd {
         this.isApproved = approved;
     }
 
-    public boolean isApprovedBy() {
+    public String getApprovedBy() {
         return this.approvedBy;
     }
 
-    public void setApprovedBy(boolean approvedBy) {
+    public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
     }
 }

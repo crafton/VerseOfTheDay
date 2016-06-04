@@ -28,11 +28,11 @@ import java.util.List;
 public class ThemeController {
 
     @Inject
-    private ControllerUtils controllerUtils;
+    ControllerUtils controllerUtils;
     @Inject
-    private ThemeDao themeDao;
+    ThemeDao themeDao;
     @Inject
-    private Logger logger;
+    Logger logger;
 
     public Result themes() {
         List<Theme> themes = themeDao.findAll();

@@ -58,7 +58,7 @@ public class VotdDao {
     }
 
     @Transactional
-    public void approve(Long votdId){
+    public void approve(Long votdId) {
         Votd votd = findById(votdId);
         votd.setApproved(true);
         getEntityManager().persist(votd);

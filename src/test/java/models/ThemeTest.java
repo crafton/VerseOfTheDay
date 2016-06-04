@@ -1,5 +1,6 @@
 package models;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,6 +9,12 @@ import static org.junit.Assert.*;
  * Created by Crafton Williams on 2/06/2016.
  */
 public class ThemeTest {
+
+    @Before
+    public void setup(){
+
+    }
+
     @Test
     public void getId() throws Exception {
 
