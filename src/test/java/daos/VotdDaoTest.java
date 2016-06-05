@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.NoResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -17,22 +18,26 @@ import static org.junit.Assert.*;
 public class VotdDaoTest extends NinjaDaoTestBase {
 
     private VotdDao votdDao;
+    private ThemeDao themeDao;
     private Votd votd;
-    private List<Theme> themeList;
+    private List<Theme> themeList = new ArrayList<>();
     private Theme theme;
 
     @Before
     public void setup() {
         votdDao = getInstance(VotdDao.class);
+        themeDao = getInstance(ThemeDao.class);
 
         votd = new Votd();
         votd.setVerses("Matthew 6:1-8");
         votd.setCreatedBy("John Smith");
         votd.setApprovedBy("Jack Thepumpkinking");
 
-        Theme theme = new Theme();
+        theme = new Theme();
         theme.setThemeName("Faith");
         theme.setCreatedBy("John Smith");
+
+        themeList.add(theme);
     }
 
     @Test
@@ -88,25 +93,42 @@ public class VotdDaoTest extends NinjaDaoTestBase {
     @Test
     public void update() throws Exception {
 
+        themeDao.save(theme);
         votdDao.save(votd);
 
-        assertEquals(0, votd.getThemes().size());
-
-        themeList.add(theme);
+        assertNull(votd.getThemes());
 
         votdDao.update(1L, themeList);
 
-        assertEquals(1, votd.getThemes().size());
-    }
+        Votd votd1 = votdDao.findById(1L);
 
-    @Test
-    public void save() throws Exception {
-
+        assertEquals(1, votd1.getThemes().size());
     }
 
     @Test
     public void delete() throws Exception {
+        votdDao.save(votd);
 
+        assertNotNull(votdDao.findById(1L));
+
+        votdDao.delete(1L);
+
+        assertNull(votdDao.findById(1L));
+    }
+
+    @Test
+    public void approve() throws Exception {
+        votdDao.save(votd);
+
+        Votd v = votdDao.findById(1L);
+
+        assertFalse(v.isApproved());
+
+        votdDao.approve(1L);
+
+        v = votdDao.findById(1L);
+
+        assertTrue(v.isApproved());
     }
 
 }
