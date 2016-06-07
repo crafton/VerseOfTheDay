@@ -8,6 +8,7 @@ import models.Theme;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class ThemeDao {
@@ -39,6 +40,7 @@ public class ThemeDao {
 
     @Transactional
     public void save(Theme theme) {
+        theme.setDateCreated(new Timestamp(System.currentTimeMillis()));
         getEntityManager().persist(theme);
     }
 

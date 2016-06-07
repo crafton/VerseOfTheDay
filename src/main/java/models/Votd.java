@@ -1,6 +1,7 @@
 package models;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -26,6 +27,10 @@ public class Votd {
     private String modifiedBy;
 
     private String createdBy;
+
+    private Timestamp dateCreated;
+
+    private Timestamp dateModified;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Theme> themes;
@@ -75,5 +80,21 @@ public class Votd {
 
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public Timestamp getDateCreated() {
+        return this.dateCreated;
+    }
+
+    public void setDateCreated(Timestamp dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Timestamp getDateModified() {
+        return this.dateModified;
+    }
+
+    public void setDateModified(Timestamp dateModified) {
+        this.dateModified = dateModified;
     }
 }

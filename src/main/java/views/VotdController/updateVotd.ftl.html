@@ -10,7 +10,11 @@
                 <div class="form-group">
                     <label for="verseToUpdate" class="col-sm-2 control-label">Verses</label>
                     <div class="col-sm-10">
-                        <span id="verseToUpdate"><#noescape>${verseText}</#noescape></span>
+                        <span id="verseToUpdate">${votd.getVerses()}
+                            <i id="verseDetails" data-toggle="fullverse" data-trigger="hover"
+                               data-html="true" data-content="${verseText}"
+                               class="fa fa-info-circle" aria-hidden="true"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -53,6 +57,11 @@
     </div>
     <script>
         $("[name='isApproved']").bootstrapSwitch();
+    </script>
+    <script>
+        $(function () {
+            $('[data-toggle="fullverse"]').popover()
+        })
     </script>
     <script type="text/javascript" src="/assets/js/votd.js"></script>
 </@layout.myLayout>

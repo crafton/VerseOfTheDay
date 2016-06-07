@@ -9,6 +9,8 @@ import models.Votd;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -55,6 +57,7 @@ public class VotdDao {
         Votd votd = findById(votdId);
         votd.setThemes(themes);
         votd.setApproved(votdStatus);
+        votd.setDateModified(new Timestamp(System.currentTimeMillis()));
         getEntityManager().persist(votd);
     }
 
@@ -67,6 +70,7 @@ public class VotdDao {
 
     @Transactional
     public void save(Votd votd) {
+        votd.setDateCreated(new Timestamp(System.currentTimeMillis()));
         getEntityManager().persist(votd);
     }
 

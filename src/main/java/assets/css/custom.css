@@ -20,7 +20,13 @@ h4#clash{
 }
 
 #verseToUpdate {
+    padding-top: 7px;
     margin-bottom: 0;
     float: left;
     font-weight: bold;
+}
+
+#verseToUpdate .popover{
+    max-width: 80%;
+    overflow: auto;
 }
