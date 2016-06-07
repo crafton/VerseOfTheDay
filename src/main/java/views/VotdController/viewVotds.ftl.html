@@ -10,7 +10,7 @@
                 <th>Status</th>
                 <th>Approve</th>
                 <th>Created By</th>
-                <th>Approved By</th>
+                <th>Modified By</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -24,7 +24,7 @@
                     <td><#if !votd.isApproved()><a class="fa fa-thumbs-up" href="/votd/approve/${votd.getId()}" aria-hidden="true"></a></#if></td>
                     <td></td>
                     <td></td>
-                    <td><a class="fa fa-trash" aria-hidden="true" href="/votd/delete/${votd.getId()}"></a></td>
+                    <td><a class="fa fa-trash" data-placement="top" data-toggle="confirmation" aria-hidden="true" href="/votd/delete/${votd.getId()}"></a></td>
                     <td><a class="fa fa-pencil" aria-hidden="true" href="/votd/update/${votd.getId()}"></a></td>
                 </tr>
             </#list>
@@ -33,6 +33,13 @@
         <#else>
             <p class="text-center text-warning"> No Votds added to the database yet. </p>
     </#if>
+    <script>
+        $('[data-toggle="confirmation"]').confirmation({
+            href: function(elem){
+                return $(elem).attr('href');
+            }
+        });
+    </script>
     <script>
         $(document).ready(function () {
             $('#votdTable').DataTable();

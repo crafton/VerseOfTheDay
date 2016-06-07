@@ -31,7 +31,7 @@ public class VotdDaoTest extends NinjaDaoTestBase {
         votd = new Votd();
         votd.setVerses("Matthew 6:1-8");
         votd.setCreatedBy("John Smith");
-        votd.setApprovedBy("Jack Thepumpkinking");
+        votd.setModifiedBy("Jack Thepumpkinking");
 
         theme = new Theme();
         theme.setThemeName("Faith");

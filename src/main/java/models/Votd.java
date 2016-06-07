@@ -1,11 +1,6 @@
 package models;
 
-import com.google.inject.Inject;
-import ninja.jpa.UnitOfWork;
-import org.eclipse.jetty.util.annotation.Name;
-
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -28,7 +23,7 @@ public class Votd {
 
     private boolean isApproved = false;
 
-    private String approvedBy;
+    private String modifiedBy;
 
     private String createdBy;
 
@@ -74,11 +69,11 @@ public class Votd {
         this.isApproved = approved;
     }
 
-    public String getApprovedBy() {
-        return this.approvedBy;
+    public String getModifiedBy() {
+        return this.modifiedBy;
     }
 
-    public void setApprovedBy(String approvedBy) {
-        this.approvedBy = approvedBy;
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 }

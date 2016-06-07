@@ -30,7 +30,7 @@
             <tr>
             <#list row as theme>
                 <td class="text-left col-md-1">${theme.getThemeName()}</td>
-                <td class="text-left"><a class="fa fa-trash" aria-hidden="true" href="/theme/delete/${theme.getId()}"></a></td>
+                <td class="text-left"><a class="fa fa-trash" data-toggle="confirmation" data-placement="top" aria-hidden="true" href="/theme/delete/${theme.getId()}"></a></td>
             </#list>
             </tr>
         </#list>
@@ -38,5 +38,13 @@
         <#else>
             <p class="text-center text-warning"> No themes added to the database yet. </p>
     </#if>
+
+    <script>
+        $('[data-toggle="confirmation"]').confirmation({
+            href: function(elem){
+                return $(elem).attr('href');
+            }
+        });
+    </script>
 
 </@layout.myLayout>

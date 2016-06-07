@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import daos.ThemeDao;
 import models.Theme;
 import models.Votd;
+import ninja.NinjaTest;
 import ninja.Result;
 import ninja.NinjaDocTester;
 import org.doctester.testbrowser.Request;
@@ -28,7 +29,8 @@ import static org.junit.Assert.assertThat;
  * Created by Crafton Williams on 4/06/2016.
  */
 
-public class ThemeControllerTest extends NinjaDocTester {
+
+public class ThemeControllerTest extends NinjaTest {
 
 
     @Before

@@ -51,9 +51,10 @@ public class VotdDao {
     }
 
     @Transactional
-    public void update(Long votdId, List<Theme> themes) {
+    public void update(Long votdId, List<Theme> themes, boolean votdStatus) {
         Votd votd = findById(votdId);
         votd.setThemes(themes);
+        votd.setApproved(votdStatus);
         getEntityManager().persist(votd);
     }
 

@@ -14,6 +14,7 @@ import com.google.inject.Singleton;
 import ninja.jpa.UnitOfWork;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.ControllerUtils;
@@ -164,7 +165,15 @@ public class VotdController {
 
         }
 
-        votdDao.update(votdId, themeList);
+        String votdStatusString = context.getParameter("isApproved");
+
+        //Set approval status
+        boolean votdStatus = false;
+        if(votdStatusString != null && votdStatusString.contentEquals("on")){
+            votdStatus = true;
+        }
+
+        votdDao.update(votdId, themeList, votdStatus);
 
         flashScope.success("Successfullt updated verse(s): "+ votd.getVerses());
         return Results.redirect("/votd/list");
