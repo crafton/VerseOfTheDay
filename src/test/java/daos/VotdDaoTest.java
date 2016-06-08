@@ -98,7 +98,7 @@ public class VotdDaoTest extends NinjaDaoTestBase {
 
         assertNull(votd.getThemes());
 
-        votdDao.update(1L, themeList);
+        votdDao.update(1L, themeList, true);
 
         Votd votd1 = votdDao.findById(1L);
 

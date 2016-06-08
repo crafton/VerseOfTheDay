@@ -3,6 +3,7 @@ package models;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -23,6 +24,8 @@ public class Theme {
     private String themeName;
 
     private String createdBy;
+
+    private Timestamp dateCreated;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "themes")
     private List<Votd> votds;
@@ -57,6 +60,14 @@ public class Theme {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Timestamp getDateCreated() {
+        return this.dateCreated;
+    }
+
+    public void setDateCreated(Timestamp dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import daos.ThemeDao;
+import exceptions.EntityBeingUsedException;
+import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import models.Votd;
 import ninja.Result;
@@ -51,12 +53,12 @@ public class ThemeController {
             return Results.redirect("/theme/list");
         }
 
-        try{
+        try {
             themeDao.findByName(theme.getThemeName());
             logger.warn("Tried to add theme that already exists.");
             flashScope.error("Cannot save, that theme already exists.");
             return Results.redirect("/theme/list");
-        }catch (NoResultException nre){
+        } catch (NoResultException nre) {
             logger.info("Theme does not exist, proceeding to save...");
         }
 
@@ -66,29 +68,24 @@ public class ThemeController {
     }
 
     public Result deleteTheme(@PathParam("theme") Long themeId, FlashScope flashScope) {
-        if (themeId == null) {
+
+        try {
+            themeDao.delete(themeId);
+        } catch (IllegalArgumentException e) {
             flashScope.error("You must supply a theme Id");
             return Results.redirect("/theme/list");
-        }
-
-        Theme theme = themeDao.findById(themeId);
-
-        if (theme == null) {
+        } catch (EntityDoesNotExistException e) {
             logger.warn("Tried to delete a theme that doesn't exist.");
             flashScope.error("No theme found with the supplied ID");
             return Results.redirect("/theme/list");
-        }
-
-        if (theme.getVotds().size() > 0) {
+        } catch (EntityBeingUsedException e) {
             logger.warn("Attempting to delete a theme that is being used.");
             flashScope.error("This theme is being used by other Votds. You cannot remove it until it is " +
                     "removed from those Votds.");
             return Results.redirect("/theme/list");
         }
-
-        themeDao.delete(themeId);
-        logger.info("Successfully deleted theme " + theme.getThemeName());
-        flashScope.success("Successfully deleted theme: " + theme.getThemeName());
+        logger.info("Successfully deleted theme.");
+        flashScope.success("Successfully deleted theme.");
 
         return Results.redirect("/theme/list");
     }
