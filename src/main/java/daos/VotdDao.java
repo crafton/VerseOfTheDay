@@ -3,6 +3,7 @@ package daos;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
+import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import models.Votd;
 
@@ -11,6 +12,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +33,12 @@ public class VotdDao {
     }
 
     @Transactional
-    public Votd findById(Long votdId) {
+    public Votd findById(Long votdId) throws IllegalArgumentException {
+
+        if (votdId == null) {
+            throw new IllegalArgumentException("Parameter must be of type 'Long'.");
+        }
+
         return getEntityManager().find(Votd.class, votdId);
     }
 
@@ -53,12 +60,27 @@ public class VotdDao {
     }
 
     @Transactional
-    public void update(Long votdId, List<Theme> themes, boolean votdStatus) {
-        Votd votd = findById(votdId);
-        votd.setThemes(themes);
-        votd.setApproved(votdStatus);
-        votd.setDateModified(new Timestamp(System.currentTimeMillis()));
-        getEntityManager().persist(votd);
+    public void update(Long votdId, List<Theme> themes, boolean votdStatus)
+            throws IllegalArgumentException, EntityDoesNotExistException {
+
+        if(themes == null){
+            themes = new ArrayList<>();
+        }
+
+        try {
+            Votd votd = findById(votdId);
+
+            if(votd == null){
+                throw new EntityDoesNotExistException("The VOTD you're trying to update does not exist.");
+            }
+
+            votd.setThemes(themes);
+            votd.setApproved(votdStatus);
+            votd.setDateModified(new Timestamp(System.currentTimeMillis()));
+            getEntityManager().persist(votd);
+        }catch(IllegalArgumentException e){
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Transactional

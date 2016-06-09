@@ -8,6 +8,7 @@ import models.Votd;
 import ninja.NinjaDaoTestBase;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -21,13 +22,12 @@ import static org.junit.Assert.*;
  */
 public class ThemeDaoTest extends NinjaDaoTestBase {
 
-
     private ThemeDao themeDao;
     private Theme theme;
 
 
     @Before
-    public void setup(){
+    public void setup() {
         themeDao = getInstance(ThemeDao.class);
 
         theme = new Theme();

@@ -3,6 +3,7 @@ package daos;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
+import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
@@ -13,11 +14,15 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.util.List;
+import org.slf4j.Logger;
 
 public class ThemeDao {
 
     @Inject
     private Provider<EntityManager> entityManagerProvider;
+
+    @Inject
+    Logger logger;
 
     public ThemeDao() {
     }
@@ -47,10 +52,17 @@ public class ThemeDao {
     }
 
     @Transactional
-    public void save(Theme theme) throws IllegalArgumentException {
+    public void save(Theme theme) throws IllegalArgumentException, EntityAlreadyExistsException {
 
-        if (theme == null) {
+        if (theme == null || theme.getThemeName().isEmpty()) {
             throw new IllegalArgumentException("Parameter must be of type 'Theme'.");
+        }
+
+        try {
+            findByName(theme.getThemeName());
+            throw new EntityAlreadyExistsException("Cannot save a theme that already exists.");
+        }catch(NoResultException e){
+            logger.debug("Theme does not exist, proceeding to save...");
         }
 
         theme.setDateCreated(new Timestamp(System.currentTimeMillis()));

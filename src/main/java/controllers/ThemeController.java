@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import daos.ThemeDao;
+import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
@@ -48,21 +49,16 @@ public class ThemeController {
 
     public Result saveTheme(Theme theme, FlashScope flashScope) {
 
-        if (theme == null || theme.getThemeName().isEmpty()) {
+        try {
+            themeDao.save(theme);
+        } catch (IllegalArgumentException e) {
             flashScope.error("A theme has not been submitted");
             return Results.redirect("/theme/list");
-        }
-
-        try {
-            themeDao.findByName(theme.getThemeName());
-            logger.warn("Tried to add theme that already exists.");
+        } catch (EntityAlreadyExistsException e) {
+            logger.warn(e.getMessage());
             flashScope.error("Cannot save, that theme already exists.");
             return Results.redirect("/theme/list");
-        } catch (NoResultException nre) {
-            logger.info("Theme does not exist, proceeding to save...");
         }
-
-        themeDao.save(theme);
 
         return Results.redirect("/theme/list");
     }
@@ -79,7 +75,7 @@ public class ThemeController {
             flashScope.error("No theme found with the supplied ID");
             return Results.redirect("/theme/list");
         } catch (EntityBeingUsedException e) {
-            logger.warn("Attempting to delete a theme that is being used.");
+            logger.warn(e.getMessage());
             flashScope.error("This theme is being used by other Votds. You cannot remove it until it is " +
                     "removed from those Votds.");
             return Results.redirect("/theme/list");
