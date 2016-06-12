@@ -63,14 +63,14 @@ public class VotdDao {
     public void update(Long votdId, List<Theme> themes, boolean votdStatus)
             throws IllegalArgumentException, EntityDoesNotExistException {
 
-        if(themes == null){
+        if (themes == null) {
             themes = new ArrayList<>();
         }
 
         try {
             Votd votd = findById(votdId);
 
-            if(votd == null){
+            if (votd == null) {
                 throw new EntityDoesNotExistException("The VOTD you're trying to update does not exist.");
             }
 
@@ -78,28 +78,49 @@ public class VotdDao {
             votd.setApproved(votdStatus);
             votd.setDateModified(new Timestamp(System.currentTimeMillis()));
             getEntityManager().persist(votd);
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
 
     @Transactional
-    public void approve(Long votdId) {
-        Votd votd = findById(votdId);
-        votd.setApproved(true);
-        getEntityManager().persist(votd);
+    public void approve(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
+
+        try {
+            Votd votd = findById(votdId);
+
+            if (votd == null) {
+                throw new EntityDoesNotExistException("You canot approve a VOTD that does not exist.");
+            }
+            votd.setApproved(true);
+            getEntityManager().persist(votd);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Transactional
-    public void save(Votd votd) {
+    public void save(Votd votd) throws IllegalArgumentException {
+
+        if (votd == null) {
+            throw new IllegalArgumentException("VOTD must be a valid entry.");
+        }
+
         votd.setDateCreated(new Timestamp(System.currentTimeMillis()));
         getEntityManager().persist(votd);
     }
 
     @Transactional
-    public void delete(Long votdId) {
-        Votd votd = findById(votdId);
-        getEntityManager().remove(votd);
+    public void delete(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
+        try {
+            Votd votd = findById(votdId);
+            if (votd == null) {
+                throw new EntityDoesNotExistException("Cannot delete a VOTD that does not exist.");
+            }
+            getEntityManager().remove(votd);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     private EntityManager getEntityManager() {

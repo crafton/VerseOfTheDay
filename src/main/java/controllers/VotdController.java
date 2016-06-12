@@ -99,10 +99,13 @@ public class VotdController {
             Theme theme = themeDao.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
-        votd.setThemes(themeList);
-        votdDao.save(votd);
-
-        flashScope.success("Successfully created a new VoTD entry.");
+        try {
+            votd.setThemes(themeList);
+            votdDao.save(votd);
+            flashScope.success("Successfully created a new VoTD entry.");
+        }catch (IllegalArgumentException e){
+            flashScope.error("Something strange has happened. Contact the administrator.");
+        }
         return Results.redirect("/votd/create");
 
     }
@@ -165,43 +168,35 @@ public class VotdController {
             return Results.redirect("/votd/list");
         }
 
-        flashScope.success("Successfullt updated verse(s): " + votd.getVerses());
+        flashScope.success("Verses successfully updated");
         return Results.redirect("/votd/list");
     }
 
     public Result approveVotd(@PathParam("votdid") Long votdId, FlashScope flashScope) {
-        if (votdId == null) {
+
+        try {
+            votdDao.approve(votdId);
+            flashScope.success("Successfully approved VOTD.");
+        } catch (IllegalArgumentException e) {
             flashScope.error("You must supply a valid votdid.");
-            return Results.redirect("/votd/list");
-        }
-
-        Votd votd = votdDao.findById(votdId);
-
-        if (votd == null) {
+        } catch (EntityDoesNotExistException e) {
             flashScope.error("You can't approve a votd that doesn't exist.");
-            return Results.redirect("/votd/list");
         }
 
-        votdDao.approve(votdId);
-        flashScope.success("Successfully approved: " + votd.getVerses());
         return Results.redirect("/votd/list");
     }
 
     public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
-        if (verseid == null) {
+
+        try {
+            votdDao.delete(verseid);
+            flashScope.success("Successfully deleted Votd.");
+        } catch (IllegalArgumentException e) {
             flashScope.error("You must supply a votd Id.");
-            return Results.redirect("/votd/list");
-        }
-
-        Votd votd = votdDao.findById(verseid);
-
-        if (votd == null) {
+        } catch (EntityDoesNotExistException e) {
             flashScope.error("Tried to delete a Votd that doesn't exist");
-            return Results.redirect("/votd/list");
         }
 
-        votdDao.delete(verseid);
-        flashScope.success("Successfully deleted Votd: " + votd.getVerses());
         return Results.redirect("/votd/list");
     }
 

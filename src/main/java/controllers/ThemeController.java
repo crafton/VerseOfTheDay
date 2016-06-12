@@ -53,11 +53,9 @@ public class ThemeController {
             themeDao.save(theme);
         } catch (IllegalArgumentException e) {
             flashScope.error("A theme has not been submitted");
-            return Results.redirect("/theme/list");
         } catch (EntityAlreadyExistsException e) {
             logger.warn(e.getMessage());
             flashScope.error("Cannot save, that theme already exists.");
-            return Results.redirect("/theme/list");
         }
 
         return Results.redirect("/theme/list");
@@ -67,21 +65,18 @@ public class ThemeController {
 
         try {
             themeDao.delete(themeId);
+            logger.info("Successfully deleted theme.");
+            flashScope.success("Successfully deleted theme.");
         } catch (IllegalArgumentException e) {
             flashScope.error("You must supply a theme Id");
-            return Results.redirect("/theme/list");
         } catch (EntityDoesNotExistException e) {
             logger.warn("Tried to delete a theme that doesn't exist.");
             flashScope.error("No theme found with the supplied ID");
-            return Results.redirect("/theme/list");
         } catch (EntityBeingUsedException e) {
             logger.warn(e.getMessage());
             flashScope.error("This theme is being used by other Votds. You cannot remove it until it is " +
                     "removed from those Votds.");
-            return Results.redirect("/theme/list");
         }
-        logger.info("Successfully deleted theme.");
-        flashScope.success("Successfully deleted theme.");
 
         return Results.redirect("/theme/list");
     }
