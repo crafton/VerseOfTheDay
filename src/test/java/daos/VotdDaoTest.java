@@ -1,5 +1,6 @@
 package daos;
 
+import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import models.Votd;
 import ninja.NinjaDaoTestBase;
@@ -63,6 +64,11 @@ public class VotdDaoTest extends NinjaDaoTestBase {
         assertNull(v1);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void findByIdWhenIdisNull() throws Exception{
+        votdDao.findById(null);
+    }
+
     @Test
     public void findByVerse() throws Exception {
         votdDao.save(votd);
@@ -106,6 +112,41 @@ public class VotdDaoTest extends NinjaDaoTestBase {
     }
 
     @Test
+    public void updateWithNullThemeList() throws Exception {
+
+        themeDao.save(theme);
+        votdDao.save(votd);
+
+        assertNull(votd.getThemes());
+
+        votdDao.update(1L, null, true);
+
+        Votd votd1 = votdDao.findById(1L);
+
+        assertEquals(0, votd1.getThemes().size());
+    }
+
+    @Test(expected = EntityDoesNotExistException.class)
+    public void updateWithFakeId() throws Exception {
+        themeDao.save(theme);
+        votdDao.save(votd);
+
+        assertNull(votd.getThemes());
+
+        votdDao.update(100L, themeList, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateWithNullId() throws Exception {
+        themeDao.save(theme);
+        votdDao.save(votd);
+
+        assertNull(votd.getThemes());
+
+        votdDao.update(null, themeList, true);
+    }
+
+    @Test
     public void delete() throws Exception {
         votdDao.save(votd);
 
@@ -114,6 +155,16 @@ public class VotdDaoTest extends NinjaDaoTestBase {
         votdDao.delete(1L);
 
         assertNull(votdDao.findById(1L));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteWithNullId() throws Exception {
+        votdDao.delete(null);
+    }
+
+    @Test(expected = EntityDoesNotExistException.class)
+    public void deleteWithFakeId() throws Exception {
+        votdDao.delete(100L);
     }
 
     @Test
@@ -130,5 +181,21 @@ public class VotdDaoTest extends NinjaDaoTestBase {
 
         assertTrue(v.isApproved());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void approveWithNullId() throws Exception {
+        votdDao.approve(null);
+    }
+
+    @Test(expected = EntityDoesNotExistException.class)
+    public void approveWithFakeId() throws Exception {
+        votdDao.approve(100L);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void saveIfVotdIsNull() throws Exception{
+        votdDao.save(null);
+    }
+
 
 }

@@ -90,7 +90,7 @@ public class VotdDao {
             Votd votd = findById(votdId);
 
             if (votd == null) {
-                throw new EntityDoesNotExistException("You canot approve a VOTD that does not exist.");
+                throw new EntityDoesNotExistException("You cannot approve a VOTD that does not exist.");
             }
             votd.setApproved(true);
             getEntityManager().persist(votd);
