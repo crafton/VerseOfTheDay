@@ -21,9 +21,6 @@ public class ThemeDao {
     @Inject
     private Provider<EntityManager> entityManagerProvider;
 
-    @Inject
-    Logger logger;
-
     public ThemeDao() {
     }
 
@@ -62,11 +59,10 @@ public class ThemeDao {
             findByName(theme.getThemeName());
             throw new EntityAlreadyExistsException("Cannot save a theme that already exists.");
         }catch(NoResultException e){
-            logger.debug("Theme does not exist, proceeding to save...");
+            //Theme does not exist, go ahead and save
+            theme.setDateCreated(new Timestamp(System.currentTimeMillis()));
+            getEntityManager().persist(theme);
         }
-
-        theme.setDateCreated(new Timestamp(System.currentTimeMillis()));
-        getEntityManager().persist(theme);
     }
 
     @Transactional

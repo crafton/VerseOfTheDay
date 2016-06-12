@@ -3,6 +3,9 @@ package daos;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
+import exceptions.EntityAlreadyExistsException;
+import exceptions.EntityBeingUsedException;
+import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import models.Votd;
 import ninja.NinjaDaoTestBase;
@@ -22,6 +25,7 @@ import static org.junit.Assert.*;
  */
 public class ThemeDaoTest extends NinjaDaoTestBase {
 
+    private VotdDao votdDao;
     private ThemeDao themeDao;
     private Theme theme;
 
@@ -37,6 +41,11 @@ public class ThemeDaoTest extends NinjaDaoTestBase {
         List<Theme> themes = new ArrayList<>();
 
         themes.add(theme);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findByIdWhenIdIsNull() throws Exception{
+        themeDao.findById(null);
     }
 
     @Test
@@ -94,6 +103,55 @@ public class ThemeDaoTest extends NinjaDaoTestBase {
         Theme t1 = themeDao.findById(1L);
 
         assertNull(t1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void saveIfThemeIsNull() throws Exception{
+        themeDao.save(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void saveIfThemeNameisEmpty() throws Exception{
+        Theme theme = new Theme();
+        theme.setThemeName("");
+        theme.setCreatedBy("John Tom");
+        themeDao.save(theme);
+    }
+    @Test(expected = EntityAlreadyExistsException.class)
+    public void saveThemeAlreadyExists() throws Exception{
+        themeDao.save(theme);
+
+        themeDao.save(theme);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteThemeWithNullID() throws Exception{
+        themeDao.delete(null);
+    }
+
+    @Test(expected = EntityDoesNotExistException.class)
+    public void deleteThemeWithNonExistent() throws Exception {
+        themeDao.delete(1L);
+    }
+
+    @Test(expected = EntityBeingUsedException.class)
+    public void deleteThemeBeingUsed() throws Exception{
+
+        themeDao.save(theme);
+
+        votdDao = getInstance(VotdDao.class);
+        Votd votd = new Votd();
+        votd.setVerses("Matthew 6:1-8");
+        votd.setCreatedBy("John Smith");
+        votd.setModifiedBy("Jack Thepumpkinking");
+        List<Theme> themeList = new ArrayList<>();
+        themeList.add(theme);
+
+        votd.setThemes(themeList);
+        votdDao.save(votd);
+
+        themeDao.delete(1L);
     }
 
 }
