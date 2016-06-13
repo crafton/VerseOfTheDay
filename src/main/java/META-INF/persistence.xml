@@ -10,7 +10,7 @@
       <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
 
             <property name="hibernate.show_sql" value="true" />
-            <property name="hibernate.format_sql" value="true" /> 
+            <property name="hibernate.format_sql" value="false" /> 
             
             <!-- Connection Pooling settings -->
             <property name="hibernate.connection.provider_class"

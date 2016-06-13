@@ -1,11 +1,18 @@
 package models;
 
 import java.io.Serializable;
-import java.lang.String;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Entity implementation class for Entity: CampaignTest
@@ -15,7 +22,8 @@ import javax.persistence.*;
 public class Campaign implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GeneratedValue(generator = "system-uuid")
 	private String campaignId;
 	private Date startDate;
 	private Date endDate;
@@ -49,6 +57,18 @@ public class Campaign implements Serializable {
 	}
 
 	public Date getEndDate() {
+//		 SimpleDateFormat htmlFormat = new SimpleDateFormat("dd/MM/yyyy");
+//		 SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
+//		 Date convertedCurrentDate;
+//		try {
+//			convertedCurrentDate = dbFormat.parse(dbFormat.format(endDate));
+//			String date=htmlFormat.format(convertedCurrentDate );
+//			endDate = htmlFormat.parse(date);
+//			
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+		 
 		return this.endDate;
 	}
 

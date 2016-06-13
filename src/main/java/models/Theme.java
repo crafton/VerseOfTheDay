@@ -18,8 +18,10 @@ public class Theme implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String themeId;
 	private String themeName;
+
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "themeList")
 	private List<Campaign> campaignList;
+	
 	private static final long serialVersionUID = 1L;
 
 	public Theme() {
