@@ -17,6 +17,7 @@ import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.h2.jdbc.JdbcSQLException;
 import org.slf4j.Logger;
+import utilities.Config;
 import utilities.ControllerUtils;
 
 import javax.persistence.*;
@@ -31,11 +32,11 @@ import java.util.List;
 public class ThemeController {
 
     @Inject
-    ControllerUtils controllerUtils;
-    @Inject
     ThemeDao themeDao;
     @Inject
     Logger logger;
+    @Inject
+    Config config;
 
     public Result themes() {
         List<Theme> themes = themeDao.findAll();
@@ -44,7 +45,7 @@ public class ThemeController {
                 .ok()
                 .html()
                 .render("themes", themes)
-                .render("maxCols", controllerUtils.getThemesMaxCols());
+                .render("maxCols", config.getThemesMaxCols());
     }
 
     public Result saveTheme(Theme theme, FlashScope flashScope) {

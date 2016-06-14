@@ -16,6 +16,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(NinjaRunner.class)
 public class ControllerUtilsTest {
+
     @Inject
     ControllerUtils controllerUtils;
     String verses = "Matthew 6:1-5";
@@ -23,13 +24,6 @@ public class ControllerUtilsTest {
     String badVerses = "Random String";
     String versesTooLong = "Matthew 6:1-20";
     String goodFormatBadVerse = "Bob 1:4-8";
-
-    @Test
-    public void getThemesMaxCols() throws Exception {
-        Integer colValue = controllerUtils.getThemesMaxCols();
-
-        assertNotNull(colValue);
-    }
 
     @Test
     public void verifyVerses() throws Exception {
