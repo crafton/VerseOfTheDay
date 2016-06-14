@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.text.html.Option;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -31,48 +32,22 @@ import java.util.Optional;
  */
 public class ControllerUtils {
 
-    private String bibleSearchKey;
-    private Integer maxVerses;
-    private Integer themesMaxCols;
+    @Inject
+    Config config;
 
     @Inject
     VotdDao votdDao;
 
-
     final static Logger logger = LoggerFactory.getLogger(ControllerUtils.class);
 
-    @Inject
-    private ControllerUtils(NinjaProperties ninjaProperties) {
-        Optional<Integer> optionalMaxVerses = Optional.of(ninjaProperties.getIntegerWithDefault("votd.maxverses", 0));
-        this.maxVerses = optionalMaxVerses.get();
+    public ControllerUtils() {
 
-        Optional<String> optionalBibleKey = Optional.ofNullable(ninjaProperties.get("biblesearch.key"));
-        if (optionalBibleKey.isPresent()) {
-            this.bibleSearchKey = optionalBibleKey.get();
-        } else {
-            this.bibleSearchKey = "";
-        }
-
-        Optional<Integer> optionalThemeMaxCols = Optional.of(ninjaProperties.getIntegerWithDefault("themes.maxcols", 7));
-        this.themesMaxCols = optionalThemeMaxCols.get();
     }
 
-    /**
-     * Retrieve the maximum number of verses allowed.
-     *
-     * @return
-     */
-    private Integer getMaxVerses() {
-        return this.maxVerses;
-    }
-
-    public Integer getThemesMaxCols() {
-        return this.themesMaxCols;
-    }
 
     public String verifyVerses(String verseSubmitted) {
 
-        Integer maxVerses = getMaxVerses();
+        Integer maxVerses = config.getMaxVerses();
 
         if (maxVerses == 0) {
             logger.error("Max verses has not been set in application.conf");
@@ -129,7 +104,7 @@ public class ControllerUtils {
             Integer startVerseInt = Integer.parseInt(startVerseStr);
             Integer endVerseInt = Integer.parseInt(endVerseStr);
 
-            return this.maxVerses > Math.abs(endVerseInt - startVerseInt);
+            return config.getMaxVerses() > Math.abs(endVerseInt - startVerseInt);
 
         } catch (NumberFormatException ne) {
             logger.info("Invalid integer formats submitted within verse range.");
@@ -183,7 +158,7 @@ public class ControllerUtils {
      * @return Verse text.
      */
     public String restGetVerses(String verseRange) {
-        HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(this.bibleSearchKey, "");
+        HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(config.getBibleSearchKey(), "");
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.register(authenticationFeature)
                 .target("https://bibles.org/v2/passages.js");
