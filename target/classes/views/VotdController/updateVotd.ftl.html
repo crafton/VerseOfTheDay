@@ -1,0 +1,67 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Update Votds">
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">Update VOTD themes</h2>
+        </div>
+        <div class="panel-body">
+            <form action="/votd/saveupdate" method="post" class="form-horizontal" data-toggle="validator" role="form">
+                <div class="form-group">
+                    <label for="verseToUpdate" class="col-sm-2 control-label">Verses</label>
+                    <div class="col-sm-10">
+                        <span id="verseToUpdate">${votd.getVerses()}
+                            <i id="verseDetails" data-toggle="fullverse" data-trigger="hover"
+                               data-html="true" data-content="${verseText}"
+                               class="fa fa-info-circle" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="themes" class="col-sm-2 control-label">Themes</label>
+                    <div class="col-sm-4">
+                        <select id="themes" name="themes" multiple="multiple">
+                            <#list themes as theme>
+                                <#if votd.getThemes()?seq_contains(theme.getThemeName())>
+                                    <option value="${theme.getId()}" selected>${theme.getThemeName()}</option>
+                                    <#else>
+                                        <option value="${theme.getId()}">${theme.getThemeName()}</option>
+                                </#if>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="isApproved" class="col-sm-2 control-label">Status</label>
+                    <div class="col-sm-4">
+                        <#if votd.isApproved()>
+                        <input data-on-text="Approved" data-off-text="Pending"
+                               data-on-color="success" data-off-color="warning"
+                               type="checkbox" name="isApproved" id="isApproved" checked>
+                        <#else>
+                            <input data-on-text="Approved" data-off-text="Pending"
+                                   data-on-color="success" data-off-color="warning"
+                                   type="checkbox" name="isApproved" id="isApproved">
+                        </#if>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input hidden name="verseid" id="verseid" value="${votd.getId()}">
+                        <button id="formSubmitButton" class="btn btn-default" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        $("[name='isApproved']").bootstrapSwitch();
+    </script>
+    <script>
+        $(function () {
+            $('[data-toggle="fullverse"]').popover()
+        })
+    </script>
+    <script type="text/javascript" src="/assets/js/votd.js"></script>
+</@layout.myLayout>

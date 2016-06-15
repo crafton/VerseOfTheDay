@@ -1,0 +1,32 @@
+/* Add additional stylesheets below
+-------------------------------------------------- */
+
+.panel {
+    margin-top: 30px;
+}
+
+#loadingDiv {
+    width: 100px;
+    height: 100px;
+    margin: auto;
+}
+
+h4#clash{
+    padding-top: 30px;
+}
+
+.themeText {
+    padding-right: 10px;
+}
+
+#verseToUpdate {
+    padding-top: 7px;
+    margin-bottom: 0;
+    float: left;
+    font-weight: bold;
+}
+
+#verseToUpdate .popover{
+    max-width: 80%;
+    overflow: auto;
+}
