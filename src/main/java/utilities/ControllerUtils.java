@@ -1,9 +1,6 @@
 package utilities;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -13,6 +10,7 @@ import ninja.Results;
 import ninja.jpa.UnitOfWork;
 import ninja.utils.MimeTypes;
 import ninja.utils.NinjaProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
@@ -162,7 +160,7 @@ public class ControllerUtils {
      * @param verseRange
      * @return Verse text.
      */
-    public String restGetVerses(String verseRange) {
+    public String restGetVerses(String verseRange) throws JsonSyntaxException {
         HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(config.getBibleSearchKey(), "");
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.register(authenticationFeature)
@@ -173,8 +171,13 @@ public class ControllerUtils {
                 .queryParam("version", "eng-ESV")
                 .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
 
-        JsonParser parser = new JsonParser();
-        JsonObject verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
+        JsonObject verseJsonObject;
+        try {
+            JsonParser parser = new JsonParser();
+            verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
 
         JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")
@@ -203,29 +206,31 @@ public class ControllerUtils {
     }
 
     /**
-     *
      * @param accessToken
      * @return
      */
-    public JsonObject auth0GetUser(String accessToken){
+    public JsonObject auth0GetUser(String accessToken) throws JsonSyntaxException {
         Client client = ClientBuilder.newClient();
-        String auth0User = client.target("https://"+config.getAuth0Domain()+"/userinfo")
+        String auth0User = client.target("https://" + config.getAuth0Domain() + "/userinfo")
                 .request()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .get(String.class);
 
         JsonParser parser = new JsonParser();
-        JsonObject userJsonObject = parser.parse(auth0User).getAsJsonObject();
-
+        JsonObject userJsonObject;
+        try {
+            userJsonObject = parser.parse(auth0User).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
         return userJsonObject;
     }
 
     /**
-     *
      * @param code
      * @return
      */
-    public Map<String, String> auth0GetToken(String code){
+    public Map<String, String> auth0GetToken(String code) throws JsonSyntaxException {
         Client client = ClientBuilder.newClient();
 
         Map<String, String> auth0TokenRequest = new HashMap<>();
@@ -237,12 +242,17 @@ public class ControllerUtils {
 
         String auth0TokenRequestString = new Gson().toJson(auth0TokenRequest);
 
-        Response response = client.target("https://"+config.getAuth0Domain()+"/oauth/token")
+        Response response = client.target("https://" + config.getAuth0Domain() + "/outh/token")
                 .request()
                 .post(Entity.entity(auth0TokenRequestString, MediaType.APPLICATION_JSON));
 
-        JsonParser parser = new JsonParser();
-        JsonObject jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
+        JsonObject jsonResponse;
+        try {
+            JsonParser parser = new JsonParser();
+            jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
 
         String accessToken = jsonResponse
                 .getAsJsonObject()

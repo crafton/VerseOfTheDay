@@ -1,17 +1,12 @@
 package controllers;
 
-import com.auth0.Auth0ServletCallback;
-import com.auth0.Auth0User;
-import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
 
 import org.slf4j.Logger;
-import us.monoid.json.JSONObject;
 import utilities.Config;
 import utilities.ControllerUtils;
 
