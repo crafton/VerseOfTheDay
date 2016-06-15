@@ -1,5 +1,6 @@
 package utilities;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -10,22 +11,26 @@ import daos.VotdDao;
 import models.Votd;
 import ninja.Results;
 import ninja.jpa.UnitOfWork;
+import ninja.utils.MimeTypes;
 import ninja.utils.NinjaProperties;
+import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.activation.MimeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.text.html.Option;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.ws.rs.core.Response;
+import java.util.*;
 
 /**
  * Created by Crafton Williams on 27/03/2016.
@@ -195,6 +200,65 @@ public class ControllerUtils {
 
         return "<h3>" + verseTitle + "</h3>" + verseText;
 
+    }
+
+    /**
+     *
+     * @param accessToken
+     * @return
+     */
+    public JsonObject auth0GetUser(String accessToken){
+        Client client = ClientBuilder.newClient();
+        String auth0User = client.target("https://"+config.getAuth0Domain()+"/userinfo")
+                .request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .get(String.class);
+
+        JsonParser parser = new JsonParser();
+        JsonObject userJsonObject = parser.parse(auth0User).getAsJsonObject();
+
+        return userJsonObject;
+    }
+
+    /**
+     *
+     * @param code
+     * @return
+     */
+    public Map<String, String> auth0GetToken(String code){
+        Client client = ClientBuilder.newClient();
+
+        Map<String, String> auth0TokenRequest = new HashMap<>();
+        auth0TokenRequest.put("client_id", config.getAuth0ClientId());
+        auth0TokenRequest.put("client_secret", config.getAuth0ClientSecret());
+        auth0TokenRequest.put("redirect_uri", config.getAuth0Callback());
+        auth0TokenRequest.put("code", code);
+        auth0TokenRequest.put("grant_type", "authorization_code");
+
+        String auth0TokenRequestString = new Gson().toJson(auth0TokenRequest);
+
+        Response response = client.target("https://"+config.getAuth0Domain()+"/oauth/token")
+                .request()
+                .post(Entity.entity(auth0TokenRequestString, MediaType.APPLICATION_JSON));
+
+        JsonParser parser = new JsonParser();
+        JsonObject jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
+
+        String accessToken = jsonResponse
+                .getAsJsonObject()
+                .get("access_token")
+                .getAsString();
+
+        String idToken = jsonResponse
+                .getAsJsonObject()
+                .get("id_token")
+                .getAsString();
+
+        Map<String, String> userTokens = new HashMap<>();
+        userTokens.put("access_token", accessToken);
+        userTokens.put("id_token", idToken);
+
+        return userTokens;
     }
 
     /**

@@ -17,6 +17,7 @@ public class Config {
     private String auth0Domain;
     private String auth0Callback;
     private String auth0Logout;
+    private String auth0ClientSecret;
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {
@@ -60,6 +61,13 @@ public class Config {
         } else {
             this.auth0Logout = "";
         }
+        Optional<String> optionalAuth0ClientSecret = Optional.of(ninjaProperties.get("auth0.clientsecret"));
+        if (optionalAuth0ClientSecret.isPresent()) {
+            this.auth0ClientSecret = optionalAuth0ClientSecret.get();
+        } else {
+            this.auth0ClientSecret = "";
+        }
+
     }
 
     public String getBibleSearchKey() {
@@ -88,5 +96,9 @@ public class Config {
 
     public String getAuth0Logout() {
         return auth0Logout;
+    }
+
+    public String getAuth0ClientSecret() {
+        return auth0ClientSecret;
     }
 }

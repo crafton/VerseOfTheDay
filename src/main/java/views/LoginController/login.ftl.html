@@ -6,16 +6,13 @@
 
         var lock = new Auth0Lock('${clientid}', '${domain}');
 
-        function signin() {
-            lock.show({
-                callbackURL: '${callback}'
-                , responseType: 'code'
-                , authParams: {
-                    scope: 'openid email'  // Learn about scopes: https://auth0.com/docs/scopes
-                }
-            });
-        }
+        lock.show({
+            callbackURL: '${callback}'
+            , responseType: 'code'
+            , authParams: {
+                scope: 'openid email'  // Learn about scopes: https://auth0.com/docs/scopes
+            }
+        });
     </script>
-    <button onclick="window.signin();">Login</button>
 
 </@layout.myLayout>

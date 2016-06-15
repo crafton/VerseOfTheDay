@@ -60,6 +60,7 @@ public class Routes implements ApplicationRoutes {
         */
 
         router.GET().route("/login").with(LoginController.class, "login");
+        router.GET().route("/callback").with(LoginController.class, "callback");
 
 
         ///////////////////////////////////////////////////////////////////////
