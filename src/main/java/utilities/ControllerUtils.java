@@ -242,7 +242,7 @@ public class ControllerUtils {
 
         String auth0TokenRequestString = new Gson().toJson(auth0TokenRequest);
 
-        Response response = client.target("https://" + config.getAuth0Domain() + "/outh/token")
+        Response response = client.target("https://" + config.getAuth0Domain() + "/oauth/token")
                 .request()
                 .post(Entity.entity(auth0TokenRequestString, MediaType.APPLICATION_JSON));
 
