@@ -1,25 +1,10 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
-#tblHeaderId {
+#campaignListTbl {
 	width: 100%;
 }
 
-#tblContentId {
-	width: 100%;
-	overflow: auto;
-}
-
-.tbl-header {
-	background-color: rgba(255, 255, 255, 0.3);
-}
-
-.tbl-content {
-	height: 400px;
-	overflow-x: auto;
-	margin-top: 0px;
-}
-
-#tblHeaderId th {
+#campaignListTbl th {
 	padding: 10px;
 	text-align: left;
 	font-weight: 700;
@@ -31,7 +16,7 @@
 	list-style: 12px;
 }
 
-#tblContentId td {
+#campaignListTbl td {
 	padding: 15px;
 	text-align: left;
 	font-size: 14px;
@@ -41,40 +26,13 @@
 	list-style: 12px;
 }
 
-.table-hover tbody tr:hover td {
-	background-color: #87CEEB;
-}
-
-
-::-webkit-scrollbar {
-	width: 8px;
-}
-
-::-webkit-scrollbar-track {
-	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
-
-::-webkit-scrollbar-thumb {
-	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
 
 /*
-For Campaign Form */
-#campaignModalHeader {
-	padding: 9px 15px;
-	border-bottom: 1px solid #eee;
-	background-color: #0480be;
-	-webkit-border-top-left-radius: 5px;
-	-webkit-border-top-right-radius: 5px;
-	-moz-border-radius-topleft: 5px;
-	-moz-border-radius-topright: 5px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	color: rgba(255, 255, 255, 1);
-}
-
+For Add Campaign Form */
 .campaignForm {
 	font-size: 14px;
 	font-family: inherit;
+	margin-left: 15px;
+	margin-top: 5px;
 	color: #1260AF;
 }

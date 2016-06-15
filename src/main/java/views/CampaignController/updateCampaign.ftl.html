@@ -7,15 +7,15 @@
 	</div>
 
 	<form role="form" action="/campaign/saveUpdateCampaign" method="post" id="updateForm">
-		<div class="form-group">
-			<label for="campaignName" class="campaignForm">Campaign Name</label>
-			<input type="text" class="form-control input_full" id="campaignName"
+		<div class="form-group campaignForm">
+			<label for="campaignName">Campaign Name</label>
+			<input type="text" class="form-control" id="campaignName"
 				name="campaignName" placeholder="Enter Campaign Name"
 				value="${campaign.campaignName}"><input type="hidden" id="campaignId"
 				name="campaignId" value="${campaign.campaignId}">
 		</div>
-		<div class="form-group">
-			<label for="themeList" class="campaignForm">Themes</label> <select
+		<div class="form-group campaignForm ">
+			<label for="themeList">Themes</label> <select
 				id="themeList" name="themeList" multiple="multiple"
 				class="form-control"> <#list themes as theme> <#if
 				campaign.getThemeList()?seq_contains(theme.getThemeName())>
@@ -26,16 +26,16 @@
 			</select>
 		</div>
 
-		<div class="form-group">
-			<label for="startDate" class="campaignForm">Start Date</label>
+		<div class="form-group campaignForm ">
+			<label for="startDate">Start Date</label>
 			<div class='input-group date'>
-				<input type="date" class="form-control input_full" id="startDate"
+				<input type="date" class="form-control" id="startDate"
 					name="startDate" value='${campaign.startDate?string("yyyy-MM-dd")}' />
 				</span>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="endDate" class="campaignForm">End Date</label>
+		<div class="form-group campaignForm ">
+			<label for="endDate">End Date</label>
 			<div class='input-group date'>
 				<input type="date" class="form-control" id="endDate" name="endDate"
 					value='${campaign.endDate?string("yyyy-MM-dd")}' /> </span>
@@ -43,7 +43,7 @@
 		</div>
 		<div class="panel-footer">
 			<button type="submit" class="btn btn-primary btn-md ">Save</button>
-			&nbsp; <a aria-hidden="true" class="btn btn-warning btn-md "
+			&nbsp; <a aria-hidden="true" class="btn btn-default btn-md "
 				href="/campaign/list">Cancel</a>
 			<div class="clearfix"></div>
 		</div>
