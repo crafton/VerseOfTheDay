@@ -8,8 +8,10 @@ import daos.ThemeDao;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
+import filters.LoginFilter;
 import models.Theme;
 import models.Votd;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.jpa.UnitOfWork;
@@ -28,7 +30,7 @@ import java.util.List;
 /**
  * Created by Crafton Williams on 28/05/2016.
  */
-
+@FilterWith(LoginFilter.class)
 public class ThemeController {
 
     @Inject

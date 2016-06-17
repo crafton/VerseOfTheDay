@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import daos.ThemeDao;
 import daos.VotdDao;
 import exceptions.EntityDoesNotExistException;
+import filters.LoginFilter;
 import models.Theme;
 import models.Votd;
 import ninja.Context;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import com.google.inject.Singleton;
@@ -22,7 +24,7 @@ import java.util.List;
  * Created by Crafton Williams on 19/03/2016.
  */
 
-@Singleton
+@FilterWith(LoginFilter.class)
 public class VotdController {
 
     @Inject

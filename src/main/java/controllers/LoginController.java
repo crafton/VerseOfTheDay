@@ -74,6 +74,6 @@ public class LoginController {
         session.clear();
 
         /*IdP logout and redirect*/
-        return Results.redirect("https://" + config.getAuth0Domain() + "/v2/logout?returnTo=http://localhost:8080");
+        return Results.redirect("https://" + config.getAuth0Domain() + "/v2/logout?returnTo=http://localhost:8080/");
     }
 }
