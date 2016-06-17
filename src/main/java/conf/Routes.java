@@ -33,7 +33,6 @@ public class Routes implements ApplicationRoutes {
     public void init(Router router) {
 
         router.GET().route("/").with(ApplicationController.class, "index");
-        router.GET().route("/hello_world.json").with(ApplicationController.class, "helloWorldJson");
 
         /**
          * Routes for VOTD CRUD
@@ -56,11 +55,12 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/theme/delete/{theme}").with(ThemeController.class, "deleteTheme");
 
         /**
-         * Routes for Login
+         * Routes for Login/Logout
         */
 
         router.GET().route("/login").with(LoginController.class, "login");
         router.GET().route("/callback").with(LoginController.class, "callback");
+        router.GET().route("/logout").with(LoginController.class, "logout");
 
 
         ///////////////////////////////////////////////////////////////////////

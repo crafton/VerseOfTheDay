@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Created by Crafton Williams on 28/05/2016.
  */
-@Singleton
+
 public class ThemeController {
 
     @Inject
