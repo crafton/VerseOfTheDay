@@ -17,15 +17,12 @@
 package conf;
 
 
-import controllers.LoginController;
-import controllers.ThemeController;
-import controllers.VotdController;
+import controllers.*;
 import models.Theme;
 import models.Votd;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
-import controllers.ApplicationController;
 
 public class Routes implements ApplicationRoutes {
 
@@ -38,6 +35,7 @@ public class Routes implements ApplicationRoutes {
          * Routes for VOTD CRUD
          */
         router.GET().route("/votd/list").with(VotdController.class, "viewVotds");
+        router.GET().route("/votd/allvotds").with(VotdController.class, "allVotds");
         router.GET().route("/votd/create").with(VotdController.class, "createVotd");
         router.GET().route("/votd/getverse/{verses}").with(VotdController.class, "getVerse");
         router.POST().route("/votd/save").with(VotdController.class, "saveVotd");
@@ -62,6 +60,11 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/callback").with(LoginController.class, "callback");
         router.GET().route("/logout").with(LoginController.class, "logout");
 
+
+        /**
+         * Routes for User Mgmt
+         */
+        router.GET().route("/user/update").with(UserController.class, "updateUser");
 
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)

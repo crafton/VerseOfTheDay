@@ -1,5 +1,7 @@
 package controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import daos.ThemeDao;
 import daos.VotdDao;
@@ -18,7 +20,9 @@ import org.slf4j.Logger;
 import utilities.ControllerUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Crafton Williams on 19/03/2016.
@@ -38,13 +42,36 @@ public class VotdController {
 
     public Result viewVotds() {
 
+        return Results
+                .ok()
+                .html();
+    }
+
+    public Result allVotds(Context context) {
+
+        Integer draw = Integer.parseInt(context.getParameter("draw"));
+        Integer start = Integer.parseInt(context.getParameter("start"));
+        Integer length = Integer.parseInt(context.getParameter("length"));
+        String search = context.getParameter("search[value]");
+
+
         List<Votd> votds = votdDao.findAll();
+        //TODO: convert votd to array of table values
+
+
+        Map<String, Object> votdMap = new HashMap<>();
+        votdMap.put("draw", 1);
+        votdMap.put("recordsTotal", votds.size());
+        votdMap.put("recordsFiltered", votds.size());
+        votdMap.put("data", votds);
+
 
         return Results
                 .ok()
-                .html()
-                .render("votds", votds);
+                .json()
+                .render(votdMap);
     }
+
 
     public Result createVotd() {
         List<Theme> themes = themeDao.findAll();
