@@ -3,6 +3,7 @@ package controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import daos.ThemeDao;
 import daos.VotdDao;
 import exceptions.EntityDoesNotExistException;
@@ -19,6 +20,8 @@ import ninja.session.FlashScope;
 import org.slf4j.Logger;
 import utilities.ControllerUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +43,9 @@ public class VotdController {
     @Inject
     Logger logger;
 
+    @Inject
+    Provider<EntityManager> entityManagerProvider;
+
     public Result viewVotds() {
 
         return Results
@@ -49,6 +55,20 @@ public class VotdController {
 
     public Result allVotds(Context context) {
 
+        String[] columns = new String[8];
+        columns[0] = "verses";
+        columns[1] = "themes";
+        columns[2] = "status";
+        columns[3] = "approve";
+        columns[4] = "createdby";
+        columns[5] = "modifiedby";
+        columns[6] = "";
+        columns[7] = "";
+
+     /*   EntityManager entityManager = entityManagerProvider.get();
+        Query q = entityManager.createNativeQuery("SELECT ");*/
+
+
         Integer draw = Integer.parseInt(context.getParameter("draw"));
         Integer start = Integer.parseInt(context.getParameter("start"));
         Integer length = Integer.parseInt(context.getParameter("length"));
@@ -56,14 +76,32 @@ public class VotdController {
 
 
         List<Votd> votds = votdDao.findAll();
-        //TODO: convert votd to array of table values
+        String[] votdFields = new String[0];
+        List<String[]> votdData = new ArrayList<>();
 
+        for (Votd votd : votds) {
+            String votdApproved = "";
+            String shouldApproveVotd = "";
+            if (votd.isApproved()) {
+                votdApproved = "Approved";
+            } else {
+                shouldApproveVotd = "<a class=\"fa fa-thumbs-up\" href=\"/votd/approve/" + votd.getId() + "\" aria-hidden=\"true\"></a>";
+                votdApproved = "Pending";
+            }
+
+            votdFields = new String[]{votd.getVerses(), votd.getThemesAsString(), votdApproved,
+                    shouldApproveVotd, votd.getCreatedBy(), votd.getModifiedBy(),
+                    "<a class=\"fa fa-trash\" data-placement=\"top\" data-toggle=\"confirmation\" aria-hidden=\"true\" href=\"/votd/delete/" + votd.getId() + "\"></a>",
+                    "<a class=\"fa fa-pencil\" aria-hidden=\"true\" href=\"/votd/update/" + votd.getId() + "\"></a>"};
+
+            votdData.add(votdFields);
+        }
 
         Map<String, Object> votdMap = new HashMap<>();
-        votdMap.put("draw", 1);
-        votdMap.put("recordsTotal", votds.size());
-        votdMap.put("recordsFiltered", votds.size());
-        votdMap.put("data", votds);
+        votdMap.put("draw", draw);
+        votdMap.put("recordsTotal", votdData.size());
+        votdMap.put("recordsFiltered", votdData.size());
+        votdMap.put("data", votdData);
 
 
         return Results
@@ -132,7 +170,7 @@ public class VotdController {
             votd.setThemes(themeList);
             votdDao.save(votd);
             flashScope.success("Successfully created a new VoTD entry.");
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             flashScope.error("Something strange has happened. Contact the administrator.");
         }
         return Results.redirect("/votd/create");

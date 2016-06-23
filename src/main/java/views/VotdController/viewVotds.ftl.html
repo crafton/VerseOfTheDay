@@ -1,7 +1,11 @@
 <#import "../layout/defaultLayout.ftl.html" as layout>
     <@layout.myLayout "Votds">
 
-        <table id="votdTable" class="table table-responsive">
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
+
+    <table id="votdTable" class="table table-responsive">
             <thead>
             <tr>
                 <th>Verses</th>
@@ -23,6 +27,7 @@
             }
         });
     </script>
+
     <script>
         $(document).ready(function () {
             $('#votdTable').DataTable({

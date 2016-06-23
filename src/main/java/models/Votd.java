@@ -3,6 +3,7 @@ package models;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Crafton Williams on 23/04/2016.
@@ -52,6 +53,12 @@ public class Votd {
 
     public List<Theme> getThemes() {
         return themes;
+    }
+
+    public String getThemesAsString(){
+        return themes.stream()
+                .map(Theme::getThemeName)
+                .collect(Collectors.joining(", "));
     }
 
     public void setThemes(List<Theme> themes) {
