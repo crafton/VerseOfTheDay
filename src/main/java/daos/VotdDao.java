@@ -6,6 +6,7 @@ import com.google.inject.persist.Transactional;
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import models.Votd;
+import utilities.Config;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -22,6 +23,9 @@ public class VotdDao {
 
     @Inject
     private Provider<EntityManager> entityManagerProvider;
+
+    @Inject
+    Config config;
 
     public VotdDao() {
     }
@@ -58,6 +62,36 @@ public class VotdDao {
 
         return (List<String>) q.getResultList();
     }
+
+    @Transactional
+    public List<Votd> wildFind(String param, Integer start, Integer length) {
+        Query q = getEntityManager().createNamedQuery("Votd.wildFind");
+        q.setParameter("verse", param + "%");
+        q.setParameter("modifiedby", param + "%");
+        q.setParameter("createdby", param + "%");
+
+        if (param.contentEquals(config.APPROVED)) {
+            q.setParameter("isapproved", true);
+        } else if (param.contentEquals(config.PENDING)) {
+            q.setParameter("isapproved", false);
+        } else{
+            q.setParameter("isapproved", null);
+        }
+        q.setFirstResult(start);
+        q.setMaxResults(length);
+
+        return (List<Votd>) q.getResultList();
+    }
+
+    @Transactional
+    public List<Votd> findAllWithLimit(Integer start, Integer length) {
+        Query q = getEntityManager().createNamedQuery("Votd.findAll");
+        q.setFirstResult(start);
+        q.setMaxResults(length);
+
+        return (List<Votd>) q.getResultList();
+    }
+
 
     @Transactional
     public void update(Long votdId, List<Theme> themes, boolean votdStatus)

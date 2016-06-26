@@ -17,7 +17,9 @@ import ninja.Results;
 import com.google.inject.Singleton;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import utilities.Config;
 import utilities.ControllerUtils;
 
 import javax.persistence.EntityManager;
@@ -42,6 +44,8 @@ public class VotdController {
     ThemeDao themeDao;
     @Inject
     Logger logger;
+    @Inject
+    Config config;
 
     @Inject
     Provider<EntityManager> entityManagerProvider;
@@ -74,33 +78,25 @@ public class VotdController {
         Integer length = Integer.parseInt(context.getParameter("length"));
         String search = context.getParameter("search[value]");
 
+        List<Votd> votds = new ArrayList<>();
+        Integer recordsTotal = 0;
+        Integer recordsFiltered = 0;
 
-        List<Votd> votds = votdDao.findAll();
-        String[] votdFields = new String[0];
-        List<String[]> votdData = new ArrayList<>();
+        votds = votdDao.findAllWithLimit(start, length);
+        List<String[]> votdData = controllerUtils.generateDataTableResults(votds);
+        recordsTotal = votdData.size();
+        recordsFiltered = recordsTotal;
 
-        for (Votd votd : votds) {
-            String votdApproved = "";
-            String shouldApproveVotd = "";
-            if (votd.isApproved()) {
-                votdApproved = "Approved";
-            } else {
-                shouldApproveVotd = "<a class=\"fa fa-thumbs-up\" href=\"/votd/approve/" + votd.getId() + "\" aria-hidden=\"true\"></a>";
-                votdApproved = "Pending";
-            }
-
-            votdFields = new String[]{votd.getVerses(), votd.getThemesAsString(), votdApproved,
-                    shouldApproveVotd, votd.getCreatedBy(), votd.getModifiedBy(),
-                    "<a class=\"fa fa-trash\" data-placement=\"top\" data-toggle=\"confirmation\" aria-hidden=\"true\" href=\"/votd/delete/" + votd.getId() + "\"></a>",
-                    "<a class=\"fa fa-pencil\" aria-hidden=\"true\" href=\"/votd/update/" + votd.getId() + "\"></a>"};
-
-            votdData.add(votdFields);
+        if(!StringUtils.isEmpty(search)){
+            votds = votdDao.wildFind(search, start, length);
+            votdData = controllerUtils.generateDataTableResults(votds);
+            recordsFiltered = votdData.size();
         }
 
         Map<String, Object> votdMap = new HashMap<>();
         votdMap.put("draw", draw);
-        votdMap.put("recordsTotal", votdData.size());
-        votdMap.put("recordsFiltered", votdData.size());
+        votdMap.put("recordsTotal", recordsTotal);
+        votdMap.put("recordsFiltered", recordsFiltered);
         votdMap.put("data", votdData);
 
 

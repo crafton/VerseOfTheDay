@@ -19,6 +19,9 @@ public class Config {
     private String auth0Logout;
     private String auth0ClientSecret;
 
+    public final String APPROVED = "Approved";
+    public final String PENDING = "Pending";
+
     @Inject
     private Config(NinjaProperties ninjaProperties) {
         Optional<Integer> optionalMaxVerses = Optional.of(ninjaProperties.getIntegerWithDefault("votd.maxverses", 0));
