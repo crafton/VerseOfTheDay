@@ -6,26 +6,29 @@
     <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
 
     <table id="votdTable" class="table table-responsive">
-            <thead>
-            <tr>
-                <th>Verses</th>
-                <th>Themes</th>
-                <th>Status</th>
-                <th>Approve</th>
-                <th>Created By</th>
-                <th>Modified By</th>
-                <th></th>
-                <th></th>
-            </tr>
-            </thead>
-        </table>
+        <thead>
+        <tr>
+            <th>Verses</th>
+            <th>Themes</th>
+            <th>Status</th>
+            <th>Approve</th>
+            <th>Created By</th>
+            <th>Modified By</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
 
     <script>
-        $('[data-toggle="confirmation"]').confirmation({
-            href: function(elem){
+
+        $('#votdTable').confirmation({
+            selector: '[data-toggle="confirmation"]',
+            href: function (elem) {
                 return $(elem).attr('href');
             }
         });
+
     </script>
 
     <script>
