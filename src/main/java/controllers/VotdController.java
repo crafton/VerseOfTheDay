@@ -57,21 +57,7 @@ public class VotdController {
                 .html();
     }
 
-    public Result allVotds(Context context) {
-
-        String[] columns = new String[8];
-        columns[0] = "verses";
-        columns[1] = "themes";
-        columns[2] = "status";
-        columns[3] = "approve";
-        columns[4] = "createdby";
-        columns[5] = "modifiedby";
-        columns[6] = "";
-        columns[7] = "";
-
-     /*   EntityManager entityManager = entityManagerProvider.get();
-        Query q = entityManager.createNativeQuery("SELECT ");*/
-
+    public Result displayVotdData(Context context) {
 
         Integer draw = Integer.parseInt(context.getParameter("draw"));
         Integer start = Integer.parseInt(context.getParameter("start"));
@@ -79,20 +65,14 @@ public class VotdController {
         String search = context.getParameter("search[value]");
 
         List<Votd> votds = new ArrayList<>();
-        Integer recordsTotal = 0;
-        Integer recordsFiltered = 0;
+        Integer recordsTotal = votdDao.getTotalRecords().intValue();
 
-        votds = votdDao.findAllWithLimit(start, length);
+        /*Retrieve records and build array of data to return*/
+        votds = votdDao.wildFind(search, start, length);
+        Integer recordsFiltered = votdDao.countFilteredRecords(search).intValue();
         List<String[]> votdData = controllerUtils.generateDataTableResults(votds);
-        recordsTotal = votdData.size();
-        recordsFiltered = recordsTotal;
 
-        if(!StringUtils.isEmpty(search)){
-            votds = votdDao.wildFind(search, start, length);
-            votdData = controllerUtils.generateDataTableResults(votds);
-            recordsFiltered = votdData.size();
-        }
-
+        /*Format data for ajax callback processing*/
         Map<String, Object> votdMap = new HashMap<>();
         votdMap.put("draw", draw);
         votdMap.put("recordsTotal", recordsTotal);

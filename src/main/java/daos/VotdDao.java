@@ -65,22 +65,27 @@ public class VotdDao {
 
     @Transactional
     public List<Votd> wildFind(String param, Integer start, Integer length) {
-        Query q = getEntityManager().createNamedQuery("Votd.wildFind");
-        q.setParameter("verse", param + "%");
-        q.setParameter("modifiedby", param + "%");
-        q.setParameter("createdby", param + "%");
 
-        if (param.contentEquals(config.APPROVED)) {
-            q.setParameter("isapproved", true);
-        } else if (param.contentEquals(config.PENDING)) {
-            q.setParameter("isapproved", false);
-        } else{
-            q.setParameter("isapproved", null);
-        }
+        Query q = this.buildSearchQuery(param, "Votd.wildFind");
+
         q.setFirstResult(start);
         q.setMaxResults(length);
 
         return (List<Votd>) q.getResultList();
+    }
+
+    @Transactional
+    public Long countFilteredRecords(String param) throws NoResultException {
+        Query q = this.buildSearchQuery(param, "Votd.wildFindCount");
+
+        return (Long) q.getSingleResult();
+    }
+
+    @Transactional
+    public Long getTotalRecords() throws NoResultException {
+        Query q = getEntityManager().createNamedQuery("Votd.count");
+
+        return (Long) q.getSingleResult();
     }
 
     @Transactional
@@ -155,6 +160,23 @@ public class VotdDao {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    private Query buildSearchQuery(String param, String queryName) {
+        Query q = getEntityManager().createNamedQuery(queryName);
+        q.setParameter("verse", param + "%");
+        q.setParameter("modifiedby", param + "%");
+        q.setParameter("createdby", param + "%");
+
+        if (param.contentEquals(config.APPROVED)) {
+            q.setParameter("isapproved", true);
+        } else if (param.contentEquals(config.PENDING)) {
+            q.setParameter("isapproved", false);
+        } else {
+            q.setParameter("isapproved", null);
+        }
+
+        return q;
     }
 
     private EntityManager getEntityManager() {

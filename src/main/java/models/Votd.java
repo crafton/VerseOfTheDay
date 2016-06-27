@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
         @NamedQuery(name = "Votd.findExistingVerse", query = "SELECT verses FROM Votd WHERE verses = :verse"),
         @NamedQuery(name = "Votd.findAll", query = "SELECT x FROM Votd x"),
         @NamedQuery(name = "Votd.wildFind", query = "SELECT x FROM Votd x WHERE x.verses LIKE :verse " +
-                "OR x.modifiedBy LIKE :modifiedby OR x.createdBy LIKE :createdby OR x.isApproved = :isapproved")
+                "OR x.modifiedBy LIKE :modifiedby OR x.createdBy LIKE :createdby OR x.isApproved = :isapproved"),
+        @NamedQuery(name = "Votd.wildFindCount", query = "SELECT COUNT(x) as total FROM Votd x WHERE x.verses LIKE :verse " +
+                "OR x.modifiedBy LIKE :modifiedby OR x.createdBy LIKE :createdby OR x.isApproved = :isapproved"),
+        @NamedQuery(name = "Votd.count", query = "SELECT COUNT(x) as total FROM Votd x")
 })
 public class Votd {
 
