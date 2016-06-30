@@ -18,6 +18,7 @@ public class Config {
     private String auth0Callback;
     private String auth0Logout;
     private String auth0ClientSecret;
+    private String auth0MgmtToken;
 
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
@@ -70,6 +71,13 @@ public class Config {
         } else {
             this.auth0ClientSecret = "";
         }
+        Optional<String> optionalAuth0MgmtToken = Optional.of(ninjaProperties.get("auth0.mgmttoken"));
+        if (optionalAuth0MgmtToken.isPresent()) {
+            this.auth0MgmtToken = optionalAuth0MgmtToken.get();
+        } else {
+            this.auth0MgmtToken = "";
+        }
+
 
     }
 
@@ -103,5 +111,9 @@ public class Config {
 
     public String getAuth0ClientSecret() {
         return auth0ClientSecret;
+    }
+
+    public String getAuth0MgmtToken() {
+        return auth0MgmtToken;
     }
 }

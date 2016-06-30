@@ -48,7 +48,7 @@ public class LoginController {
         String code = context.getParameter("code");
 
         if (StringUtils.isEmpty(code)) {
-            //TODO:send to some unauthenticated page
+            Results.redirect("/");
         }
 
         /*Retrieve authentication tokens from auth0*/

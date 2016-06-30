@@ -387,6 +387,13 @@ public class ControllerUtils {
 
     }
 
+    /**
+     * Reformat query results to what DataTables expects. Ensure fields are added to the
+     * array in the same order as the columns headings are displayed.
+     *
+     * @param votds
+     * @return
+     */
     public List<String[]> generateDataTableResults(List<Votd> votds){
 
         String[] votdFields = new String[0];

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
+import daos.UserDao;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
@@ -23,9 +24,12 @@ public class UserController {
     @Inject
     Logger logger;
 
-    public Result users(){
+    @Inject
+    UserDao userDao;
 
+    public Result viewUsers() {
 
+        logger.info("Total number of users is " + userDao.getTotalRecords());
         return Results.ok();
     }
 

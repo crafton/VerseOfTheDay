@@ -64,6 +64,7 @@ public class Routes implements ApplicationRoutes {
         /**
          * Routes for User Mgmt
          */
+        router.GET().route("/user/list").with(UserController.class, "viewUsers");
         router.GET().route("/user/update").with(UserController.class, "updateUser");
 
         ///////////////////////////////////////////////////////////////////////
