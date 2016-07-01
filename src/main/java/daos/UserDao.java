@@ -35,6 +35,39 @@ public class UserDao {
     }
 
     /**
+     * Retrieve user records for the data table based on specified query
+     *
+     * @param start
+     * @param length
+     * @param search
+     * @return JsonObject containing returned records
+     * @throws JsonSyntaxException
+     */
+    public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
+
+        String queryString = "user_metadata.name" + search + "* OR email:" + search + "*";
+
+        Client client = ClientBuilder.newClient();
+        String response = client.target("https://" + config.getAuth0Domain() + "/api/v2/users")
+                .queryParam("per_page", length)
+                .queryParam("page", start)
+                .queryParam("include_totals", "true")
+                .queryParam("fields", "name, email")
+                .queryParam("include_fields", "true")
+                .queryParam("search_engine", "v2")
+                .queryParam("q", queryString)
+                .request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
+                .get(String.class);
+
+        try {
+            return getJsonFromString(response);
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
+    }
+
+    /**
      * Retrieve the total number of users from auth0
      *
      * @return Integer. Total number of users
@@ -52,18 +85,33 @@ public class UserDao {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
                 .get(String.class);
 
-        JsonParser parser = new JsonParser();
-        JsonObject responseJsonObject;
         try {
-            responseJsonObject = parser.parse(response).getAsJsonObject();
+            return getJsonFromString(response)
+                    .get("total")
+                    .getAsInt();
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
+    }
+
+    /**
+     * Get a JsonObject from a json formatted String
+     *
+     * @param someString
+     * @return JsonObject
+     * @throws JsonSyntaxException
+     */
+    private JsonObject getJsonFromString(String someString) throws JsonSyntaxException {
+        JsonParser parser = new JsonParser();
+
+        try {
+            return parser.parse(someString).getAsJsonObject();
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
 
-        return responseJsonObject
-                .get("total")
-                .getAsInt();
     }
+
 
     private void refreshCache() {
 
