@@ -8,10 +8,13 @@ import utilities.Utils;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Crafton Williams on 20/06/2016.
@@ -49,23 +52,20 @@ public class UserDao {
      */
     public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
 
-        String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "*";
+        String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
+                "OR app_metadata.roles:" + search + "*";
 
-        Client client = ClientBuilder.newClient();
-        String response = client.target("https://" + config.getAuth0Domain() + "/api/v2/users")
-                .queryParam("per_page", length)
-                .queryParam("page", start)
-                .queryParam("include_totals", "true")
-                .queryParam("fields", "name,user_metadata.name,email,last_login,created_at,user_id")
-                .queryParam("include_fields", "true")
-                .queryParam("search_engine", "v2")
-                .queryParam("q", queryString)
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
-                .get(String.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("per_page", length);
+        params.put("page", start);
+        params.put("include_totals", "true");
+        params.put("fields", "name,user_metadata.name,email,last_login,created_at,user_id,app_metadata.roles");
+        params.put("include_fields", "true");
+        params.put("search_engine", "v2");
+        params.put("q", queryString);
 
         try {
-            return utils.getJsonFromString(response);
+            return utils.auth0ApiQueryWithMgmtToken(params, config.USER_API);
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
@@ -78,19 +78,18 @@ public class UserDao {
      * @throws JsonSyntaxException
      */
     public Integer getTotalRecords() throws JsonSyntaxException {
-        Client client = ClientBuilder.newClient();
-        String response = client.target("https://" + config.getAuth0Domain() + "/api/v2/users")
-                .queryParam("per_page", "1")
-                .queryParam("include_totals", "true")
-                .queryParam("fields", "name")
-                .queryParam("include_fields", "true")
-                .queryParam("search_engine", "v2")
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
-                .get(String.class);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("per_page", "1");
+        params.put("include_totals", "true");
+        params.put("fields", "name");
+        params.put("include_fields", "true");
+        params.put("search_engine", "v2");
+
+        JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.USER_API);
 
         try {
-            return utils.getJsonFromString(response)
+            return response
                     .get("total")
                     .getAsInt();
         } catch (JsonSyntaxException e) {
@@ -111,16 +110,24 @@ public class UserDao {
 
         for (JsonElement user : usersJsonList) {
             String name;
+            String roles;
             try {
                 name = user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString();
             } catch (NullPointerException npe) {
                 name = user.getAsJsonObject().get("name").getAsString();
             }
 
+            try {
+                roles = user.getAsJsonObject().get("app_metadata").getAsJsonObject().get("roles").getAsJsonArray().getAsString();
+            } catch (NullPointerException npe) {
+                roles = "";
+            }
+
             userFields = new String[]{name,
                     user.getAsJsonObject().get("email").getAsString(),
+                    roles,
                     user.getAsJsonObject().get("last_login").getAsString(),
-                    user.getAsJsonObject().get("created_at").getAsString(), "", ""};
+                    user.getAsJsonObject().get("created_at").getAsString(), ""};
 
             usersData.add(userFields);
         }
@@ -133,20 +140,40 @@ public class UserDao {
      * @return
      */
     public JsonObject auth0GetUser(String accessToken) throws JsonSyntaxException {
-        Client client = ClientBuilder.newClient();
-        String auth0User = client.target("https://" + config.getAuth0Domain() + "/userinfo")
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .get(String.class);
-
-        JsonParser parser = new JsonParser();
-        JsonObject userJsonObject;
         try {
-            userJsonObject = parser.parse(auth0User).getAsJsonObject();
+            return utils.auth0ApiQuery(null, "/userinfo", accessToken);
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
-        return userJsonObject;
+
+    }
+
+    /**
+     * Get a list of all roles assigned to the given user
+     *
+     * @param userID
+     * @return
+     */
+    public List<String> getUserRoles(String userID) throws JsonSyntaxException {
+        List<String> rolesList = new ArrayList<>();
+        Map<String, Object> params = new HashMap<>();
+        params.put("fields", "app_metadata");
+        params.put("include_fields", "true");
+
+        try {
+            JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.USER_API + "/" + userID);
+
+            JsonArray rolesArray = response.get("app_metadata")
+                    .getAsJsonArray();
+
+            for (JsonElement role : rolesArray) {
+                rolesList.add(role.getAsString());
+            }
+            return rolesList;
+
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
     }
 
     private void refreshCache() {

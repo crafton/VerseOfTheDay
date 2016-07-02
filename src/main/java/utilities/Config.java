@@ -25,6 +25,7 @@ public class Config {
     public final String MEMBER_ROLE = "member";
     public final String CONTRIBUTOR_ROLE = "contributor";
     public final String PUBLISHER_ROLE = "publisher";
+    public final String USER_API = "/api/v2/users";
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {

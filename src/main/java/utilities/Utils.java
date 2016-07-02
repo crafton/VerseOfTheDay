@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
@@ -86,6 +88,51 @@ public class Utils {
         }
 
         return "<p><ul>" + formattedList + "</ul></p>";
+    }
+
+    /**
+     * Generic method to query the auth0 web api using the management token
+     *
+     * @param params
+     * @param apiPath
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public JsonObject auth0ApiQueryWithMgmtToken(Map<String, Object> params, String apiPath) throws JsonSyntaxException {
+        try {
+            return auth0ApiQuery(params, apiPath, config.getAuth0MgmtToken());
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
+    }
+
+    /**
+     * Generic method to query the auth0 web api
+     *
+     * @param params
+     * @param apiPath
+     * @param token
+     * @return
+     */
+    public JsonObject auth0ApiQuery(Map<String, Object> params, String apiPath, String token){
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("https://" + config.getAuth0Domain() + apiPath);
+
+        if(params != null && !params.isEmpty()) {
+            for (Map.Entry<String, Object> param : params.entrySet()) {
+                target = target.queryParam(param.getKey(), param.getValue());
+            }
+        }
+
+        String response = target.request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .get(String.class);
+
+        try {
+            return getJsonFromString(response);
+        } catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException(e.getMessage());
+        }
     }
 
     /**
