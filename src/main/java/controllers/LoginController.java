@@ -2,7 +2,7 @@ package controllers;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import daos.UserDao;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
@@ -12,7 +12,7 @@ import ninja.session.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import utilities.Config;
-import utilities.ControllerUtils;
+import utilities.Utils;
 
 import java.util.Map;
 
@@ -30,7 +30,10 @@ public class LoginController {
     Logger logger;
 
     @Inject
-    ControllerUtils controllerUtils;
+    Utils utils;
+
+    @Inject
+    UserDao userDao;
 
     @Inject
     NinjaCache ninjaCache;
@@ -52,8 +55,8 @@ public class LoginController {
         }
 
         /*Retrieve authentication tokens from auth0*/
-        Map<String, String> tokens = controllerUtils.auth0GetToken(code);
-        JsonObject userObject = controllerUtils.auth0GetUser(tokens.get("access_token"));
+        Map<String, String> tokens = utils.auth0GetToken(code);
+        JsonObject userObject = userDao.auth0GetUser(tokens.get("access_token"));
 
         /*Cache user profile so we don't have to query information again for the session*/
         ninjaCache.set(tokens.get("id_token"), userObject.toString());

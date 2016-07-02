@@ -1,30 +1,20 @@
 package controllers;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.persist.Transactional;
 import daos.ThemeDao;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
 import filters.LoginFilter;
 import models.Theme;
-import models.Votd;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
-import ninja.jpa.UnitOfWork;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
-import org.h2.jdbc.JdbcSQLException;
 import org.slf4j.Logger;
 import utilities.Config;
-import utilities.ControllerUtils;
 
-import javax.persistence.*;
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

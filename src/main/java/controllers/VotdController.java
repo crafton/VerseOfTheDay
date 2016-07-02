@@ -1,7 +1,5 @@
 package controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import daos.ThemeDao;
@@ -14,16 +12,13 @@ import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
-import com.google.inject.Singleton;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import utilities.Config;
-import utilities.ControllerUtils;
+import utilities.Utils;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +32,7 @@ import java.util.Map;
 public class VotdController {
 
     @Inject
-    ControllerUtils controllerUtils;
+    Utils utils;
     @Inject
     VotdDao votdDao;
     @Inject
@@ -64,11 +59,10 @@ public class VotdController {
         Integer length = Integer.parseInt(context.getParameter("length"));
         String search = context.getParameter("search[value]");
 
-        List<Votd> votds = new ArrayList<>();
         Integer recordsTotal = votdDao.getTotalRecords().intValue();
 
         /*Retrieve records and build array of data to return*/
-        votds = votdDao.wildFind(search, start, length);
+        List<Votd> votds = votdDao.wildFind(search, start, length);
         Integer recordsFiltered = votdDao.countFilteredRecords(search).intValue();
         List<String[]> votdData = votdDao.generateDataTableResults(votds);
 
@@ -98,7 +92,7 @@ public class VotdController {
 
     public Result getVerse(@PathParam("verses") String verses) {
 
-        String verificationErrorMessage = controllerUtils.verifyVerses(verses);
+        String verificationErrorMessage = votdDao.verifyVerses(verses);
 
         if (!verificationErrorMessage.isEmpty()) {
             return Results.badRequest().text().render(verificationErrorMessage);
@@ -107,15 +101,15 @@ public class VotdController {
         String versesTrimmed = verses.trim();
 
         /*Call web service to retrieve verses.*/
-        String versesRetrieved = controllerUtils.restGetVerses(versesTrimmed);
+        String versesRetrieved = votdDao.restGetVerses(versesTrimmed);
 
         /*Find all verses that clash with what we're trying to add to the database*/
-        List<String> verseClashes = controllerUtils.findClashes(versesTrimmed);
+        List<String> verseClashes = votdDao.findClashes(versesTrimmed);
         if (!verseClashes.isEmpty()) {
             versesRetrieved += "<h4 id='clash' class='text-danger'>Verse Clashes</h4>" +
                     "<small>Verses that already exist in the database which " +
                     "intersect with the verses being entered.</small>"
-                    + controllerUtils.formatListToHtml(verseClashes);
+                    + utils.formatListToHtml(verseClashes);
         }
 
         return Results.ok().text().render(versesRetrieved);
@@ -123,7 +117,7 @@ public class VotdController {
 
     public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
 
-        String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
+        String verificationErrorMessage = votdDao.verifyVerses(votd.getVerses());
 
         if (!verificationErrorMessage.isEmpty()) {
             flashScope.error(verificationErrorMessage);
@@ -171,7 +165,7 @@ public class VotdController {
         }
 
         //Get verse text
-        String verseText = controllerUtils.restGetVerses(votd.getVerses());
+        String verseText = votdDao.restGetVerses(votd.getVerses());
 
         return Results
                 .ok()

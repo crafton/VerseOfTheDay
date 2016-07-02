@@ -3,17 +3,17 @@ package controllers;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import daos.UserDao;
+import filters.LoginFilter;
 import ninja.Context;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.cache.NinjaCache;
 import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.slf4j.Logger;
-import utilities.Config;
-import utilities.ControllerUtils;
+import utilities.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,7 @@ import java.util.Map;
 /**
  * Created by Crafton Williams on 20/06/2016.
  */
+@FilterWith(LoginFilter.class)
 public class UserController {
 
     @Inject
@@ -33,7 +34,7 @@ public class UserController {
     UserDao userDao;
 
     @Inject
-    ControllerUtils controllerUtils;
+    Utils utils;
 
     public Result viewUsers() {
 

@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
 import utilities.Config;
+import utilities.Utils;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -22,6 +23,9 @@ public class UserDao {
 
     @Inject
     Config config;
+
+    @Inject
+    Utils utils;
 
     public UserDao() {
     }
@@ -61,7 +65,7 @@ public class UserDao {
                 .get(String.class);
 
         try {
-            return getJsonFromString(response);
+            return utils.getJsonFromString(response);
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
@@ -86,7 +90,7 @@ public class UserDao {
                 .get(String.class);
 
         try {
-            return getJsonFromString(response)
+            return utils.getJsonFromString(response)
                     .get("total")
                     .getAsInt();
         } catch (JsonSyntaxException e) {
@@ -118,23 +122,25 @@ public class UserDao {
     }
 
     /**
-     * Get a JsonObject from a json formatted String
-     *
-     * @param someString
-     * @return JsonObject
-     * @throws JsonSyntaxException
+     * @param accessToken
+     * @return
      */
-    private JsonObject getJsonFromString(String someString) throws JsonSyntaxException {
-        JsonParser parser = new JsonParser();
+    public JsonObject auth0GetUser(String accessToken) throws JsonSyntaxException {
+        Client client = ClientBuilder.newClient();
+        String auth0User = client.target("https://" + config.getAuth0Domain() + "/userinfo")
+                .request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .get(String.class);
 
+        JsonParser parser = new JsonParser();
+        JsonObject userJsonObject;
         try {
-            return parser.parse(someString).getAsJsonObject();
+            userJsonObject = parser.parse(auth0User).getAsJsonObject();
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
-
+        return userJsonObject;
     }
-
 
     private void refreshCache() {
 
