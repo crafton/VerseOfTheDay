@@ -22,6 +22,9 @@ public class Config {
 
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
+    public final String MEMBER_ROLE = "member";
+    public final String CONTRIBUTOR_ROLE = "contributor";
+    public final String PUBLISHER_ROLE = "publisher";
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {

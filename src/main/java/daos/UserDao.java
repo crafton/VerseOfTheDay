@@ -49,14 +49,14 @@ public class UserDao {
      */
     public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
 
-        String queryString = "user_metadata.name:" + search + "* OR email:" + search + "*";
+        String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "*";
 
         Client client = ClientBuilder.newClient();
         String response = client.target("https://" + config.getAuth0Domain() + "/api/v2/users")
                 .queryParam("per_page", length)
                 .queryParam("page", start)
                 .queryParam("include_totals", "true")
-                .queryParam("fields", "user_metadata.name,email,last_login,created_at")
+                .queryParam("fields", "name,user_metadata.name,email,last_login,created_at,user_id")
                 .queryParam("include_fields", "true")
                 .queryParam("search_engine", "v2")
                 .queryParam("q", queryString)
@@ -105,12 +105,19 @@ public class UserDao {
      * @param usersJsonList
      * @return
      */
-    public List<String[]> generateDataTableResults(JsonArray usersJsonList){
+    public List<String[]> generateDataTableResults(JsonArray usersJsonList) {
         List<String[]> usersData = new ArrayList<>();
         String[] userFields = new String[0];
 
-        for(JsonElement user : usersJsonList){
-            userFields = new String[]{user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString(),
+        for (JsonElement user : usersJsonList) {
+            String name;
+            try {
+                name = user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString();
+            } catch (NullPointerException npe) {
+                name = user.getAsJsonObject().get("name").getAsString();
+            }
+
+            userFields = new String[]{name,
                     user.getAsJsonObject().get("email").getAsString(),
                     user.getAsJsonObject().get("last_login").getAsString(),
                     user.getAsJsonObject().get("created_at").getAsString(), "", ""};
