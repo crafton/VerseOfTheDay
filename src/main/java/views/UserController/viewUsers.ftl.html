@@ -1,0 +1,42 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Votds">
+
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
+
+    <table id="usersTable" class="table table-responsive">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Last Login</th>
+            <th>Date Joined</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+
+    <script>
+
+        $('#usersTable').confirmation({
+            selector: '[data-toggle="confirmation"]',
+            href: function (elem) {
+                return $(elem).attr('href');
+            }
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#usersTable').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": "/user/displayusers"
+            });
+        });
+    </script>
+</@layout.myLayout>

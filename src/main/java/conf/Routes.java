@@ -23,6 +23,7 @@ import models.Votd;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
+import org.eclipse.jetty.server.Authentication;
 
 public class Routes implements ApplicationRoutes {
 
@@ -66,6 +67,7 @@ public class Routes implements ApplicationRoutes {
          */
         router.GET().route("/user/list").with(UserController.class, "viewUsers");
         router.GET().route("/user/update").with(UserController.class, "updateUser");
+        router.GET().route("/user/displayusers").with(UserController.class, "displayUserData");
 
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)

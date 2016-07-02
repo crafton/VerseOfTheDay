@@ -45,14 +45,14 @@ public class UserDao {
      */
     public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
 
-        String queryString = "user_metadata.name" + search + "* OR email:" + search + "*";
+        String queryString = "user_metadata.name:" + search + "* OR email:" + search + "*";
 
         Client client = ClientBuilder.newClient();
         String response = client.target("https://" + config.getAuth0Domain() + "/api/v2/users")
                 .queryParam("per_page", length)
                 .queryParam("page", start)
                 .queryParam("include_totals", "true")
-                .queryParam("fields", "name, email")
+                .queryParam("fields", "user_metadata.name,email,last_login,created_at")
                 .queryParam("include_fields", "true")
                 .queryParam("search_engine", "v2")
                 .queryParam("q", queryString)

@@ -420,4 +420,27 @@ public class ControllerUtils {
         return votdData;
     }
 
+    /**
+     * Reformat query results to what DataTables expects. Ensure fields are added to the
+     * array in the same order as the columns headings are displayed.
+     *
+     * @param usersJsonList
+     * @return
+     */
+    public List<String[]> generateUserDataTableResults(JsonArray usersJsonList){
+        List<String[]> usersData = new ArrayList<>();
+        String[] userFields = new String[0];
+
+        for(JsonElement user : usersJsonList){
+            userFields = new String[]{user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString(),
+                    user.getAsJsonObject().get("email").getAsString(),
+                    user.getAsJsonObject().get("last_login").getAsString(),
+                    user.getAsJsonObject().get("created_at").getAsString(), "", ""};
+
+            usersData.add(userFields);
+        }
+
+        return usersData;
+    }
+
 }
