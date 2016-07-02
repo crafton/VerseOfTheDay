@@ -53,7 +53,7 @@ public class UserController {
         JsonObject usersJson = userDao.getUserRecords(start, length, search);
         Integer recordsFiltered = usersJson.get("total")
                 .getAsInt();
-        List<String[]> usersData = controllerUtils.generateUserDataTableResults(usersJson.getAsJsonArray("users"));
+        List<String[]> usersData = userDao.generateDataTableResults(usersJson.getAsJsonArray("users"));
 
         /*Format data for ajax callback processing*/
         Map<String, Object> userMap = new HashMap<>();

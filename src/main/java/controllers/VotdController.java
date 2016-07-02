@@ -70,7 +70,7 @@ public class VotdController {
         /*Retrieve records and build array of data to return*/
         votds = votdDao.wildFind(search, start, length);
         Integer recordsFiltered = votdDao.countFilteredRecords(search).intValue();
-        List<String[]> votdData = controllerUtils.generateDataTableResults(votds);
+        List<String[]> votdData = votdDao.generateDataTableResults(votds);
 
         /*Format data for ajax callback processing*/
         Map<String, Object> votdMap = new HashMap<>();

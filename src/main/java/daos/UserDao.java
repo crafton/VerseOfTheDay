@@ -1,8 +1,6 @@
 package daos;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
 import utilities.Config;
@@ -11,6 +9,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Crafton Williams on 20/06/2016.
@@ -92,6 +92,29 @@ public class UserDao {
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
+    }
+
+    /**
+     * Reformat query results to what DataTables expects. Ensure fields are added to the
+     * array in the same order as the columns headings are displayed.
+     *
+     * @param usersJsonList
+     * @return
+     */
+    public List<String[]> generateDataTableResults(JsonArray usersJsonList){
+        List<String[]> usersData = new ArrayList<>();
+        String[] userFields = new String[0];
+
+        for(JsonElement user : usersJsonList){
+            userFields = new String[]{user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString(),
+                    user.getAsJsonObject().get("email").getAsString(),
+                    user.getAsJsonObject().get("last_login").getAsString(),
+                    user.getAsJsonObject().get("created_at").getAsString(), "", ""};
+
+            usersData.add(userFields);
+        }
+
+        return usersData;
     }
 
     /**
