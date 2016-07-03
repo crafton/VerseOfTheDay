@@ -108,7 +108,7 @@ public class VotdController {
         if (!verseClashes.isEmpty()) {
             versesRetrieved += "<h4 id='clash' class='text-danger'>Verse Clashes</h4>" +
                     "<small>Verses that already exist in the database which " +
-                    "intersect with the verses being entered.</small>"
+                    "intersect with the verses being entered.</small><p></p>"
                     + utils.formatListToHtml(verseClashes);
         }
 

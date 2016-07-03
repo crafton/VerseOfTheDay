@@ -3,11 +3,14 @@ package daos;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
+import org.apache.commons.lang.StringUtils;
+import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import utilities.Config;
 import utilities.Utils;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -110,7 +113,7 @@ public class UserDao {
 
         for (JsonElement user : usersJsonList) {
             String name;
-            String roles;
+            List<String> rolesList = new ArrayList<>();
             try {
                 name = user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString();
             } catch (NullPointerException npe) {
@@ -118,14 +121,22 @@ public class UserDao {
             }
 
             try {
-                roles = user.getAsJsonObject().get("app_metadata").getAsJsonObject().get("roles").getAsJsonArray().getAsString();
+                JsonArray rolesArray = user.getAsJsonObject().get("app_metadata")
+                        .getAsJsonObject()
+                        .get("roles")
+                        .getAsJsonArray();
+
+                for (JsonElement role : rolesArray) {
+                    rolesList.add(role.getAsString());
+                }
+
             } catch (NullPointerException npe) {
-                roles = "";
+                //do nothing data table will get empty list
             }
 
             userFields = new String[]{name,
                     user.getAsJsonObject().get("email").getAsString(),
-                    roles,
+                    utils.formatListToHtml(rolesList),
                     user.getAsJsonObject().get("last_login").getAsString(),
                     user.getAsJsonObject().get("created_at").getAsString(), ""};
 
@@ -174,6 +185,39 @@ public class UserDao {
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
+    }
+
+    /**
+     * Add a role to user's profile
+     *
+     * @param userId
+     * @param role
+     * @param currentRoles
+     */
+    public void addUserRole(String userId, String role, List<String> currentRoles) {
+
+        if (currentRoles.contains(role)) {
+            throw new IllegalArgumentException("Cannot add a role that already exists.");
+        }
+
+        if (!role.contentEquals(config.MEMBER_ROLE) || !role.contentEquals(config.CONTRIBUTOR_ROLE)
+                || !role.contentEquals(config.PUBLISHER_ROLE)) {
+            throw new IllegalArgumentException(role + " is not recognized as a valid role.");
+        }
+
+        currentRoles.add(role);
+
+        String body = "{\"app_metadata\": { \"roles\": " + currentRoles + "}";
+
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.USER_API + "/" + userId);
+        String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+                .request()
+                .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
+    }
+
+    public void removeUserROle(String user_id, String role) {
+
     }
 
     private void refreshCache() {

@@ -81,13 +81,17 @@ public class Utils {
      */
     public String formatListToHtml(List<String> items) {
 
+        if(items.isEmpty()){
+            return "";
+        }
+
         String formattedList = "";
 
         for (String item : items) {
             formattedList += "<li>" + item + "</li>";
         }
 
-        return "<p><ul>" + formattedList + "</ul></p>";
+        return "<ul>" + formattedList + "</ul>";
     }
 
     /**
