@@ -138,7 +138,8 @@ public class UserDao {
                     user.getAsJsonObject().get("email").getAsString(),
                     utils.formatListToHtml(rolesList),
                     user.getAsJsonObject().get("last_login").getAsString(),
-                    user.getAsJsonObject().get("created_at").getAsString(), ""};
+                    user.getAsJsonObject().get("created_at").getAsString(),
+                    "<i id=\"editrole\" class=\"fa fa-pencil\" aria-hidden=\"true\"></i>" };
 
             usersData.add(userFields);
         }

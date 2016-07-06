@@ -4,6 +4,7 @@
     <!-- Data Tables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootbox.min.js"></script>
 
     <table id="usersTable" class="table table-responsive">
         <thead>
@@ -27,9 +28,30 @@
             }
         });
 
-    </script>
+        $(document).on("click", "#editrole", function (e) {
+            bootbox.dialog({
+                message: "Info about the roles",
+                title: "Edit Roles",
+                buttons: {
+                    cancel: {
+                        label: "Cancel",
+                        className: "btn",
+                        callback: function () {
+                            Example.show("cancel clicked");
 
-    <script>
+                        }
+                    },
+                    save: {
+                        label: "Save",
+                        className: "btn-primary",
+                        callback: function () {
+                            Example.show("Saved");
+                        }
+                    },
+                }
+            });
+        });
+
         $(document).ready(function () {
             $('#usersTable').DataTable({
                 "ordering": false,
@@ -38,5 +60,6 @@
                 "ajax": "/user/displayusers"
             });
         });
+
     </script>
 </@layout.myLayout>
