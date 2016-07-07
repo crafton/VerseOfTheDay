@@ -4,7 +4,6 @@
     <!-- Data Tables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
-    <script type="text/javascript" src="/assets/js/bootbox.min.js"></script>
 
     <table id="usersTable" class="table table-responsive">
         <thead>
@@ -19,37 +18,30 @@
         </thead>
     </table>
 
+    <div class="modal fade" id="updateRolesModal" role="dialog" aria-labelledby="myModalLabel">
+        <#include "updateRoles.ftl.html" />
+    </div>
+
     <script>
+        //Capture modal event and popular with user info
+        $('#updateRolesModal').on('show.bs.modal', function(event){
+            var itemClicked = $(event.relatedTarget)
+            var recepient = itemClicked.data('username')
+
+            var modal = $(this)
+            modal.find('.modal-title').text('Update roles for ' + recepient)
+
+        });
+
+        $('#saveRolesUpdate').on('click', function(event){
+            console.log("save clicked")
+        });
 
         $('#usersTable').confirmation({
             selector: '[data-toggle="confirmation"]',
             href: function (elem) {
                 return $(elem).attr('href');
             }
-        });
-
-        $(document).on("click", "#editrole", function (e) {
-            bootbox.dialog({
-                message: "Info about the roles",
-                title: "Edit Roles",
-                buttons: {
-                    cancel: {
-                        label: "Cancel",
-                        className: "btn",
-                        callback: function () {
-                            Example.show("cancel clicked");
-
-                        }
-                    },
-                    save: {
-                        label: "Save",
-                        className: "btn-primary",
-                        callback: function () {
-                            Example.show("Saved");
-                        }
-                    },
-                }
-            });
         });
 
         $(document).ready(function () {

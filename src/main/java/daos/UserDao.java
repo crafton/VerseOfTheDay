@@ -139,7 +139,8 @@ public class UserDao {
                     utils.formatListToHtml(rolesList),
                     user.getAsJsonObject().get("last_login").getAsString(),
                     user.getAsJsonObject().get("created_at").getAsString(),
-                    "<i id=\"editrole\" class=\"fa fa-pencil\" aria-hidden=\"true\"></i>" };
+                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"fa fa-pencil\" aria-hidden=\"true\" data-toggle=\"modal\" data-username=\""+name+"\"" +
+                            " data-target=\"#updateRolesModal\"></a>" };
 
             usersData.add(userFields);
         }

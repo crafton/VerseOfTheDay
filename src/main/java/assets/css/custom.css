@@ -37,3 +37,7 @@ h4#clash{
     float: left;
     font-weight: bold;
 }
+
+.checkbox {
+    padding-bottom: 10px;
+}
