@@ -139,8 +139,9 @@ public class UserDao {
                     utils.formatListToHtml(rolesList),
                     user.getAsJsonObject().get("last_login").getAsString(),
                     user.getAsJsonObject().get("created_at").getAsString(),
-                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"fa fa-pencil\" aria-hidden=\"true\" data-toggle=\"modal\" data-username=\""+name+"\"" +
-                            " data-target=\"#updateRolesModal\"></a>" };
+                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"fa fa-pencil\" aria-hidden=\"true\" " +
+                            "data-toggle=\"modal\" data-userid=\"" + user.getAsJsonObject().get("user_id").getAsString() + "\" data-username=\"" + name + "\"" +
+                            " data-target=\"#updateRolesModal\"></a>"};
 
             usersData.add(userFields);
         }
@@ -177,6 +178,8 @@ public class UserDao {
             JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.USER_API + "/" + userID);
 
             JsonArray rolesArray = response.get("app_metadata")
+                    .getAsJsonObject()
+                    .get("roles")
                     .getAsJsonArray();
 
             for (JsonElement role : rolesArray) {

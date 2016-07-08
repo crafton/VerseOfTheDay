@@ -26,10 +26,32 @@
         //Capture modal event and popular with user info
         $('#updateRolesModal').on('show.bs.modal', function(event){
             var itemClicked = $(event.relatedTarget)
-            var recepient = itemClicked.data('username')
-
+            var recipient = itemClicked.data('username')
+            var userid = itemClicked.data('userid')
             var modal = $(this)
-            modal.find('.modal-title').text('Update roles for ' + recepient)
+
+            //Clear existing modal
+            modal.find('.modal-title').text('Loading...')
+            modal.find('.modal-body').html('')
+
+            $.ajax({
+                url: "/user/displayuserroles/" + encodeURIComponent(userid),
+                cache: false,
+                beforeSend: function () {
+                    $('#loadingDiv').show();
+                },
+                complete: function () {
+                    $('#loadingDiv').hide();
+                },
+                success: function (data) {
+                    modal.find('.modal-title').text('Update roles for ' + recipient)
+                    modal.find('.modal-body').html(data)
+                },
+                error: function (xhr, status, errorThro) {
+                    modal.find('.modal-title').text('Role data not found')
+                    modal.find('.modal-body').text(xhr.responseText)
+                }
+            });
 
         });
 

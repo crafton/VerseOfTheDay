@@ -9,11 +9,17 @@ import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.cache.NinjaCache;
+import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.slf4j.Logger;
+import utilities.Config;
 import utilities.Utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +40,9 @@ public class UserController {
     UserDao userDao;
 
     @Inject
+    Config config;
+
+    @Inject
     Utils utils;
 
     public Result viewUsers() {
@@ -43,7 +52,57 @@ public class UserController {
                 .html();
     }
 
-    public Result displayUserData(Context context){
+    public Result displayUserRoles(@PathParam("userid") String userId) {
+
+        List<String> roles = null;
+        roles = userDao.getUserRoles(userId);
+
+        /*try {
+            roles = userDao.getUserRoles(URLDecoder.decode(userId, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JsonSyntaxException e){
+            e.printStackTrace();
+        }*/
+
+        String checkBoxString = "";
+        String roleDescription = "";
+
+
+        for (String roleType : config.rolesList) {
+            if (roleType.contentEquals(config.MEMBER_ROLE)) {
+                roleDescription = config.MEMBER_DESCRIPTION;
+            } else if (roleType.contentEquals(config.CONTRIBUTOR_ROLE)) {
+                roleDescription = config.CONTRIBUTOR_DESCRIPTION;
+            } else if (roleType.contentEquals(config.PUBLISHER_ROLE)) {
+                roleDescription = config.PUBLISHER_DESCRIPTION;
+            }
+            if (roles.contains(roleType)) {
+                checkBoxString += "<div class=\"checkbox\">\n" +
+                        "                <label>\n" +
+                        "                    <input type=\"checkbox\" value=\"" + roleType + "\" checked>\n" +
+                        "                    <b>" + roleType + "</b><br/>\n" +
+                        "                    <i>" + roleDescription + "</i>\n" +
+                        "                </label>\n" +
+                        "            </div>";
+            } else {
+                checkBoxString += "<div class=\"checkbox\">\n" +
+                        "                <label>\n" +
+                        "                    <input type=\"checkbox\" value=\"" + roleType + "\" >\n" +
+                        "                    <b>" + roleType + "</b><br/>\n" +
+                        "                    <i>" + roleDescription + "</i>\n" +
+                        "                </label>\n" +
+                        "            </div>";
+            }
+
+        }
+
+        return Results.ok()
+                .text()
+                .render(checkBoxString);
+    }
+
+    public Result displayUserData(Context context) {
         Integer draw = Integer.parseInt(context.getParameter("draw"));
         Integer start = Integer.parseInt(context.getParameter("start"));
         Integer length = Integer.parseInt(context.getParameter("length"));

@@ -3,6 +3,8 @@ package utilities;
 import com.google.inject.Inject;
 import ninja.utils.NinjaProperties;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -26,6 +28,10 @@ public class Config {
     public final String CONTRIBUTOR_ROLE = "contributor";
     public final String PUBLISHER_ROLE = "publisher";
     public final String USER_API = "/api/v2/users";
+    public final String MEMBER_DESCRIPTION = "The default role for all logged in users.";
+    public final String CONTRIBUTOR_DESCRIPTION = "Users with this role can create VOTDs but cannot approve them.";
+    public final String PUBLISHER_DESCRIPTION = "Users with this role can create VOTDs and approve them as well.";
+    public final List<String> rolesList = Arrays.asList(MEMBER_ROLE, CONTRIBUTOR_ROLE, PUBLISHER_ROLE);
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {
