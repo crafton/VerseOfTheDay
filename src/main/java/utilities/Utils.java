@@ -36,7 +36,7 @@ public class Utils {
      * @param code
      * @return
      */
-    public Map<String, String> auth0GetToken(String code) throws JsonSyntaxException {
+    public Map<String, String> auth0GetToken(String code) throws JsonSyntaxException, IllegalStateException {
         Client client = ClientBuilder.newClient();
 
         Map<String, String> auth0TokenRequest = new HashMap<>();
@@ -58,6 +58,8 @@ public class Utils {
             jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
+        } catch (IllegalStateException e){
+            throw new IllegalStateException(e.getMessage());
         }
 
         String accessToken = jsonResponse

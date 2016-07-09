@@ -23,7 +23,8 @@ public class MemberFilter implements Filter {
 
         String idTokenString = context.getSession().get("idToken");
 
-        if (utils.hasRole(idTokenString, config.MEMBER_ROLE)) {
+        if (utils.hasRole(idTokenString, config.MEMBER_ROLE) || utils.hasRole(idTokenString, config.CONTRIBUTOR_ROLE)
+                || utils.hasRole(idTokenString, config.PUBLISHER_ROLE) || utils.hasRole(idTokenString, "admin")) {
             return filterChain.next(context);
         } else {
             return Results.redirect("/");

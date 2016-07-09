@@ -257,7 +257,4 @@ public class UserDao {
 
     }
 
-    private void refreshCache() {
-
-    }
 }
