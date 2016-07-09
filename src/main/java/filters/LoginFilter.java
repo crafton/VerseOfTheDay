@@ -10,15 +10,13 @@ import ninja.cache.NinjaCache;
  */
 public class LoginFilter implements Filter {
 
-    public final String accessToken = "accessToken";
-    public final String idToken = "idToken";
-
     @Inject
-    NinjaCache ninjaCache;
+    private NinjaCache ninjaCache;
 
     @Override
     public Result filter(FilterChain chain, Context context){
 
+        String idToken = "idToken";
         String idTokenString = context.getSession().get(idToken);
 
         if(context.getSession() == null

@@ -6,6 +6,7 @@ import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
 import filters.LoginFilter;
+import filters.MemberFilter;
 import models.Theme;
 import ninja.FilterWith;
 import ninja.Result;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * Created by Crafton Williams on 28/05/2016.
  */
-@FilterWith(LoginFilter.class)
+@FilterWith({LoginFilter.class, MemberFilter.class})
 public class ThemeController {
 
     @Inject

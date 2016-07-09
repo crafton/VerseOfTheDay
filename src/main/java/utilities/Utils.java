@@ -2,6 +2,7 @@ package utilities;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import ninja.cache.NinjaCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,9 @@ public class Utils {
 
     @Inject
     Config config;
+
+    @Inject
+    NinjaCache ninjaCache;
 
     final static Logger logger = LoggerFactory.getLogger(Utils.class);
 
@@ -155,6 +159,27 @@ public class Utils {
             throw new JsonSyntaxException(e.getMessage());
         }
 
+    }
+
+    public boolean hasRole(String idTokenString, String role){
+
+        String userJsonString = (String) ninjaCache.get(idTokenString);
+        JsonParser jsonParser = new JsonParser();
+
+        JsonObject userProfile = jsonParser.parse(userJsonString).getAsJsonObject();
+
+        JsonArray rolesArray = userProfile.get("app_metadata")
+                .getAsJsonObject()
+                .get("roles")
+                .getAsJsonArray();
+
+        for(JsonElement roleElement : rolesArray){
+            if(roleElement.getAsString().contentEquals(role)){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

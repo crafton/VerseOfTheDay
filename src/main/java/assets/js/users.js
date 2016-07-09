@@ -77,12 +77,12 @@ $('#saveRolesUpdate').on('click', function (event) {
             window.setTimeout(function(){$('#loadingText').hide()}, 500)
         },
         success: function (data) {
-            $('#savingRoles').text('Saved.')
+            $('#savingRoles').text('Saved')
             $('#loadingDiv').hide();
             $('#usersTable').DataTable().ajax.reload()
             window.setTimeout(function(){
                     $('#updateRolesModal').modal('toggle')},
-                1100)
+                1200)
         },
         error: function (xhr, status, errorThro) {
 

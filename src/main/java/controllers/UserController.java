@@ -66,12 +66,10 @@ public class UserController {
     public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, FlashScope flashScope){
 
         if(StringUtils.isEmpty(userId)){
-            flashScope.error("Something went wrong, contact administrator.");
-            return Results.badRequest();
+            return Results.badRequest().text();
         }
 
         userDao.updateUserRole(userId, Arrays.asList(roles.split(",")));
-        flashScope.success("Successfully updated roles.");
 
         return Results.ok().text();
     }
