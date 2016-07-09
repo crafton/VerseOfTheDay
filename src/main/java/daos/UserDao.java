@@ -150,6 +150,51 @@ public class UserDao {
     }
 
     /**
+     * For a given user id, generate a set of checkboxes representing all roles
+     * with the existing roles pre-selected.
+     *
+     * @param userId
+     * @return
+     */
+    public String generateRolesCheckboxes(String userId) {
+        List<String> roles = getUserRoles(userId);
+
+        String checkBoxString = "";
+        String roleDescription = "";
+
+
+        for (String roleType : config.rolesList) {
+            if (roleType.contentEquals(config.MEMBER_ROLE)) {
+                roleDescription = config.MEMBER_DESCRIPTION;
+            } else if (roleType.contentEquals(config.CONTRIBUTOR_ROLE)) {
+                roleDescription = config.CONTRIBUTOR_DESCRIPTION;
+            } else if (roleType.contentEquals(config.PUBLISHER_ROLE)) {
+                roleDescription = config.PUBLISHER_DESCRIPTION;
+            }
+            if (roles.contains(roleType)) {
+                checkBoxString += "<div class=\"checkbox\">\n" +
+                        "                <label>\n" +
+                        "                    <input id=\"" + roleType + "\" type=\"checkbox\" value=\"" + roleType + "\" checked>\n" +
+                        "                    <b>" + roleType + "</b><br/>\n" +
+                        "                    <i>" + roleDescription + "</i>\n" +
+                        "                </label>\n" +
+                        "            </div>";
+            } else {
+                checkBoxString += "<div class=\"checkbox\">\n" +
+                        "                <label>\n" +
+                        "                    <input id=\"" + roleType + "\" type=\"checkbox\" value=\"" + roleType + "\" >\n" +
+                        "                    <b>" + roleType + "</b><br/>\n" +
+                        "                    <i>" + roleDescription + "</i>\n" +
+                        "                </label>\n" +
+                        "            </div>";
+            }
+
+        }
+
+        return checkBoxString;
+    }
+
+    /**
      * @param accessToken
      * @return
      */
@@ -196,32 +241,19 @@ public class UserDao {
      * Add a role to user's profile
      *
      * @param userId
-     * @param role
-     * @param currentRoles
+     * @param roles
      */
-    public void addUserRole(String userId, String role, List<String> currentRoles) {
+    public void updateUserRole(String userId, List<String> roles) {
 
-        if (currentRoles.contains(role)) {
-            throw new IllegalArgumentException("Cannot add a role that already exists.");
-        }
-
-        if (!role.contentEquals(config.MEMBER_ROLE) || !role.contentEquals(config.CONTRIBUTOR_ROLE)
-                || !role.contentEquals(config.PUBLISHER_ROLE)) {
-            throw new IllegalArgumentException(role + " is not recognized as a valid role.");
-        }
-
-        currentRoles.add(role);
-
-        String body = "{\"app_metadata\": { \"roles\": " + currentRoles + "}";
+        Gson gson = new Gson();
+        String body = "{\"app_metadata\": { \"roles\": " + gson.toJson(roles) + "} }";
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target("https://" + config.getAuth0Domain() + config.USER_API + "/" + userId);
         String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
                 .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
-    }
-
-    public void removeUserROle(String user_id, String role) {
 
     }
 

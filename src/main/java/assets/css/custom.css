@@ -11,6 +11,13 @@
     margin: auto;
 }
 
+#loadingText {
+    width: 100px;
+    /* height: 100px;*/
+    margin: auto;
+    color: green;
+}
+
 h4#clash{
     padding-top: 30px;
 }

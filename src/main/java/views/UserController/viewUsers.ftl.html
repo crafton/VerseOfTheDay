@@ -22,58 +22,6 @@
         <#include "updateRoles.ftl.html" />
     </div>
 
-    <script>
-        //Capture modal event and popular with user info
-        $('#updateRolesModal').on('show.bs.modal', function(event){
-            var itemClicked = $(event.relatedTarget)
-            var recipient = itemClicked.data('username')
-            var userid = itemClicked.data('userid')
-            var modal = $(this)
+    <script type="text/javascript" src="/assets/js/users.js"></script>
 
-            //Clear existing modal
-            modal.find('.modal-title').text('Loading...')
-            modal.find('.modal-body').html('')
-
-            $.ajax({
-                url: "/user/displayuserroles/" + encodeURIComponent(userid),
-                cache: false,
-                beforeSend: function () {
-                    $('#loadingDiv').show();
-                },
-                complete: function () {
-                    $('#loadingDiv').hide();
-                },
-                success: function (data) {
-                    modal.find('.modal-title').text('Update roles for ' + recipient)
-                    modal.find('.modal-body').html(data)
-                },
-                error: function (xhr, status, errorThro) {
-                    modal.find('.modal-title').text('Role data not found')
-                    modal.find('.modal-body').text(xhr.responseText)
-                }
-            });
-
-        });
-
-        $('#saveRolesUpdate').on('click', function(event){
-            console.log("save clicked")
-        });
-
-        $('#usersTable').confirmation({
-            selector: '[data-toggle="confirmation"]',
-            href: function (elem) {
-                return $(elem).attr('href');
-            }
-        });
-
-        $(document).ready(function () {
-            $('#usersTable').DataTable({
-                "ordering": false,
-                "processing": true,
-                "serverSide": true,
-                "ajax": "/user/displayusers"
-            });
-        });
-
-    </script>
 </@layout.myLayout>

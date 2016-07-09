@@ -12,6 +12,7 @@ import ninja.cache.NinjaCache;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import ninja.session.Session;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import utilities.Config;
 import utilities.Utils;
@@ -20,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,52 +56,24 @@ public class UserController {
 
     public Result displayUserRoles(@PathParam("userid") String userId) {
 
-        List<String> roles = null;
-        roles = userDao.getUserRoles(userId);
-
-        /*try {
-            roles = userDao.getUserRoles(URLDecoder.decode(userId, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (JsonSyntaxException e){
-            e.printStackTrace();
-        }*/
-
-        String checkBoxString = "";
-        String roleDescription = "";
-
-
-        for (String roleType : config.rolesList) {
-            if (roleType.contentEquals(config.MEMBER_ROLE)) {
-                roleDescription = config.MEMBER_DESCRIPTION;
-            } else if (roleType.contentEquals(config.CONTRIBUTOR_ROLE)) {
-                roleDescription = config.CONTRIBUTOR_DESCRIPTION;
-            } else if (roleType.contentEquals(config.PUBLISHER_ROLE)) {
-                roleDescription = config.PUBLISHER_DESCRIPTION;
-            }
-            if (roles.contains(roleType)) {
-                checkBoxString += "<div class=\"checkbox\">\n" +
-                        "                <label>\n" +
-                        "                    <input type=\"checkbox\" value=\"" + roleType + "\" checked>\n" +
-                        "                    <b>" + roleType + "</b><br/>\n" +
-                        "                    <i>" + roleDescription + "</i>\n" +
-                        "                </label>\n" +
-                        "            </div>";
-            } else {
-                checkBoxString += "<div class=\"checkbox\">\n" +
-                        "                <label>\n" +
-                        "                    <input type=\"checkbox\" value=\"" + roleType + "\" >\n" +
-                        "                    <b>" + roleType + "</b><br/>\n" +
-                        "                    <i>" + roleDescription + "</i>\n" +
-                        "                </label>\n" +
-                        "            </div>";
-            }
-
-        }
+        String checkBoxString = userDao.generateRolesCheckboxes(userId);
 
         return Results.ok()
                 .text()
                 .render(checkBoxString);
+    }
+
+    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, FlashScope flashScope){
+
+        if(StringUtils.isEmpty(userId)){
+            flashScope.error("Something went wrong, contact administrator.");
+            return Results.badRequest();
+        }
+
+        userDao.updateUserRole(userId, Arrays.asList(roles.split(",")));
+        flashScope.success("Successfully updated roles.");
+
+        return Results.ok().text();
     }
 
     public Result displayUserData(Context context) {
