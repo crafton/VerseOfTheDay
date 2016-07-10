@@ -248,12 +248,7 @@ public class UserDao {
         Gson gson = new Gson();
         String body = "{\"app_metadata\": { \"roles\": " + gson.toJson(roles) + "} }";
 
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.USER_API + "/" + userId);
-        String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
-                .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
+        utils.updateUserProfile(userId, body);
 
     }
 

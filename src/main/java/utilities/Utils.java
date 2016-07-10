@@ -3,6 +3,7 @@ package utilities;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
+import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,6 +161,23 @@ public class Utils {
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
+
+    }
+
+    /**
+     * Update user profile
+     *
+     * @param userId
+     * @param body
+     */
+    public void updateUserProfile(String userId, String body) {
+
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.USER_API + "/" + userId);
+        String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+                .request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
+                .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
 
     }
 
