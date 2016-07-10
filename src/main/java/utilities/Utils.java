@@ -88,7 +88,7 @@ public class Utils {
      */
     public String formatListToHtml(List<String> items) {
 
-        if(items.isEmpty()){
+        if(items == null || items.isEmpty()){
             return "";
         }
 

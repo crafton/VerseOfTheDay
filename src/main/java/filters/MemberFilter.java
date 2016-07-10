@@ -27,7 +27,7 @@ public class MemberFilter implements Filter {
                 || utils.hasRole(idTokenString, config.PUBLISHER_ROLE) || utils.hasRole(idTokenString, "admin")) {
             return filterChain.next(context);
         } else {
-            return Results.redirect("/");
+            return Results.redirect("/unauthorized");
         }
     }
 }

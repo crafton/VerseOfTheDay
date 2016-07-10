@@ -1,0 +1,18 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+<@layout.myLayout "Error. Forbidden.">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <img src="/assets/img/unauthorized.svg" width="128" height="128">
+                <h1>Stop</h1>
+                <h2>Unauthorized</h2>
+                <div class="error-details">
+                    Sorry, you don't have permissions to access this page!. If you think this is a mistake please
+                    contact the site administrator.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</@layout.myLayout>

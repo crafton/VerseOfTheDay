@@ -31,4 +31,8 @@ public class ApplicationController {
 
     }
 
+    public Result unauthorized() {
+        return Results.html();
+    }
+
 }
