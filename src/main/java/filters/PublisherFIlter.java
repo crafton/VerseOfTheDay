@@ -8,7 +8,7 @@ import utilities.Utils;
 /**
  * Created by Crafton Williams on 9/07/2016.
  */
-public class PublisherFIlter implements Filter {
+public class PublisherFilter implements Filter {
     @Inject
     private Config config;
 

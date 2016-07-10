@@ -3,7 +3,10 @@ package controllers;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import daos.UserDao;
+import filters.LoginFilter;
+import filters.MemberFilter;
 import ninja.Context;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 
@@ -14,6 +17,7 @@ import org.slf4j.Logger;
 import utilities.Config;
 import utilities.Utils;
 
+import java.lang.reflect.Member;
 import java.util.Map;
 
 
@@ -68,6 +72,7 @@ public class LoginController {
         return Results.redirect("/votd/list");
     }
 
+    @FilterWith({LoginFilter.class, MemberFilter.class})
     public Result logout(Session session) {
 
         String idToken = session.get("idToken");
