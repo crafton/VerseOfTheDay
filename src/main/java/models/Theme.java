@@ -16,7 +16,7 @@ public class Theme implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String themeId;
+	private Long themeId;
 	private String themeName;
 
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "themeList")
@@ -28,11 +28,11 @@ public class Theme implements Serializable {
 		super();
 	}
 
-	public String getThemeId() {
+	public Long getThemeId() {
 		return this.themeId;
 	}
 
-	public void setThemeId(String themeId) {
+	public void setThemeId(Long themeId) {
 		this.themeId = themeId;
 	}
 

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -22,9 +23,8 @@ import org.hibernate.annotations.GenericGenerator;
 public class Campaign implements Serializable {
 
 	@Id
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	@GeneratedValue(generator = "system-uuid")
-	private String campaignId;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long campaignId;
 	private Date startDate;
 	private Date endDate;
 	private String campaignName;
@@ -40,11 +40,11 @@ public class Campaign implements Serializable {
 		super();
 	}
 
-	public String getCampaignId() {
+	public Long getCampaignId() {
 		return this.campaignId;
 	}
 
-	public void setCampaignId(String campaignId) {
+	public void setCampaignId(Long campaignId) {
 		this.campaignId = campaignId;
 	}
 
