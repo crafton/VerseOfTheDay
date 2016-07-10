@@ -1,3 +1,4 @@
 $(document).ready(function(){
- $(".datetmepicker").datetimepicker();
+ $(".datetimepicker").datetimepicker(
+ 	{format : "M dd, yyyy hh:ii"});
 });
