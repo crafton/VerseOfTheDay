@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import daos.UserDao;
 import filters.LoginFilter;
@@ -28,21 +29,28 @@ import java.util.Map;
 public class LoginController {
 
     @Inject
-    Config config;
+    private Config config;
 
     @Inject
-    Logger logger;
+    private Logger logger;
 
     @Inject
-    Utils utils;
+    private Utils utils;
 
     @Inject
-    UserDao userDao;
+    private UserDao userDao;
 
     @Inject
-    NinjaCache ninjaCache;
+    private NinjaCache ninjaCache;
 
+    /**
+     * Direct to view with auth0 login lock.
+     *
+     * @return
+     */
     public Result login() {
+
+        logger.debug("Entered login controller...");
 
         return Results.ok()
                 .render("clientid", config.getAuth0ClientId())
@@ -50,28 +58,50 @@ public class LoginController {
                 .render("callback", config.getAuth0Callback());
     }
 
+    /**
+     * Login callback. This action will be triggered after a user successfully authenticates.
+     *
+     * @param context
+     * @param session
+     * @return
+     */
     public Result callback(Context context, Session session) {
+
+        logger.debug("Entered login callback...");
 
         String code = context.getParameter("code");
 
+        /*Make sure an authorization code is received before proceeding.*/
         if (StringUtils.isEmpty(code)) {
-            Results.redirect("/");
+            logger.error("Authorization code not received.");
+            Results.redirect("/servererror");
         }
 
-        /*Retrieve authentication tokens from auth0*/
-        Map<String, String> tokens = utils.auth0GetToken(code);
-        JsonObject userObject = userDao.auth0GetUser(tokens.get("access_token"));
+        try {
+            /*Retrieve authentication tokens from auth0*/
+            Map<String, String> tokens = utils.auth0GetToken(code);
+            JsonObject userObject = userDao.auth0GetUser(tokens.get("access_token"));
 
-        /*Cache user profile so we don't have to query information again for the session*/
-        ninjaCache.set(tokens.get("id_token"), userObject.toString());
+            /*Cache user profile so we don't have to query information again for the session*/
+            ninjaCache.set(tokens.get("id_token"), userObject.toString());
 
-        /*Store only tokens in the session cookie*/
-        session.put("idToken", tokens.get("id_token"));
-        session.put("accessToken", tokens.get("access_token"));
+            /*Store only tokens in the session cookie*/
+            session.put("idToken", tokens.get("id_token"));
+            session.put("accessToken", tokens.get("access_token"));
+        } catch (JsonSyntaxException | IllegalStateException e) {
+            logger.error(e.getMessage());
+            Results.redirect("/servererror");
+        }
 
         return Results.redirect("/votd/list");
     }
 
+    /**
+     * Logout of the votd application.
+     *
+     * @param session
+     * @return
+     */
     @FilterWith({LoginFilter.class, MemberFilter.class})
     public Result logout(Session session) {
 

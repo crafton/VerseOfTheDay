@@ -1,0 +1,17 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+<@layout.myLayout "Error. Forbidden.">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <img src="/assets/img/servererror.svg" width="128" height="128">
+                <h1>Oops!</h1>
+                <h2>Server Error</h2>
+                <div class="error-details">
+                    Something unexpected has happened. Please contact the site administrator for assistance.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</@layout.myLayout>

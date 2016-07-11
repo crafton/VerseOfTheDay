@@ -32,6 +32,7 @@ public class Routes implements ApplicationRoutes {
 
         router.GET().route("/").with(ApplicationController.class, "index");
         router.GET().route("/unauthorized").with(ApplicationController.class, "unauthorized");
+        router.GET().route("/servererror").with(ApplicationController.class, "servererror");
 
         /**
          * Routes for VOTD CRUD

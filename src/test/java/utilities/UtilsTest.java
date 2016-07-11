@@ -25,7 +25,7 @@ public class UtilsTest {
     String versesTooLong = "Matthew 6:1-20";
     String goodFormatBadVerse = "Bob 1:4-8";
 
-    @Test
+/*    @Test
     public void verifyVerses() throws Exception {
         String result = utils.verifyVerses(verses);
 
@@ -92,7 +92,7 @@ public class UtilsTest {
 
         utils.votdDao.delete(votd1.getId());
 
-    }
+    }*/
 
     @Test
     public void formatListToHtml() throws Exception {
