@@ -5,7 +5,9 @@ import com.google.inject.Provider;
 import daos.ThemeDao;
 import daos.VotdDao;
 import exceptions.EntityDoesNotExistException;
+import filters.ContributorFilter;
 import filters.LoginFilter;
+import filters.PublisherFilter;
 import models.Theme;
 import models.Votd;
 import ninja.Context;
@@ -24,27 +26,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Crafton Williams on 19/03/2016.
- */
 
 @FilterWith(LoginFilter.class)
 public class VotdController {
 
     @Inject
-    Utils utils;
+    private Utils utils;
     @Inject
-    VotdDao votdDao;
+    private VotdDao votdDao;
     @Inject
-    ThemeDao themeDao;
+    private ThemeDao themeDao;
     @Inject
-    Logger logger;
-    @Inject
-    Config config;
+    private Logger logger;
 
-    @Inject
-    Provider<EntityManager> entityManagerProvider;
 
+    /**
+     * Display all votds in the database
+     *
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
     public Result viewVotds() {
 
         return Results
@@ -52,6 +53,7 @@ public class VotdController {
                 .html();
     }
 
+    @FilterWith(PublisherFilter.class)
     public Result displayVotdData(Context context) {
 
         Integer draw = Integer.parseInt(context.getParameter("draw"));
@@ -81,6 +83,7 @@ public class VotdController {
     }
 
 
+    @FilterWith(ContributorFilter.class)
     public Result createVotd() {
         List<Theme> themes = themeDao.findAll();
 
@@ -90,6 +93,7 @@ public class VotdController {
                 .render("themes", themes);
     }
 
+    @FilterWith(ContributorFilter.class)
     public Result getVerse(@PathParam("verses") String verses) {
 
         String verificationErrorMessage = votdDao.verifyVerses(verses);
@@ -115,6 +119,7 @@ public class VotdController {
         return Results.ok().text().render(versesRetrieved);
     }
 
+    @FilterWith(ContributorFilter.class)
     public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
 
         String verificationErrorMessage = votdDao.verifyVerses(votd.getVerses());
@@ -147,6 +152,7 @@ public class VotdController {
 
     }
 
+    @FilterWith(PublisherFilter.class)
     public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
 
         if (verseid == null) {
@@ -175,6 +181,7 @@ public class VotdController {
                 .render("verseText", verseText);
     }
 
+    @FilterWith(PublisherFilter.class)
     public Result saveVotdUpdate(Context context, FlashScope flashScope) {
 
         //Retrieve the themeIDs selected and convert to list of theme objects
@@ -209,6 +216,7 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
+    @FilterWith(PublisherFilter.class)
     public Result approveVotd(@PathParam("votdid") Long votdId, FlashScope flashScope) {
 
         try {
@@ -223,6 +231,7 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
+    @FilterWith(PublisherFilter.class)
     public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
 
         try {

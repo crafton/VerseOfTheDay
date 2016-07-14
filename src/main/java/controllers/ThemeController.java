@@ -18,9 +18,6 @@ import utilities.Config;
 
 import java.util.List;
 
-/**
- * Created by Crafton Williams on 28/05/2016.
- */
 @FilterWith({LoginFilter.class, PublisherFilter.class})
 public class ThemeController {
 

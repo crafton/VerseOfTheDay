@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.inject.Inject;
 import daos.UserDao;
 import filters.LoginFilter;
+import filters.PublisherFilter;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
@@ -26,27 +27,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Crafton Williams on 20/06/2016.
- */
-@FilterWith(LoginFilter.class)
+@FilterWith({LoginFilter.class, PublisherFilter.class})
 public class UserController {
 
     @Inject
-    NinjaCache ninjaCache;
+    private NinjaCache ninjaCache;
 
     @Inject
-    Logger logger;
+    private Logger logger;
 
     @Inject
-    UserDao userDao;
+    private UserDao userDao;
 
-    @Inject
-    Config config;
-
-    @Inject
-    Utils utils;
-
+    /**
+     *Render view to display all users
+     *
+     * @return
+     */
     public Result viewUsers() {
 
         return Results
@@ -54,7 +51,18 @@ public class UserController {
                 .html();
     }
 
+    /**
+     * Display all roles available with roles assigned already selected.
+     *
+     * @param userId
+     * @return html checkboxes associated with available roles
+     */
     public Result displayUserRoles(@PathParam("userid") String userId) {
+
+        if(StringUtils.isEmpty(userId)){
+            logger.warn("User tried to query 'displayUserRoles' without a userid.");
+            return Results.badRequest().text();
+        }
 
         String checkBoxString = userDao.generateRolesCheckboxes(userId);
 
@@ -63,9 +71,17 @@ public class UserController {
                 .render(checkBoxString);
     }
 
-    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, FlashScope flashScope){
+    /**
+     * Update a user's roles
+     *
+     * @param userId
+     * @param roles
+     * @return
+     */
+    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles){
 
         if(StringUtils.isEmpty(userId)){
+            logger.warn("User tried to 'updateUserRoles' without supplying a userid.");
             return Results.badRequest().text();
         }
 
@@ -74,32 +90,50 @@ public class UserController {
         return Results.ok().text();
     }
 
+    /**
+     * Display all registered users
+     *
+     * @param context
+     * @return a map containing all query results
+     */
     public Result displayUserData(Context context) {
-        Integer draw = Integer.parseInt(context.getParameter("draw"));
-        Integer start = Integer.parseInt(context.getParameter("start"));
-        Integer length = Integer.parseInt(context.getParameter("length"));
-        String search = context.getParameter("search[value]");
+        try {
+            Integer draw = Integer.parseInt(context.getParameter("draw"));
+            Integer start = Integer.parseInt(context.getParameter("start"));
+            Integer length = Integer.parseInt(context.getParameter("length"));
+            String search = context.getParameter("search[value]");
 
-        Integer recordsTotal = userDao.getTotalRecords();
+            Integer recordsTotal = userDao.getTotalRecords();
 
-        JsonObject usersJson = userDao.getUserRecords(start, length, search);
-        Integer recordsFiltered = usersJson.get("total")
-                .getAsInt();
-        List<String[]> usersData = userDao.generateDataTableResults(usersJson.getAsJsonArray("users"));
+            JsonObject usersJson = userDao.getUserRecords(start, length, search);
+            Integer recordsFiltered = usersJson.get("total")
+                    .getAsInt();
+            List<String[]> usersData = userDao.generateDataTableResults(usersJson.getAsJsonArray("users"));
 
         /*Format data for ajax callback processing*/
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("draw", draw);
-        userMap.put("recordsTotal", recordsTotal);
-        userMap.put("recordsFiltered", recordsFiltered);
-        userMap.put("data", usersData);
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("draw", draw);
+            userMap.put("recordsTotal", recordsTotal);
+            userMap.put("recordsFiltered", recordsFiltered);
+            userMap.put("data", usersData);
 
-        return Results
-                .ok()
-                .json()
-                .render(userMap);
+            return Results
+                    .ok()
+                    .json()
+                    .render(userMap);
+        }catch (JsonSyntaxException e){
+            logger.error(e.getMessage());
+            return Results.internalServerError().json();
+        }
     }
 
+    /**
+     *THIS MIGHT GO AWAY
+     *
+     * @param flashScope
+     * @param session
+     * @return
+     */
     public Result updateUser(FlashScope flashScope, Session session) {
 
         String idTokenString = session.get("idToken");
@@ -116,6 +150,13 @@ public class UserController {
         }
     }
 
+    /**
+     *THIS MIGHT GO AWAY
+     *
+     * @param context
+     * @param session
+     * @return
+     */
     public Result saveUpdate(Context context, Session session) {
         return Results.ok();
     }

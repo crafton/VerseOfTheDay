@@ -59,7 +59,7 @@ public class Utils {
             jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             throw new IllegalStateException(e.getMessage());
         }
 
@@ -88,7 +88,7 @@ public class Utils {
      */
     public String formatListToHtml(List<String> items) {
 
-        if(items == null || items.isEmpty()){
+        if (items == null || items.isEmpty()) {
             return "";
         }
 
@@ -125,11 +125,11 @@ public class Utils {
      * @param token
      * @return
      */
-    public JsonObject auth0ApiQuery(Map<String, Object> params, String apiPath, String token){
+    public JsonObject auth0ApiQuery(Map<String, Object> params, String apiPath, String token) {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target("https://" + config.getAuth0Domain() + apiPath);
 
-        if(params != null && !params.isEmpty()) {
+        if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, Object> param : params.entrySet()) {
                 target = target.queryParam(param.getKey(), param.getValue());
             }
@@ -179,9 +179,11 @@ public class Utils {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
                 .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
 
+        logger.info("Received the following response after updating user profile:" + response);
+
     }
 
-    public boolean hasRole(String idTokenString, String role){
+    public boolean hasRole(String idTokenString, String role) {
 
         String userJsonString = (String) ninjaCache.get(idTokenString);
         JsonParser jsonParser = new JsonParser();
@@ -193,8 +195,8 @@ public class Utils {
                 .get("roles")
                 .getAsJsonArray();
 
-        for(JsonElement roleElement : rolesArray){
-            if(roleElement.getAsString().contentEquals(role)){
+        for (JsonElement roleElement : rolesArray) {
+            if (roleElement.getAsString().contentEquals(role)) {
                 return true;
             }
         }
