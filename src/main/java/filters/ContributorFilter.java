@@ -24,7 +24,7 @@ public class ContributorFilter implements Filter {
                 || utils.hasRole(idTokenString, "admin")) {
             return filterChain.next(context);
         } else {
-            return Results.redirect("/");
+            return Results.redirect("/unauthorized");
         }
     }
 }

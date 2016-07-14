@@ -1,5 +1,6 @@
 package controllers;
 
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import daos.ThemeDao;
@@ -53,36 +54,51 @@ public class VotdController {
                 .html();
     }
 
+    /**
+     * Display all votds in the database with an optional filter.
+     *
+     * @param context
+     * @return
+     */
     @FilterWith(PublisherFilter.class)
     public Result displayVotdData(Context context) {
 
-        Integer draw = Integer.parseInt(context.getParameter("draw"));
-        Integer start = Integer.parseInt(context.getParameter("start"));
-        Integer length = Integer.parseInt(context.getParameter("length"));
-        String search = context.getParameter("search[value]");
+        try {
+            Integer draw = Integer.parseInt(context.getParameter("draw"));
+            Integer start = Integer.parseInt(context.getParameter("start"));
+            Integer length = Integer.parseInt(context.getParameter("length"));
+            String search = context.getParameter("search[value]");
 
-        Integer recordsTotal = votdDao.getTotalRecords().intValue();
+            Integer recordsTotal = votdDao.getTotalRecords().intValue();
 
         /*Retrieve records and build array of data to return*/
-        List<Votd> votds = votdDao.wildFind(search, start, length);
-        Integer recordsFiltered = votdDao.countFilteredRecords(search).intValue();
-        List<String[]> votdData = votdDao.generateDataTableResults(votds);
+            List<Votd> votds = votdDao.wildFind(search, start, length);
+            Integer recordsFiltered = votdDao.countFilteredRecords(search).intValue();
+            List<String[]> votdData = votdDao.generateDataTableResults(votds);
 
         /*Format data for ajax callback processing*/
-        Map<String, Object> votdMap = new HashMap<>();
-        votdMap.put("draw", draw);
-        votdMap.put("recordsTotal", recordsTotal);
-        votdMap.put("recordsFiltered", recordsFiltered);
-        votdMap.put("data", votdData);
+            Map<String, Object> votdMap = new HashMap<>();
+            votdMap.put("draw", draw);
+            votdMap.put("recordsTotal", recordsTotal);
+            votdMap.put("recordsFiltered", recordsFiltered);
+            votdMap.put("data", votdData);
 
 
-        return Results
-                .ok()
-                .json()
-                .render(votdMap);
+            return Results
+                    .ok()
+                    .json()
+                    .render(votdMap);
+        }catch (JsonSyntaxException e){
+            logger.error(e.getMessage());
+            return Results.badRequest().json();
+        }
     }
 
 
+    /**
+     * Render view to create a new votd
+     * @return
+     */
     @FilterWith(ContributorFilter.class)
     public Result createVotd() {
         List<Theme> themes = themeDao.findAll();
@@ -93,6 +109,12 @@ public class VotdController {
                 .render("themes", themes);
     }
 
+    /**
+     *Retrieve the full versetext from the web service given a verse range
+     *
+     * @param verses verses to retrieve
+     * @return
+     */
     @FilterWith(ContributorFilter.class)
     public Result getVerse(@PathParam("verses") String verses) {
 
@@ -119,6 +141,14 @@ public class VotdController {
         return Results.ok().text().render(versesRetrieved);
     }
 
+    /**
+     * Save a new Votd to the database
+     *
+     * @param context
+     * @param votd
+     * @param flashScope
+     * @return
+     */
     @FilterWith(ContributorFilter.class)
     public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
 
@@ -152,6 +182,13 @@ public class VotdController {
 
     }
 
+    /**
+     * Update an existing votd associated with the supplied verseid
+     *
+     * @param verseid
+     * @param flashScope
+     * @return
+     */
     @FilterWith(PublisherFilter.class)
     public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
 
@@ -166,21 +203,34 @@ public class VotdController {
         List<Theme> themes = themeDao.findAll();
 
         if (votd == null) {
-            flashScope.error("Tried to update a Votd that doesn't exist.");
+            flashScope.error("Tried to retrieve a Votd that doesn't exist.");
             return Results.redirect("/votd/list");
         }
 
-        //Get verse text
-        String verseText = votdDao.restGetVerses(votd.getVerses());
+        try {
+            //Get verse text
+            String verseText = votdDao.restGetVerses(votd.getVerses());
 
-        return Results
-                .ok()
-                .html()
-                .render("votd", votd)
-                .render("themes", themes)
-                .render("verseText", verseText);
+            return Results
+                    .ok()
+                    .html()
+                    .render("votd", votd)
+                    .render("themes", themes)
+                    .render("verseText", verseText);
+        }catch (JsonSyntaxException e){
+            flashScope.error("Could not retrieve the requested votd.");
+            logger.error("CFailed web service call to retrieve verses.");
+            return Results.redirect("/votd/list");
+        }
     }
 
+    /**
+     * Save an updated votd record
+     *
+     * @param context
+     * @param flashScope
+     * @return
+     */
     @FilterWith(PublisherFilter.class)
     public Result saveVotdUpdate(Context context, FlashScope flashScope) {
 
@@ -216,6 +266,13 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
+    /**
+     * Approve a submitted Votd
+     *
+     * @param votdId
+     * @param flashScope
+     * @return
+     */
     @FilterWith(PublisherFilter.class)
     public Result approveVotd(@PathParam("votdid") Long votdId, FlashScope flashScope) {
 
@@ -231,6 +288,13 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
+    /**
+     * Delete a votd
+     *
+     * @param verseid
+     * @param flashScope
+     * @return
+     */
     @FilterWith(PublisherFilter.class)
     public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
 

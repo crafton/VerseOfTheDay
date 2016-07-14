@@ -23,7 +23,7 @@ public class PublisherFilter implements Filter {
         if (utils.hasRole(idTokenString, config.PUBLISHER_ROLE) || utils.hasRole(idTokenString, "admin")) {
             return filterChain.next(context);
         } else {
-            return Results.redirect("/");
+            return Results.redirect("/unauthorized");
         }
     }
 }
