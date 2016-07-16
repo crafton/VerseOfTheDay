@@ -5,10 +5,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by Crafton Williams on 23/04/2016.
- */
-
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Votd.findVersesInChapter", query = "SELECT verses FROM Votd WHERE verses LIKE :bookchapter"),

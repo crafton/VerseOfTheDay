@@ -11,9 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Crafton Williams on 20/06/2016.
- */
+
 public class UserDao {
 
     @Inject
