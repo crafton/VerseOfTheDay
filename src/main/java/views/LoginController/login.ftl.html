@@ -1,21 +1,29 @@
 <#import "../layout/defaultLayout.ftl.html" as layout>
     <@layout.myLayout "Login">
 
-    <script src="https://cdn.auth0.com/js/lock-9.1.min.js"></script>
+    <script src="https://cdn.auth0.com/js/lock/10.0.0-rc.2/lock.min.js"></script>
     <script type="text/javascript">
 
-        var lock = new Auth0Lock('${clientid}', '${domain}');
-
-        function signin() {
-            lock.show({
-                callbackURL: '${callback}'
-                , responseType: 'code'
-                , authParams: {
-                    scope: 'openid email'  // Learn about scopes: https://auth0.com/docs/scopes
+        var lock = new Auth0Lock('${clientid}', '${domain}',
+                {
+                    socialButtonStyle: "small",
+                    additionalSignUpFields: [{
+                        name: "name",
+                        placeholder: "your full name",
+                        //icon: "/assets/img/name.svg"
+                    }],
+                    auth: {
+                        redirectUrl: "${callback}",
+                        redirect: true,
+                        params: {scope: "openid email"},
+                        responseType: "code"
+                    }
+                },
+                function (error, result) {
                 }
-            });
-        }
+        );
+
+        lock.show();
     </script>
-    <button onclick="window.signin();">Login</button>
 
 </@layout.myLayout>

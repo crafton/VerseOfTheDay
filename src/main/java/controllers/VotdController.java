@@ -1,51 +1,104 @@
 package controllers;
 
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import daos.ThemeDao;
-import daos.VotdDao;
+import services.ThemeService;
+import services.VotdService;
 import exceptions.EntityDoesNotExistException;
+import filters.ContributorFilter;
+import filters.LoginFilter;
+import filters.PublisherFilter;
 import models.Theme;
 import models.Votd;
 import ninja.Context;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
-import com.google.inject.Singleton;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
-import utilities.ControllerUtils;
+import utilities.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Created by Crafton Williams on 19/03/2016.
- */
 
-@Singleton
+@FilterWith(LoginFilter.class)
 public class VotdController {
 
     @Inject
-    ControllerUtils controllerUtils;
+    private Utils utils;
     @Inject
-    VotdDao votdDao;
+    private VotdService votdService;
     @Inject
-    ThemeDao themeDao;
+    private ThemeService themeService;
     @Inject
-    Logger logger;
+    private Logger logger;
 
+
+    /**
+     * Display all votds in the database
+     *
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
     public Result viewVotds() {
-
-        List<Votd> votds = votdDao.findAll();
 
         return Results
                 .ok()
-                .html()
-                .render("votds", votds);
+                .html();
     }
 
+    /**
+     * Display all votds in the database with an optional filter.
+     *
+     * @param context
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
+    public Result displayVotdData(Context context) {
+
+        try {
+            Integer draw = Integer.parseInt(context.getParameter("draw"));
+            Integer start = Integer.parseInt(context.getParameter("start"));
+            Integer length = Integer.parseInt(context.getParameter("length"));
+            String search = context.getParameter("search[value]");
+
+            Integer recordsTotal = votdService.getTotalRecords().intValue();
+
+        /*Retrieve records and build array of data to return*/
+            List<Votd> votds = votdService.wildFind(search, start, length);
+            Integer recordsFiltered = votdService.countFilteredRecords(search).intValue();
+            List<String[]> votdData = votdService.generateDataTableResults(votds);
+
+        /*Format data for ajax callback processing*/
+            Map<String, Object> votdMap = new HashMap<>();
+            votdMap.put("draw", draw);
+            votdMap.put("recordsTotal", recordsTotal);
+            votdMap.put("recordsFiltered", recordsFiltered);
+            votdMap.put("data", votdData);
+
+
+            return Results
+                    .ok()
+                    .json()
+                    .render(votdMap);
+        }catch (JsonSyntaxException e){
+            logger.error(e.getMessage());
+            return Results.badRequest().json();
+        }
+    }
+
+
+    /**
+     * Render view to create a new votd
+     * @return
+     */
+    @FilterWith(ContributorFilter.class)
     public Result createVotd() {
-        List<Theme> themes = themeDao.findAll();
+        List<Theme> themes = themeService.findAll();
 
         return Results
                 .ok()
@@ -53,9 +106,16 @@ public class VotdController {
                 .render("themes", themes);
     }
 
+    /**
+     *Retrieve the full versetext from the web service given a verse range
+     *
+     * @param verses verses to retrieve
+     * @return
+     */
+    @FilterWith(ContributorFilter.class)
     public Result getVerse(@PathParam("verses") String verses) {
 
-        String verificationErrorMessage = controllerUtils.verifyVerses(verses);
+        String verificationErrorMessage = votdService.verifyVerses(verses);
 
         if (!verificationErrorMessage.isEmpty()) {
             return Results.badRequest().text().render(verificationErrorMessage);
@@ -64,23 +124,32 @@ public class VotdController {
         String versesTrimmed = verses.trim();
 
         /*Call web service to retrieve verses.*/
-        String versesRetrieved = controllerUtils.restGetVerses(versesTrimmed);
+        String versesRetrieved = votdService.restGetVerses(versesTrimmed);
 
         /*Find all verses that clash with what we're trying to add to the database*/
-        List<String> verseClashes = controllerUtils.findClashes(versesTrimmed);
+        List<String> verseClashes = votdService.findClashes(versesTrimmed);
         if (!verseClashes.isEmpty()) {
             versesRetrieved += "<h4 id='clash' class='text-danger'>Verse Clashes</h4>" +
                     "<small>Verses that already exist in the database which " +
-                    "intersect with the verses being entered.</small>"
-                    + controllerUtils.formatListToHtml(verseClashes);
+                    "intersect with the verses being entered.</small><p></p>"
+                    + utils.formatListToHtml(verseClashes);
         }
 
         return Results.ok().text().render(versesRetrieved);
     }
 
+    /**
+     * Save a new Votd to the database
+     *
+     * @param context
+     * @param votd
+     * @param flashScope
+     * @return
+     */
+    @FilterWith(ContributorFilter.class)
     public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
 
-        String verificationErrorMessage = controllerUtils.verifyVerses(votd.getVerses());
+        String verificationErrorMessage = votdService.verifyVerses(votd.getVerses());
 
         if (!verificationErrorMessage.isEmpty()) {
             flashScope.error(verificationErrorMessage);
@@ -96,20 +165,28 @@ public class VotdController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeDao.findById(Long.parseLong(themeId));
+            Theme theme = themeService.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         try {
             votd.setThemes(themeList);
-            votdDao.save(votd);
+            votdService.save(votd);
             flashScope.success("Successfully created a new VoTD entry.");
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             flashScope.error("Something strange has happened. Contact the administrator.");
         }
         return Results.redirect("/votd/create");
 
     }
 
+    /**
+     * Update an existing votd associated with the supplied verseid
+     *
+     * @param verseid
+     * @param flashScope
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
     public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
 
         if (verseid == null) {
@@ -117,27 +194,41 @@ public class VotdController {
             return Results.redirect("/votd/list");
         }
 
-        Votd votd = votdDao.findById(verseid);
+        Votd votd = votdService.findById(verseid);
 
         //Get all themes
-        List<Theme> themes = themeDao.findAll();
+        List<Theme> themes = themeService.findAll();
 
         if (votd == null) {
-            flashScope.error("Tried to update a Votd that doesn't exist.");
+            flashScope.error("Tried to retrieve a Votd that doesn't exist.");
             return Results.redirect("/votd/list");
         }
 
-        //Get verse text
-        String verseText = controllerUtils.restGetVerses(votd.getVerses());
+        try {
+            //Get verse text
+            String verseText = votdService.restGetVerses(votd.getVerses());
 
-        return Results
-                .ok()
-                .html()
-                .render("votd", votd)
-                .render("themes", themes)
-                .render("verseText", verseText);
+            return Results
+                    .ok()
+                    .html()
+                    .render("votd", votd)
+                    .render("themes", themes)
+                    .render("verseText", verseText);
+        }catch (JsonSyntaxException e){
+            flashScope.error("Could not retrieve the requested votd.");
+            logger.error("CFailed web service call to retrieve verses.");
+            return Results.redirect("/votd/list");
+        }
     }
 
+    /**
+     * Save an updated votd record
+     *
+     * @param context
+     * @param flashScope
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
     public Result saveVotdUpdate(Context context, FlashScope flashScope) {
 
         //Retrieve the themeIDs selected and convert to list of theme objects
@@ -146,7 +237,7 @@ public class VotdController {
         List<Theme> themeList = new ArrayList<>();
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeDao.findById(Long.parseLong(themeId));
+                Theme theme = themeService.findById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
 
@@ -162,7 +253,7 @@ public class VotdController {
 
         try {
             Long votdId = Long.parseLong(context.getParameter("verseid"));
-            votdDao.update(votdId, themeList, votdStatus);
+            votdService.update(votdId, themeList, votdStatus);
         } catch (IllegalArgumentException | EntityDoesNotExistException e) {
             flashScope.error("The VOTD you're trying to update does not exist.");
             return Results.redirect("/votd/list");
@@ -172,10 +263,18 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
+    /**
+     * Approve a submitted Votd
+     *
+     * @param votdId
+     * @param flashScope
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
     public Result approveVotd(@PathParam("votdid") Long votdId, FlashScope flashScope) {
 
         try {
-            votdDao.approve(votdId);
+            votdService.approve(votdId);
             flashScope.success("Successfully approved VOTD.");
         } catch (IllegalArgumentException e) {
             flashScope.error("You must supply a valid votdid.");
@@ -186,10 +285,18 @@ public class VotdController {
         return Results.redirect("/votd/list");
     }
 
+    /**
+     * Delete a votd
+     *
+     * @param verseid
+     * @param flashScope
+     * @return
+     */
+    @FilterWith(PublisherFilter.class)
     public Result deleteVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
 
         try {
-            votdDao.delete(verseid);
+            votdService.delete(verseid);
             flashScope.success("Successfully deleted Votd.");
         } catch (IllegalArgumentException e) {
             flashScope.error("You must supply a votd Id.");

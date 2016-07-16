@@ -7,8 +7,15 @@
 
 #loadingDiv {
     width: 100px;
-    height: 100px;
+   /* height: 100px;*/
     margin: auto;
+}
+
+#loadingText {
+    width: 100px;
+    /* height: 100px;*/
+    margin: auto;
+    color: green;
 }
 
 h4#clash{
@@ -29,4 +36,15 @@ h4#clash{
 #verseToUpdate .popover{
     max-width: 80%;
     overflow: auto;
+}
+
+#email {
+    padding-top: 7px;
+    margin-bottom: 0;
+    float: left;
+    font-weight: bold;
+}
+
+.checkbox {
+    padding-bottom: 10px;
 }

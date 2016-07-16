@@ -7,6 +7,12 @@ $("#verifyVerseButton").click(function () {
     $.ajax({
         url: "/votd/getverse/" + encodeURIComponent($("#verses").val()),
         cache: false,
+        beforeSend: function () {
+            $('#loadingDiv').show();
+        },
+        complete: function () {
+            $('#loadingDiv').hide();
+        },
         success: function (data) {
             $("#verseRetrieved").html(data);
         },
@@ -14,20 +20,6 @@ $("#verifyVerseButton").click(function () {
             $("#verseRetrieved").html("<strong>" + xhr.responseText + "</strong> ");
         }
     });
-});
-
-
-
-//Show a nice loader when verses are being retrieved
-jQuery.ajaxSetup({
-    beforeSend: function () {
-        $('#loadingDiv').show();
-    },
-    complete: function () {
-        $('#loadingDiv').hide();
-    },
-    success: function () {
-    }
 });
 
 <!-- Initialize the multiselect plugin: -->

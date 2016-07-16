@@ -43,7 +43,7 @@ public class ApiControllerDocTesterTest extends NinjaDocTester {
 
 
     }
-    
+/*
     @Test
     public void testGetHelloWorldJson() {
     
@@ -57,6 +57,6 @@ public class ApiControllerDocTesterTest extends NinjaDocTester {
         assertThat(simplePojo.content, CoreMatchers.equalTo("Hello World! Hello Json!"));
 
     
-    }
+    }*/
 
 }

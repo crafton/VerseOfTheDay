@@ -1,48 +1,40 @@
 <#import "../layout/defaultLayout.ftl.html" as layout>
     <@layout.myLayout "Votds">
 
-    <#if (votds?size) gt 0>
-        <table id="votdTable" class="table table-responsive">
-            <thead>
-            <tr>
-                <th>Verses</th>
-                <th>Themes</th>
-                <th>Status</th>
-                <th>Approve</th>
-                <th>Created By</th>
-                <th>Modified By</th>
-                <th></th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <#list votds as votd>
-                <tr>
-                    <td>${votd.getVerses()}</td>
-                    <td>${votd.getThemes()?join(", ")}</td>
-                    <td><#if votd.isApproved()> Approved <#else> Pending </#if> </td>
-                    <td><#if !votd.isApproved()><a class="fa fa-thumbs-up" href="/votd/approve/${votd.getId()}" aria-hidden="true"></a></#if></td>
-                    <td></td>
-                    <td></td>
-                    <td><a class="fa fa-trash" data-placement="top" data-toggle="confirmation" aria-hidden="true" href="/votd/delete/${votd.getId()}"></a></td>
-                    <td><a class="fa fa-pencil" aria-hidden="true" href="/votd/update/${votd.getId()}"></a></td>
-                </tr>
-            </#list>
-            </tbody>
-        </table>
-        <#else>
-            <p class="text-center text-warning"> No Votds added to the database yet. </p>
-    </#if>
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
+
+    <table id="votdTable" class="table table-responsive">
+        <thead>
+        <tr>
+            <th>Verses</th>
+            <th>Themes</th>
+            <th>Status</th>
+            <th>Approve</th>
+            <th>Created By</th>
+            <th>Modified By</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+
     <script>
-        $('[data-toggle="confirmation"]').confirmation({
-            href: function(elem){
+        $('#votdTable').confirmation({
+            selector: '[data-toggle="confirmation"]',
+            href: function (elem) {
                 return $(elem).attr('href');
             }
         });
-    </script>
-    <script>
+
         $(document).ready(function () {
-            $('#votdTable').DataTable();
+            $('#votdTable').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": "/votd/displayvotds"
+            });
         });
     </script>
 </@layout.myLayout>

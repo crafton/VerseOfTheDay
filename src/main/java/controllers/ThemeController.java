@@ -1,45 +1,42 @@
 package controllers;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.persist.Transactional;
-import daos.ThemeDao;
+import services.ThemeService;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
+import filters.LoginFilter;
+import filters.PublisherFilter;
 import models.Theme;
-import models.Votd;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
-import ninja.jpa.UnitOfWork;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
-import org.h2.jdbc.JdbcSQLException;
 import org.slf4j.Logger;
 import utilities.Config;
-import utilities.ControllerUtils;
 
-import javax.persistence.*;
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Crafton Williams on 28/05/2016.
- */
-@Singleton
+@FilterWith({LoginFilter.class, PublisherFilter.class})
 public class ThemeController {
 
     @Inject
-    ThemeDao themeDao;
+    private ThemeService themeService;
     @Inject
-    Logger logger;
+    private Logger logger;
     @Inject
-    Config config;
+    private Config config;
 
+    /**
+     * Retrieve list of themes from database as well as the maximum number of
+     * columns to render.
+     *
+     * @return
+     */
     public Result themes() {
-        List<Theme> themes = themeDao.findAll();
+        logger.debug("Generating themes list...");
+        List<Theme> themes = themeService.findAll();
 
         return Results
                 .ok()
@@ -48,11 +45,20 @@ public class ThemeController {
                 .render("maxCols", config.getThemesMaxCols());
     }
 
+    /**
+     * Save a new theme to the database.
+     *
+     * @param theme
+     * @param flashScope
+     * @return
+     */
     public Result saveTheme(Theme theme, FlashScope flashScope) {
+        logger.debug("Entered saveTheme action...");
 
         try {
-            themeDao.save(theme);
+            themeService.save(theme);
         } catch (IllegalArgumentException e) {
+            logger.warn("User tried to access the save controller directly.");
             flashScope.error("A theme has not been submitted");
         } catch (EntityAlreadyExistsException e) {
             logger.warn(e.getMessage());
@@ -62,13 +68,22 @@ public class ThemeController {
         return Results.redirect("/theme/list");
     }
 
+    /**
+     *Delete a theme given a themeId
+     *
+     * @param themeId
+     * @param flashScope
+     * @return
+     */
     public Result deleteTheme(@PathParam("theme") Long themeId, FlashScope flashScope) {
+        logger.debug("Entered deleteTheme action...");
 
         try {
-            themeDao.delete(themeId);
+            themeService.delete(themeId);
             logger.info("Successfully deleted theme.");
             flashScope.success("Successfully deleted theme.");
         } catch (IllegalArgumentException e) {
+            logger.warn("User tried to delete a theme by accessing the action directly.");
             flashScope.error("You must supply a theme Id");
         } catch (EntityDoesNotExistException e) {
             logger.warn("Tried to delete a theme that doesn't exist.");
