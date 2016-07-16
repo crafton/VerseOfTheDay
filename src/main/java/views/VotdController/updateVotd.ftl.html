@@ -57,11 +57,19 @@
     </div>
     <script>
         $("[name='isApproved']").bootstrapSwitch();
-    </script>
-    <script>
+
         $(function () {
             $('[data-toggle="fullverse"]').popover()
         })
+
+        <!-- Initialize the multiselect plugin: -->
+        $(document).ready(function () {
+            $('#themes').multiselect({
+                disableIfEmpty: true,
+                enableFiltering: true,
+                numberDisplayed: 6,
+                maxHeight: 400
+            });
+        });
     </script>
-    <script type="text/javascript" src="/assets/js/votd.js"></script>
 </@layout.myLayout>
