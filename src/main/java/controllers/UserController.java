@@ -2,7 +2,7 @@ package controllers;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
-import daos.UserDao;
+import services.UserDao;
 import filters.LoginFilter;
 import filters.PublisherFilter;
 import ninja.Context;
@@ -15,13 +15,7 @@ import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
-import utilities.Config;
-import utilities.Utils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

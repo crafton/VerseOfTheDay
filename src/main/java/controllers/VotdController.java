@@ -2,9 +2,8 @@ package controllers;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import daos.ThemeDao;
-import daos.VotdDao;
+import services.ThemeDao;
+import services.VotdDao;
 import exceptions.EntityDoesNotExistException;
 import filters.ContributorFilter;
 import filters.LoginFilter;
@@ -18,10 +17,8 @@ import ninja.Results;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
-import utilities.Config;
 import utilities.Utils;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

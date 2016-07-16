@@ -1,8 +1,5 @@
-package daos;
+package services;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.persist.Transactional;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
@@ -11,9 +8,7 @@ import models.Votd;
 import ninja.NinjaDaoTestBase;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
 
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;

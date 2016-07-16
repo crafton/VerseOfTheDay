@@ -1,4 +1,4 @@
-package daos;
+package services;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -9,12 +9,10 @@ import exceptions.EntityDoesNotExistException;
 import models.Theme;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.util.List;
-import org.slf4j.Logger;
 
 public class ThemeDao {
 

@@ -1,4 +1,4 @@
-package daos;
+package services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -21,25 +21,21 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by Crafton Williams on 1/06/2016.
- */
 public class VotdDao {
 
     @Inject
     private Provider<EntityManager> entityManagerProvider;
 
     @Inject
-    Config config;
+    private Config config;
 
     @Inject
-    Logger logger;
+    private Logger logger;
 
     public VotdDao() {
     }

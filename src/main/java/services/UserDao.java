@@ -1,19 +1,11 @@
-package daos;
+package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
-import org.apache.commons.lang.StringUtils;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import utilities.Config;
 import utilities.Utils;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,10 +26,6 @@ public class UserDao {
     Utils utils;
 
     public UserDao() {
-    }
-
-    public void update() {
-
     }
 
     public String getCurrentUser(String idToken) {
@@ -195,6 +183,8 @@ public class UserDao {
     }
 
     /**
+     * Retrieve a user from auth0
+     *
      * @param accessToken
      * @return
      */
@@ -213,7 +203,7 @@ public class UserDao {
      * @param userID
      * @return
      */
-    public List<String> getUserRoles(String userID) throws JsonSyntaxException {
+    private List<String> getUserRoles(String userID) throws JsonSyntaxException {
         List<String> rolesList = new ArrayList<>();
         Map<String, Object> params = new HashMap<>();
         params.put("fields", "app_metadata");

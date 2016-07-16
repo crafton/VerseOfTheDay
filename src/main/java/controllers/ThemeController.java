@@ -1,7 +1,7 @@
 package controllers;
 
 import com.google.inject.Inject;
-import daos.ThemeDao;
+import services.ThemeDao;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;

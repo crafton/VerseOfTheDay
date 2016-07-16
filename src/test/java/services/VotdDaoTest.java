@@ -1,4 +1,4 @@
-package daos;
+package services;
 
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
