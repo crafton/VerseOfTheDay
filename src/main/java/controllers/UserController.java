@@ -2,7 +2,7 @@ package controllers;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
-import services.UserDao;
+import services.UserService;
 import filters.LoginFilter;
 import filters.PublisherFilter;
 import ninja.Context;
@@ -31,7 +31,7 @@ public class UserController {
     private Logger logger;
 
     @Inject
-    private UserDao userDao;
+    private UserService userService;
 
     /**
      *Render view to display all users
@@ -58,7 +58,7 @@ public class UserController {
             return Results.badRequest().text();
         }
 
-        String checkBoxString = userDao.generateRolesCheckboxes(userId);
+        String checkBoxString = userService.generateRolesCheckboxes(userId);
 
         return Results.ok()
                 .text()
@@ -79,7 +79,7 @@ public class UserController {
             return Results.badRequest().text();
         }
 
-        userDao.updateUserRole(userId, Arrays.asList(roles.split(",")));
+        userService.updateUserRole(userId, Arrays.asList(roles.split(",")));
 
         return Results.ok().text();
     }
@@ -97,12 +97,12 @@ public class UserController {
             Integer length = Integer.parseInt(context.getParameter("length"));
             String search = context.getParameter("search[value]");
 
-            Integer recordsTotal = userDao.getTotalRecords();
+            Integer recordsTotal = userService.getTotalRecords();
 
-            JsonObject usersJson = userDao.getUserRecords(start, length, search);
+            JsonObject usersJson = userService.getUserRecords(start, length, search);
             Integer recordsFiltered = usersJson.get("total")
                     .getAsInt();
-            List<String[]> usersData = userDao.generateDataTableResults(usersJson.getAsJsonArray("users"));
+            List<String[]> usersData = userService.generateDataTableResults(usersJson.getAsJsonArray("users"));
 
         /*Format data for ajax callback processing*/
             Map<String, Object> userMap = new HashMap<>();

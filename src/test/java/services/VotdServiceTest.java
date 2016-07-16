@@ -16,18 +16,18 @@ import static org.junit.Assert.*;
 /**
  * Created by Crafton Williams on 2/06/2016.
  */
-public class VotdDaoTest extends NinjaDaoTestBase {
+public class VotdServiceTest extends NinjaDaoTestBase {
 
-    private VotdDao votdDao;
-    private ThemeDao themeDao;
+    private VotdService votdService;
+    private ThemeService themeService;
     private Votd votd;
     private List<Theme> themeList = new ArrayList<>();
     private Theme theme;
 
     @Before
     public void setup() {
-        votdDao = getInstance(VotdDao.class);
-        themeDao = getInstance(ThemeDao.class);
+        votdService = getInstance(VotdService.class);
+        themeService = getInstance(ThemeService.class);
 
         votd = new Votd();
         votd.setVerses("Matthew 6:1-8");
@@ -43,9 +43,9 @@ public class VotdDaoTest extends NinjaDaoTestBase {
 
     @Test
     public void findAll() throws Exception {
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        List<Votd> votdList = votdDao.findAll();
+        List<Votd> votdList = votdService.findAll();
 
         assertEquals(1, votdList.size());
         assertEquals(votd.getVerses(), votdList.get(0).getVerses());
@@ -53,45 +53,45 @@ public class VotdDaoTest extends NinjaDaoTestBase {
 
     @Test
     public void findById() throws Exception {
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        Votd v = votdDao.findById(1L);
+        Votd v = votdService.findById(1L);
 
         assertEquals(votd.getVerses(), v.getVerses());
 
-        Votd v1 = votdDao.findById(2L);
+        Votd v1 = votdService.findById(2L);
 
         assertNull(v1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findByIdWhenIdisNull() throws Exception{
-        votdDao.findById(null);
+        votdService.findById(null);
     }
 
     @Test
     public void findByVerse() throws Exception {
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        String verse = votdDao.findByVerse(votd.getVerses());
+        String verse = votdService.findByVerse(votd.getVerses());
 
         assertEquals(verse, votd.getVerses());
     }
 
     @Test(expected = NoResultException.class)
     public void findByBadVerse() throws Exception {
-        votdDao.findByVerse("Some random verse");
+        votdService.findByVerse("Some random verse");
     }
 
     @Test
     public void findVersesInChapter() throws Exception {
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        List<String> versesInChapter = votdDao.findVersesInChapter("Matthew 6");
+        List<String> versesInChapter = votdService.findVersesInChapter("Matthew 6");
 
         assertEquals(versesInChapter.get(0), votd.getVerses());
 
-        List<String> versesNotInChapter = votdDao.findVersesInChapter("Random");
+        List<String> versesNotInChapter = votdService.findVersesInChapter("Random");
 
         assertEquals(0, versesNotInChapter.size());
     }
@@ -99,14 +99,14 @@ public class VotdDaoTest extends NinjaDaoTestBase {
     @Test
     public void update() throws Exception {
 
-        themeDao.save(theme);
-        votdDao.save(votd);
+        themeService.save(theme);
+        votdService.save(votd);
 
         assertNull(votd.getThemes());
 
-        votdDao.update(1L, themeList, true);
+        votdService.update(1L, themeList, true);
 
-        Votd votd1 = votdDao.findById(1L);
+        Votd votd1 = votdService.findById(1L);
 
         assertEquals(1, votd1.getThemes().size());
     }
@@ -114,87 +114,87 @@ public class VotdDaoTest extends NinjaDaoTestBase {
     @Test
     public void updateWithNullThemeList() throws Exception {
 
-        themeDao.save(theme);
-        votdDao.save(votd);
+        themeService.save(theme);
+        votdService.save(votd);
 
         assertNull(votd.getThemes());
 
-        votdDao.update(1L, null, true);
+        votdService.update(1L, null, true);
 
-        Votd votd1 = votdDao.findById(1L);
+        Votd votd1 = votdService.findById(1L);
 
         assertEquals(0, votd1.getThemes().size());
     }
 
     @Test(expected = EntityDoesNotExistException.class)
     public void updateWithFakeId() throws Exception {
-        themeDao.save(theme);
-        votdDao.save(votd);
+        themeService.save(theme);
+        votdService.save(votd);
 
         assertNull(votd.getThemes());
 
-        votdDao.update(100L, themeList, true);
+        votdService.update(100L, themeList, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void updateWithNullId() throws Exception {
-        themeDao.save(theme);
-        votdDao.save(votd);
+        themeService.save(theme);
+        votdService.save(votd);
 
         assertNull(votd.getThemes());
 
-        votdDao.update(null, themeList, true);
+        votdService.update(null, themeList, true);
     }
 
     @Test
     public void delete() throws Exception {
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        assertNotNull(votdDao.findById(1L));
+        assertNotNull(votdService.findById(1L));
 
-        votdDao.delete(1L);
+        votdService.delete(1L);
 
-        assertNull(votdDao.findById(1L));
+        assertNull(votdService.findById(1L));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void deleteWithNullId() throws Exception {
-        votdDao.delete(null);
+        votdService.delete(null);
     }
 
     @Test(expected = EntityDoesNotExistException.class)
     public void deleteWithFakeId() throws Exception {
-        votdDao.delete(100L);
+        votdService.delete(100L);
     }
 
     @Test
     public void approve() throws Exception {
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        Votd v = votdDao.findById(1L);
+        Votd v = votdService.findById(1L);
 
         assertFalse(v.isApproved());
 
-        votdDao.approve(1L);
+        votdService.approve(1L);
 
-        v = votdDao.findById(1L);
+        v = votdService.findById(1L);
 
         assertTrue(v.isApproved());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void approveWithNullId() throws Exception {
-        votdDao.approve(null);
+        votdService.approve(null);
     }
 
     @Test(expected = EntityDoesNotExistException.class)
     public void approveWithFakeId() throws Exception {
-        votdDao.approve(100L);
+        votdService.approve(100L);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void saveIfVotdIsNull() throws Exception{
-        votdDao.save(null);
+        votdService.save(null);
     }
 
 

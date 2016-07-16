@@ -18,16 +18,16 @@ import static org.junit.Assert.*;
 /**
  * Created by Crafton Williams on 2/06/2016.
  */
-public class ThemeDaoTest extends NinjaDaoTestBase {
+public class ThemeServiceTest extends NinjaDaoTestBase {
 
-    private VotdDao votdDao;
-    private ThemeDao themeDao;
+    private VotdService votdService;
+    private ThemeService themeService;
     private Theme theme;
 
 
     @Before
     public void setup() {
-        themeDao = getInstance(ThemeDao.class);
+        themeService = getInstance(ThemeService.class);
 
         theme = new Theme();
         theme.setThemeName("Love");
@@ -40,13 +40,13 @@ public class ThemeDaoTest extends NinjaDaoTestBase {
 
     @Test(expected = IllegalArgumentException.class)
     public void findByIdWhenIdIsNull() throws Exception{
-        themeDao.findById(null);
+        themeService.findById(null);
     }
 
     @Test
     public void findAll() throws Exception {
-        themeDao.save(theme);
-        List<Theme> themesList = themeDao.findAll();
+        themeService.save(theme);
+        List<Theme> themesList = themeService.findAll();
 
         assertEquals(1, themesList.size());
         assertEquals(themesList.get(0).getThemeName(), "Love");
@@ -54,55 +54,55 @@ public class ThemeDaoTest extends NinjaDaoTestBase {
 
     @Test
     public void findAllWithEmptyDB() throws Exception {
-        List<Theme> themeList = themeDao.findAll();
+        List<Theme> themeList = themeService.findAll();
 
         assertEquals(0, themeList.size());
     }
 
     @Test
     public void findByName() throws Exception {
-        themeDao.save(theme);
-        String themeName = themeDao.findByName("Love");
+        themeService.save(theme);
+        String themeName = themeService.findByName("Love");
 
         assertEquals("Love", themeName);
     }
 
     @Test(expected = NoResultException.class)
     public void findByNameWithBadName() throws Exception {
-        themeDao.findByName("Some fictitious name");
+        themeService.findByName("Some fictitious name");
     }
 
     @Test
     public void findById() throws Exception {
-        Theme t = themeDao.findById(100L);
+        Theme t = themeService.findById(100L);
 
         assertNull(t);
 
-        themeDao.save(theme);
+        themeService.save(theme);
 
-        Theme t2 = themeDao.findById(1L);
+        Theme t2 = themeService.findById(1L);
 
         assertEquals(theme.getThemeName(), t2.getThemeName());
     }
 
     @Test
     public void delete() throws Exception {
-        themeDao.save(theme);
+        themeService.save(theme);
 
-        Theme t = themeDao.findById(1L);
+        Theme t = themeService.findById(1L);
 
         assertEquals(theme.getThemeName(), t.getThemeName());
 
-        themeDao.delete(1L);
+        themeService.delete(1L);
 
-        Theme t1 = themeDao.findById(1L);
+        Theme t1 = themeService.findById(1L);
 
         assertNull(t1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void saveIfThemeIsNull() throws Exception{
-        themeDao.save(null);
+        themeService.save(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -110,32 +110,32 @@ public class ThemeDaoTest extends NinjaDaoTestBase {
         Theme theme = new Theme();
         theme.setThemeName("");
         theme.setCreatedBy("John Tom");
-        themeDao.save(theme);
+        themeService.save(theme);
     }
     @Test(expected = EntityAlreadyExistsException.class)
     public void saveThemeAlreadyExists() throws Exception{
-        themeDao.save(theme);
+        themeService.save(theme);
 
-        themeDao.save(theme);
+        themeService.save(theme);
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void deleteThemeWithNullID() throws Exception{
-        themeDao.delete(null);
+        themeService.delete(null);
     }
 
     @Test(expected = EntityDoesNotExistException.class)
     public void deleteThemeWithNonExistent() throws Exception {
-        themeDao.delete(1L);
+        themeService.delete(1L);
     }
 
     @Test(expected = EntityBeingUsedException.class)
     public void deleteThemeBeingUsed() throws Exception{
 
-        themeDao.save(theme);
+        themeService.save(theme);
 
-        votdDao = getInstance(VotdDao.class);
+        votdService = getInstance(VotdService.class);
         Votd votd = new Votd();
         votd.setVerses("Matthew 6:1-8");
         votd.setCreatedBy("John Smith");
@@ -144,9 +144,9 @@ public class ThemeDaoTest extends NinjaDaoTestBase {
         themeList.add(theme);
 
         votd.setThemes(themeList);
-        votdDao.save(votd);
+        votdService.save(votd);
 
-        themeDao.delete(1L);
+        themeService.delete(1L);
     }
 
 }

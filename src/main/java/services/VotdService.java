@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class VotdDao {
+public class VotdService {
 
     @Inject
     private Provider<EntityManager> entityManagerProvider;
@@ -37,7 +37,7 @@ public class VotdDao {
     @Inject
     private Logger logger;
 
-    public VotdDao() {
+    public VotdService() {
     }
 
     @Transactional

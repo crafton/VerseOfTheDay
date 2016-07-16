@@ -14,12 +14,12 @@ import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class ThemeDao {
+public class ThemeService {
 
     @Inject
     private Provider<EntityManager> entityManagerProvider;
 
-    public ThemeDao() {
+    public ThemeService() {
     }
 
     @Transactional

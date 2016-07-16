@@ -3,7 +3,7 @@ package controllers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import services.UserDao;
+import services.UserService;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import ninja.Context;
@@ -37,7 +37,7 @@ public class LoginController {
     private Utils utils;
 
     @Inject
-    private UserDao userDao;
+    private UserService userService;
 
     @Inject
     private NinjaCache ninjaCache;
@@ -79,7 +79,7 @@ public class LoginController {
         try {
             /*Retrieve authentication tokens from auth0*/
             Map<String, String> tokens = utils.auth0GetToken(code);
-            JsonObject userObject = userDao.auth0GetUser(tokens.get("access_token"));
+            JsonObject userObject = userService.auth0GetUser(tokens.get("access_token"));
 
             /*Cache user profile so we don't have to query information again for the session*/
             ninjaCache.set(tokens.get("id_token"), userObject.toString());

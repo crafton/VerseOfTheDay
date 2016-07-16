@@ -1,7 +1,7 @@
 package controllers;
 
 import com.google.inject.Inject;
-import services.ThemeDao;
+import services.ThemeService;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ThemeController {
 
     @Inject
-    private ThemeDao themeDao;
+    private ThemeService themeService;
     @Inject
     private Logger logger;
     @Inject
@@ -36,7 +36,7 @@ public class ThemeController {
      */
     public Result themes() {
         logger.debug("Generating themes list...");
-        List<Theme> themes = themeDao.findAll();
+        List<Theme> themes = themeService.findAll();
 
         return Results
                 .ok()
@@ -56,7 +56,7 @@ public class ThemeController {
         logger.debug("Entered saveTheme action...");
 
         try {
-            themeDao.save(theme);
+            themeService.save(theme);
         } catch (IllegalArgumentException e) {
             logger.warn("User tried to access the save controller directly.");
             flashScope.error("A theme has not been submitted");
@@ -79,7 +79,7 @@ public class ThemeController {
         logger.debug("Entered deleteTheme action...");
 
         try {
-            themeDao.delete(themeId);
+            themeService.delete(themeId);
             logger.info("Successfully deleted theme.");
             flashScope.success("Successfully deleted theme.");
         } catch (IllegalArgumentException e) {

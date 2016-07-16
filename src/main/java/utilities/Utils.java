@@ -22,18 +22,18 @@ import java.util.*;
 public class Utils {
 
     @Inject
-    Config config;
+    private Config config;
 
     @Inject
-    NinjaCache ninjaCache;
-
-    final static Logger logger = LoggerFactory.getLogger(Utils.class);
+    private Logger logger;
 
     public Utils() {
 
     }
 
     /**
+     * Retrieve an authentication token given a login code
+     *
      * @param code
      * @return
      */
@@ -162,46 +162,6 @@ public class Utils {
             throw new JsonSyntaxException(e.getMessage());
         }
 
-    }
-
-    /**
-     * Update user profile
-     *
-     * @param userId
-     * @param body
-     */
-    public void updateUserProfile(String userId, String body) {
-
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.getAuth0UserApi() + "/" + userId);
-        String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
-                .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
-
-        logger.info("Received the following response after updating user profile:" + response);
-
-    }
-
-    public boolean hasRole(String idTokenString, String role) {
-
-        String userJsonString = (String) ninjaCache.get(idTokenString);
-        JsonParser jsonParser = new JsonParser();
-
-        JsonObject userProfile = jsonParser.parse(userJsonString).getAsJsonObject();
-
-        JsonArray rolesArray = userProfile.get("app_metadata")
-                .getAsJsonObject()
-                .get("roles")
-                .getAsJsonArray();
-
-        for (JsonElement roleElement : rolesArray) {
-            if (roleElement.getAsString().contentEquals(role)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
 }
