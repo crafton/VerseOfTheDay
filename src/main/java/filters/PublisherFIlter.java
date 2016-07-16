@@ -20,7 +20,7 @@ public class PublisherFilter implements Filter {
 
         String idTokenString = context.getSession().get("idToken");
 
-        if (utils.hasRole(idTokenString, config.PUBLISHER_ROLE) || utils.hasRole(idTokenString, "admin")) {
+        if (utils.hasRole(idTokenString, config.getPublisherRole()) || utils.hasRole(idTokenString, "admin")) {
             return filterChain.next(context);
         } else {
             return Results.redirect("/unauthorized");

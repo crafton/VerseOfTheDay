@@ -15,13 +15,13 @@ import java.util.Map;
 public class UserDao {
 
     @Inject
-    NinjaCache ninjaCache;
+    private NinjaCache ninjaCache;
 
     @Inject
-    Config config;
+    private Config config;
 
     @Inject
-    Utils utils;
+    private Utils utils;
 
     public UserDao() {
     }
@@ -54,7 +54,7 @@ public class UserDao {
         params.put("q", queryString);
 
         try {
-            return utils.auth0ApiQueryWithMgmtToken(params, config.USER_API);
+            return utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
@@ -75,7 +75,7 @@ public class UserDao {
         params.put("include_fields", "true");
         params.put("search_engine", "v2");
 
-        JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.USER_API);
+        JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
 
         try {
             return response
@@ -149,13 +149,13 @@ public class UserDao {
         String roleDescription = "";
 
 
-        for (String roleType : config.rolesList) {
-            if (roleType.contentEquals(config.MEMBER_ROLE)) {
-                roleDescription = config.MEMBER_DESCRIPTION;
-            } else if (roleType.contentEquals(config.CONTRIBUTOR_ROLE)) {
-                roleDescription = config.CONTRIBUTOR_DESCRIPTION;
-            } else if (roleType.contentEquals(config.PUBLISHER_ROLE)) {
-                roleDescription = config.PUBLISHER_DESCRIPTION;
+        for (String roleType : config.getRolesList()) {
+            if (roleType.contentEquals(config.getMemberRole())) {
+                roleDescription = config.getMemberDescription();
+            } else if (roleType.contentEquals(config.getContributorRole())) {
+                roleDescription = config.getContributorDescription();
+            } else if (roleType.contentEquals(config.getPublisherRole())) {
+                roleDescription = config.getPublisherDescription();
             }
             if (roles.contains(roleType)) {
                 checkBoxString += "<div class=\"checkbox\">\n" +
@@ -208,7 +208,7 @@ public class UserDao {
         params.put("include_fields", "true");
 
         try {
-            JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.USER_API + "/" + userID);
+            JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi() + "/" + userID);
 
             JsonArray rolesArray = response.get("app_metadata")
                     .getAsJsonObject()

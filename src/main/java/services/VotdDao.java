@@ -256,6 +256,12 @@ public class VotdDao {
 
     }
 
+    /**
+     * Ensure verses supplied are valid.
+     *
+     * @param verseSubmitted
+     * @return
+     */
     public String verifyVerses(String verseSubmitted) {
 
         Integer maxVerses = config.getMaxVerses();
@@ -321,6 +327,8 @@ public class VotdDao {
     }
 
     /**
+     * Checks the database to see if the VOTD already exists
+     *
      * @param verse
      * @return
      */
@@ -382,6 +390,13 @@ public class VotdDao {
 
     }
 
+    /**
+     * Generic method to build a search query for a verse.
+     *
+     * @param param
+     * @param queryName
+     * @return
+     */
     private Query buildSearchQuery(String param, String queryName) {
         Query q = getEntityManager().createNamedQuery(queryName);
         q.setParameter("verse", param + "%");
@@ -459,6 +474,12 @@ public class VotdDao {
         return verseRange.matches("(\\d\\s)?\\w+\\s(\\d{1,2}):(\\d{1,3})(\\S?-\\S?\\d{1,3})?");
     }
 
+    /**
+     * Given a verseRange get the verse numbers
+     *
+     * @param verseRange
+     * @return
+     */
     private String[] getVerseNumbers(String verseRange) {
         /*Get string after the colon*/
         String verses = verseRange.split(":")[1];

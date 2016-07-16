@@ -173,7 +173,7 @@ public class Utils {
     public void updateUserProfile(String userId, String body) {
 
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.USER_API + "/" + userId);
+        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.getAuth0UserApi() + "/" + userId);
         String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())

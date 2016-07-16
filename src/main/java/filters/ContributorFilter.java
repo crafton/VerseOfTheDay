@@ -20,7 +20,7 @@ public class ContributorFilter implements Filter {
 
         String idTokenString = context.getSession().get("idToken");
 
-        if (utils.hasRole(idTokenString, config.CONTRIBUTOR_ROLE) || utils.hasRole(idTokenString, config.PUBLISHER_ROLE)
+        if (utils.hasRole(idTokenString, config.getContributorRole()) || utils.hasRole(idTokenString, config.getPublisherRole())
                 || utils.hasRole(idTokenString, "admin")) {
             return filterChain.next(context);
         } else {
