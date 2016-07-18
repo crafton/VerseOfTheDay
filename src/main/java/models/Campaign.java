@@ -1,7 +1,7 @@
 package models;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -12,21 +12,25 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Entity implementation class for Entity: CampaignTest
  *
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Campaign.findAll", query = "SELECT x FROM Campaign x")
+})
 public class Campaign implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long campaignId;
-	private Date startDate;
-	private Date endDate;
+	private Timestamp startDate;
+	private Timestamp endDate;
 	private String campaignName;
 	private int campaignDays;
 
@@ -48,15 +52,15 @@ public class Campaign implements Serializable {
 		this.campaignId = campaignId;
 	}
 
-	public Date getStartDate() {
+	public Timestamp getStartDate() {
 		return this.startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(Timestamp startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public Timestamp getEndDate() {
 //		 SimpleDateFormat htmlFormat = new SimpleDateFormat("dd/MM/yyyy");
 //		 SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
 //		 Date convertedCurrentDate;
@@ -72,7 +76,7 @@ public class Campaign implements Serializable {
 		return this.endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(Timestamp endDate) {
 		this.endDate = endDate;
 	}
 

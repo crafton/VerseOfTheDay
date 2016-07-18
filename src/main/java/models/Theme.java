@@ -11,7 +11,9 @@ import javax.persistence.*;
  *
  */
 @Entity
-
+@NamedQueries({
+    @NamedQuery(name = "Theme.findAll", query = "SELECT x FROM Theme x "),
+})
 public class Theme implements Serializable {
 
 	@Id
@@ -52,4 +54,8 @@ public class Theme implements Serializable {
 		this.campaignList = campaignList;
 	}
 
+	@Override
+	public String toString(){
+		return this.getThemeName();
+	}
 }
