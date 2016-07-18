@@ -1,4 +1,4 @@
-https://travis-ci.org/crafton/VerseOfTheDay.svg?branch=development
+[![Build Status](https://travis-ci.org/crafton/VerseOfTheDay.svg?branch=development)](https://travis-ci.org/crafton/VerseOfTheDay)
 
 # VerseOfTheDay
 
