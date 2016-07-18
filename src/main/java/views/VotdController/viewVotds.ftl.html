@@ -1,0 +1,40 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Votds">
+
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
+
+    <table id="votdTable" class="table table-responsive">
+        <thead>
+        <tr>
+            <th>Verses</th>
+            <th>Themes</th>
+            <th>Status</th>
+            <th>Approve</th>
+            <th>Created By</th>
+            <th>Modified By</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+
+    <script>
+        $('#votdTable').confirmation({
+            selector: '[data-toggle="confirmation"]',
+            href: function (elem) {
+                return $(elem).attr('href');
+            }
+        });
+
+        $(document).ready(function () {
+            $('#votdTable').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": "/votd/displayvotds"
+            });
+        });
+    </script>
+</@layout.myLayout>

@@ -1,0 +1,44 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Themes">
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">Add a theme</h2>
+        </div>
+        <div class="panel-body">
+            <form action="/theme/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
+                <div class="form-group">
+                    <label for="themeName" class="col-sm-2 control-label">Theme</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="themeName" name="themeName"
+                               pattern="(^[A-Z][a-z]+)" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button id="formSubmitButton" class="btn btn-default" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <hr/>
+    <#if (themes?size) gt 0>
+        <table class="table table-responsive">
+        <#list themes?chunk(maxCols) as row>
+            <tr>
+            <#list row as theme>
+                <td class="text-left col-md-1">${theme.getThemeName()}</td>
+                <td class="text-left"><a class="fa fa-trash" data-toggle="confirmation" data-placement="top" aria-hidden="true" href="/theme/delete/${theme.getId()}"></a></td>
+            </#list>
+            </tr>
+        </#list>
+        </table>
+        <#else>
+            <p class="text-center text-warning"> No themes added to the database yet. </p>
+    </#if>
+
+    <script type="text/javascript" src="/assets/js/themes.js"></script>
+
+</@layout.myLayout>

@@ -15,7 +15,7 @@
     <url>http://www.ninjaframework.org</url>
 
     <properties>
-        <ninja.version>5.4.0</ninja.version>
+        <ninja.version>5.7.0</ninja.version>
         <jetty.version>9.2.10.v20150310</jetty.version>
     </properties>
 
@@ -26,8 +26,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -190,6 +190,16 @@
             <artifactId>ninja-test-utilities</artifactId>
             <version>${ninja.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.22.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2</version>
         </dependency>
     </dependencies>
 </project>
