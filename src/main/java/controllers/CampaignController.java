@@ -1,5 +1,6 @@
 package controllers;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,7 @@ import com.google.inject.Singleton;
 
 import daos.CampaignDao;
 import daos.ThemeDao;
+import exceptions.CampaignException;
 import models.Campaign;
 import models.Theme;
 import ninja.Context;
@@ -23,13 +25,16 @@ import ninja.Result;
 import ninja.Results;
 import ninja.Router;
 import ninja.params.PathParam;
+import ninja.session.FlashScope;
 
 @Singleton
 public class CampaignController {
+
+	final static Logger logger = LoggerFactory.getLogger(CampaignController.class);
+
 	@Inject
 	Router router;
-	public static int tt = 0;
-	final static Logger logger = LoggerFactory.getLogger(CampaignController.class);
+
 	@Inject
 	CampaignDao campaignDao;
 
@@ -41,7 +46,7 @@ public class CampaignController {
 		return Results.html().render("campaignList", campaignDao.getCampaignList()).render("themeList",
 				themeDao.getThemeList());
 	}
-	
+
 	/**
 	 * Adding new campaign
 	 **/
@@ -52,81 +57,97 @@ public class CampaignController {
 	/**
 	 * Saving new campaign
 	 **/
-	public Result saveCampaign(Context context, Campaign campaign) {
-		
+	public Result saveCampaign(Context context, Campaign campaign, FlashScope flashScope) {
+		DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+
 		List<String> themeIds = context.getParameterValues("themes");
 		if (themeIds.isEmpty()) {
 			campaign.setThemeList(new ArrayList<Theme>());
 		}
 
+		try {
+			campaign.setStartDate(new Timestamp(formatter.parse(context.getParameter("startDate")).getTime()));
+			campaign.setEndDate(new Timestamp(formatter.parse(context.getParameter("endDate")).getTime()));
+		} catch (ParseException e) {
+			flashScope.error("Error creating campaign. Contact the administrator.");
+			logger.error("Error parsing date in save campaign" + e.getMessage());
+		}
+
 		List<Theme> themeList = new ArrayList<>();
 		for (String themeId : themeIds) {
-			Theme theme = themeDao.getThemeById(themeId);
+			Theme theme = themeDao.getThemeById(Long.parseLong(themeId));
 			themeList.add(theme);
 		}
 		campaign.setThemeList(themeList);
-		campaignDao.save(campaign);
+		
+		try {
+			campaignDao.save(campaign);
+			flashScope.success("Campaign succesfully created");
+		} catch (CampaignException e) {
+			flashScope.error("Error creating campaign. Contact the administrator.");
+			logger.error("Error in save campaign" + e.getMessage());
+		}
 
 		return Results.redirect("/campaign/list");
 	}
-	
+
 	/**
 	 * Rendering campaign for a particular campaign Id which needs to be updated
 	 **/
-	public Result updateCampaign(@PathParam("campaignId") String campaignId) {
+	public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
 		logger.info("Updating campaign details of campaign: =" + campaignId);
 		System.out.println("Updating campaign details of campaign: =" + campaignId);
-		return Results.html().render("campaign", campaignDao.getCampaignById(campaignId)).render("themes", themeDao.getThemeList());
+		return Results.html().render("campaign", campaignDao.getCampaignById(campaignId)).render("themes",
+				themeDao.getThemeList());
 	}
 
 	/**
 	 * Saving updated campaign
+	 * 
 	 * @param context
 	 * @return
 	 */
-	public Result saveUpdatedCampaign(Context context) {
-		System.out.println(context.getParameter("campaignId"));
-		System.out.println(context.getParameter("campaignName"));
-		System.out.println(context.getParameter("startDate"));
-		System.out.println(context.getParameter("endDate"));
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		Date startDate = null, endDate = null;
+	public Result saveUpdatedCampaign(Context context, FlashScope flashScope) {
+		DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+		Timestamp startDate = null, endDate = null;
 		try {
-			startDate = formatter.parse(context.getParameter("startDate"));
-			endDate = formatter.parse(context.getParameter("endDate"));
+			startDate = new Timestamp(formatter.parse(context.getParameter("startDate")).getTime());
+			endDate = new Timestamp(formatter.parse(context.getParameter("endDate")).getTime());
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			flashScope.error("Error updating campaign. Contact the administrator.");
+			logger.error("Error parsing date in save campaign" + e.getMessage());
 		}
 		List<String> themeIds = context.getParameterValues("themeList");
 		List<Theme> themeList = new ArrayList<>();
 
 		if (!themeIds.isEmpty()) {
 			for (String themeId : themeIds) {
-				Theme theme = themeDao.getThemeById(themeId);
+				Theme theme = themeDao.getThemeById(Long.parseLong(themeId));
 				themeList.add(theme);
 			}
 		}
 		try {
-			campaignDao.update(context.getParameter("campaignId"), context.getParameter("campaignName"), startDate,
-					endDate, themeList);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			campaignDao.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"),
+					startDate, endDate, themeList);
+			flashScope.success("Campaign updated");
+		} catch (CampaignException e) {
+			flashScope.error("Error updating campaign. Contact the administrator.");
+			logger.error("Error in updating campaign" + e.getMessage());
 		}
 		return Results.redirect("/campaign/list");
 	}
-	
-	  public Result deleteCampaign(@PathParam("campaignId") String campaignId) {
 
-	        try {
-	        	campaignDao.deleteCampaign(campaignId);;
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+	public Result deleteCampaign(@PathParam("campaignId") Long campaignId, FlashScope flashScope) {
 
-	        return Results.redirect("/campaign/list");
-	    }
+		try {
+			campaignDao.deleteCampaign(campaignId);
+			flashScope.success("Campaign deleted successfully.");
+		} catch (CampaignException e) {
+			flashScope.error("Campaign, trying to delete, doesn't exist");
+			logger.error("Error in deleting campaign" + e.getMessage());
+		}
 
+		return Results.redirect("/campaign/list");
+	}
 
 }

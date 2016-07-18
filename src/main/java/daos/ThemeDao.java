@@ -5,7 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 
 import com.google.inject.persist.Transactional;
 
@@ -17,15 +17,15 @@ public class ThemeDao {
 
 	@Transactional
 	public List<Theme> getThemeList() {
-		TypedQuery<Theme> q = getEntityManager().createQuery("from Theme", Theme.class);
+		Query q = getEntityManager().createNamedQuery("Theme.findAll");
 		return q.getResultList();
 	}
 	
 	@Transactional
-	public Theme getThemeById(String themeId) throws IllegalArgumentException {
+	public Theme getThemeById(Long themeId) throws IllegalArgumentException {
 
 		if (themeId == null) {
-			throw new IllegalArgumentException("Parameter must be of type 'String'.");
+			throw new IllegalArgumentException("Parameter must be of type 'Long'.");
 		}
 
 		return getEntityManager().find(Theme.class, themeId);

@@ -1,16 +1,17 @@
 package daos;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 
 import com.google.inject.persist.Transactional;
 
+import exceptions.CampaignException;
 import models.Campaign;
 import models.Theme;
 
@@ -20,69 +21,59 @@ public class CampaignDao {
 
 	@Transactional
 	public List<Campaign> getCampaignList() {
-		TypedQuery<Campaign> q = getEntityManager().createQuery("from Campaign", Campaign.class);
+		Query q = getEntityManager().createNamedQuery("Campaign.findAll");
 		return q.getResultList();
 	}
 
 	@Transactional
-	public Campaign getCampaignById(String campaignId) throws IllegalArgumentException {
+	public Campaign getCampaignById(Long campaignId) throws IllegalArgumentException {
 
 		if (campaignId == null) {
-			throw new IllegalArgumentException("Parameter must be of type 'String'.");
+			throw new IllegalArgumentException("Parameter must be of type 'Long'.");
 		}
 
 		return getEntityManager().find(Campaign.class, campaignId);
 	}
 
 	@Transactional
-	public void save(Campaign campaign) {
-
-		try {
-			getEntityManager().persist(campaign);
-			
-		} catch (Exception e) {
-		}
+	public void save(Campaign campaign) throws CampaignException {
+		getEntityManager().persist(campaign);
 	}
 
 	@Transactional
-	public void update(String campaignId, String campaignName, Date startDate, Date endDate, List<Theme> themeList)
-			throws Exception {
+	public void update(Long campaignId, String campaignName, Timestamp startDate, Timestamp endDate,
+			List<Theme> themeList) throws CampaignException {
 
 		if (themeList == null) {
 			themeList = new ArrayList<>();
 		}
 
+		Campaign campaign = getCampaignById(campaignId);
+
+		if (campaign == null) {
+			throw new CampaignException("The campaign you're trying to update does not exist.");
+		}
+		campaign.setCampaignName(campaignName);
+		campaign.setStartDate(startDate);
+		campaign.setEndDate(endDate);
+		campaign.setThemeList(themeList);
+		getEntityManager().persist(campaign);
+	}
+
+	@Transactional
+	public void deleteCampaign(Long campaignId) throws CampaignException {
 		try {
 			Campaign campaign = getCampaignById(campaignId);
 
 			if (campaign == null) {
-				throw new Exception("The campaign you're trying to update does not exist.");
+				throw new CampaignException("The campaign you're trying to update does not exist.");
 			}
-			campaign.setCampaignName(campaignName);
-			campaign.setStartDate(startDate);
-			campaign.setEndDate(endDate);
-			campaign.setThemeList(themeList);
-			getEntityManager().persist(campaign);
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
+
+			getEntityManager().remove(campaign);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException(e.getMessage());
 		}
 	}
-	
-
-    @Transactional
-    public void deleteCampaign(String campaignId) throws Exception{
-        try {
-        	Campaign campaign = getCampaignById(campaignId);
-
-			if (campaign == null) {
-				throw new Exception("The campaign you're trying to update does not exist.");
-			}
-			
-            getEntityManager().remove(campaign);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
-    }
 
 	private EntityManager getEntityManager() {
 		return entityManagerProvider.get();
