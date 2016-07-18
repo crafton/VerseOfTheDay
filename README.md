@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/crafton/VerseOfTheDay.svg?branch=development)](https://travis-ci.org/crafton/VerseOfTheDay)
+[![Gitter](https://badges.gitter.im/crafton/VerseOfTheDay.svg)](https://gitter.im/crafton/VerseOfTheDay?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # VerseOfTheDay
 
