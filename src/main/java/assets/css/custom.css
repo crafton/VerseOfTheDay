@@ -1,10 +1,44 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
+#campaignListTbl {
+	width: 100%;
+}
 
+#campaignListTbl th {
+	padding: 10px;
+	text-align: left;
+	font-weight: 700;
+	font-size: 16px;
+	font-family: inherit;
+	color: #1260AF;
+	/*text-transform: uppercase;*/
+	vertical-align: bottom;
+	list-style: 12px;
+}
 .panel {
     margin-top: 30px;
 }
 
+#campaignListTbl td {
+	padding: 15px;
+	text-align: left;
+	font-size: 14px;
+	font-family: inherit;
+	font-weight : 400;
+	color: #4B0082;
+	list-style: 12px;
+}
+
+
+/*
+For Campaign Form */
+.campaignForm {
+	font-size: 14px;
+	font-family: inherit;
+	margin-left: 15px;
+	margin-top: 5px;
+	color: #1260AF;
+}
 #loadingDiv {
     width: 100px;
    /* height: 100px;*/

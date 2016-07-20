@@ -73,6 +73,16 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/user/displayuserroles/{userid}").with(UserController.class, "displayUserRoles");
         router.GET().route("/user/updateroles/{userid}/{roles}").with(UserController.class, "updateUserRoles");
 
+        
+        router.GET().route("/campaign/list").with(CampaignController.class, "campaignList");
+        router.GET().route("/campaign/add").with(CampaignController.class, "addCampaign");
+        router.GET().route("/campaign/update/{campaignId}").with(CampaignController.class, "updateCampaign");
+        router.GET().route("/campaign/delete/{campaignId}").with(CampaignController.class, "deleteCampaign");
+        
+        router.POST().route("/campaign/saveCampaign").with(CampaignController.class, "saveCampaign");
+        router.POST().route("/campaign/saveUpdateCampaign").with(CampaignController.class, "saveUpdatedCampaign");
+        
+ 
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)
         ///////////////////////////////////////////////////////////////////////    

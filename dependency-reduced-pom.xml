@@ -28,8 +28,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.2</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -134,8 +134,8 @@
   <dependencies>
     <dependency>
       <groupId>org.ninjaframework</groupId>
-      <artifactId>ninja-test-controllers.utilities</artifactId>
-      <version>5.4.0</version>
+      <artifactId>ninja-test-utilities</artifactId>
+      <version>5.5.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -170,7 +170,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <ninja.version>5.4.0</ninja.version>
+    <ninja.version>5.5.0</ninja.version>
     <jetty.version>9.2.10.v20150310</jetty.version>
   </properties>
 </project>

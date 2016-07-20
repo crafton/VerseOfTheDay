@@ -1,0 +1,57 @@
+<#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
+"List Campaign">
+
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h2 class="panel-title">Your Campaign(s)</h2>
+	</div>
+	<div class="tbl-header">
+		<table id="campaignListTbl" class="stripe hover row-border"
+			id="tblContentId" data-page-length='10'>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Theme</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+					<th>Campaign Duration</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<#list campaignList as campaign>
+				<tr>
+					<td>${campaign.campaignName}</td>
+					<td><#list campaign.themeList as theme>
+						${theme.themeName}<#sep>,</#list></td>
+					<td>${campaign.startDate?string("MMMMM dd, yyyy HH:mm")}</td>
+					<td>${campaign.endDate?string("MMMMM dd, yyyy HH:mm")}</td>
+					<td>${campaign.campaignDays}</td>
+					<td><a class="fa fa-trash" data-placement="top"
+						data-toggle="confirmation" aria-hidden="true"
+						data-title="Are you sure you want to delete this campaign"
+						data-href="/campaign/delete/${campaign.getCampaignId()}"></a></td>
+					<td><a class="fa fa-pencil" aria-hidden="true"
+						href="/campaign/update/${campaign.getCampaignId()}"></a></td>
+				</tr>
+				<#else>
+				<tr>
+					<td colspan="5">No ongoing campaigns!!! <a
+						href="/campaign/add">Want to create one??</a>
+					</td>
+				</tr>
+				</#list>
+			</tbody>
+		</table>
+	</div>
+	<div class="panel-footer">
+		<a class="btn btn-primary btn-md pull-right" id="addNewCampaign"
+			href="/campaign/add">Add New</a>
+		<div class="clearfix"></div>
+	</div>
+</div>
+<script>
+	$('[data-toggle="confirmation"]').confirmation();
+</script>
+</@layout.myLayout>
