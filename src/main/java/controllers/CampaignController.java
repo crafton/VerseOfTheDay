@@ -43,14 +43,14 @@ public class CampaignController {
 	/** Displaying list of campaigns **/
 	public Result campaignList() {
 		return Results.html().render("campaignList", campaignService.getCampaignList()).render("themeList",
-				themeService.getThemeList());
+				themeService.findAll());
 	}
 
 	/**
 	 * Adding new campaign
 	 **/
 	public Result addCampaign() {
-		return Results.html().render("themes", themeService.getThemeList());
+		return Results.html().render("themes", themeService.findAll());
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class CampaignController {
 
 		List<Theme> themeList = new ArrayList<>();
 		for (String themeId : themeIds) {
-			Theme theme = themeService.getThemeById(Long.parseLong(themeId));
+			Theme theme = themeService.findById(Long.parseLong(themeId));
 			themeList.add(theme);
 		}
 		campaign.setThemeList(themeList);
@@ -97,7 +97,7 @@ public class CampaignController {
 		logger.info("Updating campaign details of campaign: =" + campaignId);
 		System.out.println("Updating campaign details of campaign: =" + campaignId);
 		return Results.html().render("campaign", campaignService.getCampaignById(campaignId)).render("themes",
-				themeService.getThemeList());
+				themeService.findAll());
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class CampaignController {
 
 		if (!themeIds.isEmpty()) {
 			for (String themeId : themeIds) {
-				Theme theme = themeService.getThemeById(Long.parseLong(themeId));
+				Theme theme = themeService.findById(Long.parseLong(themeId));
 				themeList.add(theme);
 			}
 		}
