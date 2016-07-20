@@ -1,4 +1,4 @@
-package daos;
+package services;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import com.google.inject.persist.Transactional;
 
 import models.Theme;
 
-public class ThemeDao {
+public class ThemeService {
 	@Inject
 	private Provider<EntityManager> entityManagerProvider;
 

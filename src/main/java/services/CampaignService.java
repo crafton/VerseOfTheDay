@@ -1,4 +1,4 @@
-package daos;
+package services;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import exceptions.CampaignException;
 import models.Campaign;
 import models.Theme;
 
-public class CampaignDao {
+public class CampaignService {
 	@Inject
 	private Provider<EntityManager> entityManagerProvider;
 

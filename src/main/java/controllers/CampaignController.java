@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -15,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 
-import daos.CampaignDao;
-import daos.ThemeDao;
+import services.CampaignService;
+import services.ThemeService;
 import exceptions.CampaignException;
 import models.Campaign;
 import models.Theme;
@@ -36,22 +35,22 @@ public class CampaignController {
 	Router router;
 
 	@Inject
-	CampaignDao campaignDao;
+	CampaignService campaignService;
 
 	@Inject
-	ThemeDao themeDao;
+	ThemeService themeService;
 
 	/** Displaying list of campaigns **/
 	public Result campaignList() {
-		return Results.html().render("campaignList", campaignDao.getCampaignList()).render("themeList",
-				themeDao.getThemeList());
+		return Results.html().render("campaignList", campaignService.getCampaignList()).render("themeList",
+				themeService.getThemeList());
 	}
 
 	/**
 	 * Adding new campaign
 	 **/
 	public Result addCampaign() {
-		return Results.html().render("themes", themeDao.getThemeList());
+		return Results.html().render("themes", themeService.getThemeList());
 	}
 
 	/**
@@ -75,13 +74,13 @@ public class CampaignController {
 
 		List<Theme> themeList = new ArrayList<>();
 		for (String themeId : themeIds) {
-			Theme theme = themeDao.getThemeById(Long.parseLong(themeId));
+			Theme theme = themeService.getThemeById(Long.parseLong(themeId));
 			themeList.add(theme);
 		}
 		campaign.setThemeList(themeList);
 		
 		try {
-			campaignDao.save(campaign);
+			campaignService.save(campaign);
 			flashScope.success("Campaign succesfully created");
 		} catch (CampaignException e) {
 			flashScope.error("Error creating campaign. Contact the administrator.");
@@ -97,8 +96,8 @@ public class CampaignController {
 	public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
 		logger.info("Updating campaign details of campaign: =" + campaignId);
 		System.out.println("Updating campaign details of campaign: =" + campaignId);
-		return Results.html().render("campaign", campaignDao.getCampaignById(campaignId)).render("themes",
-				themeDao.getThemeList());
+		return Results.html().render("campaign", campaignService.getCampaignById(campaignId)).render("themes",
+				themeService.getThemeList());
 	}
 
 	/**
@@ -122,12 +121,12 @@ public class CampaignController {
 
 		if (!themeIds.isEmpty()) {
 			for (String themeId : themeIds) {
-				Theme theme = themeDao.getThemeById(Long.parseLong(themeId));
+				Theme theme = themeService.getThemeById(Long.parseLong(themeId));
 				themeList.add(theme);
 			}
 		}
 		try {
-			campaignDao.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"),
+			campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"),
 					startDate, endDate, themeList);
 			flashScope.success("Campaign updated");
 		} catch (CampaignException e) {
@@ -140,7 +139,7 @@ public class CampaignController {
 	public Result deleteCampaign(@PathParam("campaignId") Long campaignId, FlashScope flashScope) {
 
 		try {
-			campaignDao.deleteCampaign(campaignId);
+			campaignService.deleteCampaign(campaignId);
 			flashScope.success("Campaign deleted successfully.");
 		} catch (CampaignException e) {
 			flashScope.error("Campaign, trying to delete, doesn't exist");
