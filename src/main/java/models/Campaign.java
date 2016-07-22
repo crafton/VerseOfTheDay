@@ -24,7 +24,7 @@ import javax.persistence.NamedQuery;
 @NamedQueries({
     @NamedQuery(name = "Campaign.findAll", query = "SELECT x FROM Campaign x")
 })
-public class Campaign implements Serializable {
+public class Campaign {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,10 +35,7 @@ public class Campaign implements Serializable {
 	private int campaignDays;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "CampaignTheme", joinColumns = @JoinColumn(name = "campaignId", referencedColumnName = "campaignId") , inverseJoinColumns = @JoinColumn(name = "themeId", referencedColumnName = "themeId") )
 	private List<Theme> themeList;
-
-	private static final long serialVersionUID = 1L;
 
 	public Campaign() {
 		super();
