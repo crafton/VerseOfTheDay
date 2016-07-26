@@ -15,9 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by Crafton Williams on 2/06/2016.
- */
+
 public class ThemeServiceTest extends NinjaDaoTestBase {
 
     private VotdService votdService;

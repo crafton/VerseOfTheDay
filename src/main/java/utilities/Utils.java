@@ -16,9 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
-/**
- * Created by Crafton Williams on 27/03/2016.
- */
 public class Utils {
 
     @Inject
@@ -153,7 +150,7 @@ public class Utils {
      * @return JsonObject
      * @throws JsonSyntaxException
      */
-    public JsonObject getJsonFromString(String someString) throws JsonSyntaxException {
+    private JsonObject getJsonFromString(String someString) throws JsonSyntaxException {
         JsonParser parser = new JsonParser();
 
         try {

@@ -7,9 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by Crafton Williams on 14/06/2016.
- */
 public class Config {
 
     private String bibleSearchKey;
@@ -37,7 +34,6 @@ public class Config {
     @Inject
     private Config(NinjaProperties ninjaProperties) {
         this.maxVerses = ninjaProperties.getIntegerWithDefault("votd.maxverses", 0);
-
 
         this.bibleSearchKey = ninjaProperties.getWithDefault("biblesearch.key", "");
         this.themesMaxCols = ninjaProperties.getIntegerWithDefault("themes.maxcols", 7);
