@@ -2,6 +2,10 @@ package controllers;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import ninja.postoffice.Mail;
+import ninja.postoffice.Postoffice;
+import org.apache.commons.mail.EmailException;
 import services.ThemeService;
 import services.VotdService;
 import exceptions.EntityDoesNotExistException;
@@ -19,6 +23,7 @@ import ninja.session.FlashScope;
 import org.slf4j.Logger;
 import utilities.Utils;
 
+import javax.mail.internet.AddressException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +41,10 @@ public class VotdController {
     private ThemeService themeService;
     @Inject
     private Logger logger;
+    @Inject
+    private Provider<Mail> mailProvider;
+    @Inject
+    private Postoffice postoffice;
 
 
     /**
@@ -305,6 +314,23 @@ public class VotdController {
         }
 
         return Results.redirect("/votd/list");
+    }
+
+    public void sendVotdContributedEmail(){
+        Mail mail = mailProvider.get();
+
+        mail.setSubject("");
+        mail.setFrom("");
+        mail.addTo("");
+        mail.setBodyHtml("");
+        mail.setBodyText("");
+
+        try {
+            postoffice.send(mail);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
     }
 
 }
