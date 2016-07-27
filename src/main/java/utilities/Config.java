@@ -28,6 +28,11 @@ public class Config {
     private String publisherDescription;
     private List<String> rolesList;
 
+    private String contributedVotdMailFrom;
+    private String contributedVotdMailHtmlBody;
+    private String contributedVotdMailTextBody;
+    private String contributedVotdMailSubject;
+
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
 
@@ -51,6 +56,11 @@ public class Config {
         this.contributorDescription = ninjaProperties.getWithDefault("role.contributordescription", "");
         this.publisherRole = ninjaProperties.getWithDefault("role.publishername", "");
         this.publisherDescription = ninjaProperties.getWithDefault("role.publisherdescription", "");
+
+        this.contributedVotdMailFrom = ninjaProperties.getWithDefault("mail.votdcontributed.from", "");
+        this.contributedVotdMailSubject = ninjaProperties.getWithDefault("mail.votdcontributed.subject", "");
+        this.contributedVotdMailHtmlBody = ninjaProperties.getWithDefault("mail.votdcontributed.htmlbody", "");
+        this.contributedVotdMailTextBody = ninjaProperties.getWithDefault("mail.votdcontributed.textbody", "");
 
         this.rolesList = Arrays.asList(this.memberRole, this.contributorRole, this.publisherRole);
 
@@ -123,5 +133,21 @@ public class Config {
 
     public List<String> getRolesList() {
         return rolesList;
+    }
+
+    public String getContributedVotdMailFrom() {
+        return contributedVotdMailFrom;
+    }
+
+    public String getContributedVotdMailHtmlBody() {
+        return contributedVotdMailHtmlBody;
+    }
+
+    public String getContributedVotdMailTextBody() {
+        return contributedVotdMailTextBody;
+    }
+
+    public String getContributedVotdMailSubject() {
+        return contributedVotdMailSubject;
     }
 }
