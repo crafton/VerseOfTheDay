@@ -2,7 +2,12 @@ package controllers;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import ninja.postoffice.Mail;
+import ninja.postoffice.Postoffice;
+import org.apache.commons.mail.EmailException;
 import services.ThemeService;
+import services.UserService;
 import services.VotdService;
 import exceptions.EntityDoesNotExistException;
 import filters.ContributorFilter;
@@ -17,8 +22,10 @@ import ninja.Results;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
+import utilities.Config;
 import utilities.Utils;
 
+import javax.mail.internet.AddressException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +43,14 @@ public class VotdController {
     private ThemeService themeService;
     @Inject
     private Logger logger;
+    @Inject
+    private Provider<Mail> mailProvider;
+    @Inject
+    private Postoffice postoffice;
+    @Inject
+    private UserService userService;
+    @Inject
+    private Config config;
 
 
     /**
@@ -85,7 +100,7 @@ public class VotdController {
                     .ok()
                     .json()
                     .render(votdMap);
-        }catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             logger.error(e.getMessage());
             return Results.badRequest().json();
         }
@@ -94,6 +109,7 @@ public class VotdController {
 
     /**
      * Render view to create a new votd
+     *
      * @return
      */
     @FilterWith(ContributorFilter.class)
@@ -107,7 +123,7 @@ public class VotdController {
     }
 
     /**
-     *Retrieve the full versetext from the web service given a verse range
+     * Retrieve the full versetext from the web service given a verse range
      *
      * @param verses verses to retrieve
      * @return
@@ -171,6 +187,11 @@ public class VotdController {
         try {
             votd.setThemes(themeList);
             votdService.save(votd);
+            //If the votd was saved by a contributor, send a notification to the publishers
+            String idToken = context.getSession().get("idToken");
+            if (userService.hasRole(idToken, config.getContributorRole())) {
+                sendVotdContributedEmail();
+            }
             flashScope.success("Successfully created a new VoTD entry.");
         } catch (IllegalArgumentException e) {
             flashScope.error("Something strange has happened. Contact the administrator.");
@@ -214,7 +235,7 @@ public class VotdController {
                     .render("votd", votd)
                     .render("themes", themes)
                     .render("verseText", verseText);
-        }catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
             logger.error("CFailed web service call to retrieve verses.");
             return Results.redirect("/votd/list");
@@ -305,6 +326,24 @@ public class VotdController {
         }
 
         return Results.redirect("/votd/list");
+    }
+
+    private void sendVotdContributedEmail() {
+        Mail mail = mailProvider.get();
+
+        mail.setSubject(config.getContributedVotdMailSubject());
+        mail.setFrom(config.getContributedVotdMailFrom());
+        //TODO: get list of publisher emails
+        mail.addTo("");
+        mail.setBodyHtml(config.getContributedVotdMailHtmlBody());
+        mail.setBodyText(config.getContributedVotdMailTextBody());
+
+        try {
+            postoffice.send(mail);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
     }
 
 }
