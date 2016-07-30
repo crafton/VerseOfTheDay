@@ -2,9 +2,12 @@ package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import ninja.Results;
 import ninja.cache.NinjaCache;
+import ninja.session.Session;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.slf4j.Logger;
+import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
 
@@ -34,6 +37,9 @@ public class UserService {
     @Inject
     private Logger logger;
 
+    @Inject
+    private UserRepository userRepository;
+
     public UserService() {
     }
 
@@ -41,57 +47,17 @@ public class UserService {
         return (String) ninjaCache.get(idToken);
     }
 
-    /**
-     * Retrieve user records for the data table based on specified query
-     *
-     * @param start
-     * @param length
-     * @param search
-     * @return JsonObject containing returned records
-     * @throws JsonSyntaxException
-     */
     public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
-
-        String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
-                "OR app_metadata.roles:" + search + "*";
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("per_page", length);
-        params.put("page", start);
-        params.put("include_totals", "true");
-        params.put("fields", "name,user_metadata.name,email,last_login,created_at,user_id,app_metadata.roles");
-        params.put("include_fields", "true");
-        params.put("search_engine", "v2");
-        params.put("q", queryString);
-
         try {
-            return utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
+            return userRepository.findUsers(start, length, search);
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
     }
 
-    /**
-     * Retrieve the total number of users from auth0
-     *
-     * @return Integer. Total number of users
-     * @throws JsonSyntaxException
-     */
     public Integer getTotalRecords() throws JsonSyntaxException {
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("per_page", "1");
-        params.put("include_totals", "true");
-        params.put("fields", "name");
-        params.put("include_fields", "true");
-        params.put("search_engine", "v2");
-
-        JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
-
         try {
-            return response
-                    .get("total")
-                    .getAsInt();
+            return userRepository.getTotalUserRecords();
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
@@ -197,9 +163,9 @@ public class UserService {
      * @param accessToken
      * @return
      */
-    public JsonObject auth0GetUser(String accessToken) throws JsonSyntaxException {
+    public JsonObject findUser(String accessToken) throws JsonSyntaxException {
         try {
-            return utils.auth0ApiQuery(null, "/userinfo", accessToken);
+            return userRepository.findUserByToken(accessToken);
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
         }
@@ -213,23 +179,8 @@ public class UserService {
      * @return
      */
     private List<String> getUserRoles(String userID) throws JsonSyntaxException {
-        List<String> rolesList = new ArrayList<>();
-        Map<String, Object> params = new HashMap<>();
-        params.put("fields", "app_metadata");
-        params.put("include_fields", "true");
-
         try {
-            JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi() + "/" + userID);
-
-            JsonArray rolesArray = response.get("app_metadata")
-                    .getAsJsonObject()
-                    .get("roles")
-                    .getAsJsonArray();
-
-            for (JsonElement role : rolesArray) {
-                rolesList.add(role.getAsString());
-            }
-            return rolesList;
+            return userRepository.findRolesByUserId(userID);
 
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException(e.getMessage());
@@ -275,27 +226,27 @@ public class UserService {
         Gson gson = new Gson();
         String body = "{\"app_metadata\": { \"roles\": " + gson.toJson(roles) + "} }";
 
-        updateUserProfile(userId, body);
+        userRepository.updateUser(userId, body);
 
     }
 
     /**
-     * Update user profile
+     * Create a user session after successful authentication
      *
-     * @param userId
-     * @param body
+     * @param session
+     * @param code
      */
-    private void updateUserProfile(String userId, String body) {
+    public void createSession(Session session, String code) throws JsonSyntaxException, IllegalStateException {
+        /*Retrieve authentication tokens from auth0*/
+        Map<String, String> tokens = userRepository.getAuthToken(code);
+        JsonObject userObject = findUser(tokens.get("access_token"));
 
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.getAuth0UserApi() + "/" + userId);
-        String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
-                .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
+            /*Cache user profile so we don't have to query information again for the session*/
+        ninjaCache.set(tokens.get("id_token"), userObject.toString());
 
-        logger.info("Received the following response after updating user profile:" + response);
-
+            /*Store only tokens in the session cookie*/
+        session.put("idToken", tokens.get("id_token"));
+        session.put("accessToken", tokens.get("access_token"));
     }
 
 }

@@ -3,6 +3,8 @@ package controllers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
+import org.h2.engine.User;
+import repositories.UserRepository;
 import services.UserService;
 import filters.LoginFilter;
 import filters.MemberFilter;
@@ -42,6 +44,9 @@ public class LoginController {
     @Inject
     private NinjaCache ninjaCache;
 
+    @Inject
+    private UserRepository userRepository;
+
     /**
      * Direct to view with auth0 login lock.
      *
@@ -77,16 +82,7 @@ public class LoginController {
         }
 
         try {
-            /*Retrieve authentication tokens from auth0*/
-            Map<String, String> tokens = utils.auth0GetToken(code);
-            JsonObject userObject = userService.auth0GetUser(tokens.get("access_token"));
-
-            /*Cache user profile so we don't have to query information again for the session*/
-            ninjaCache.set(tokens.get("id_token"), userObject.toString());
-
-            /*Store only tokens in the session cookie*/
-            session.put("idToken", tokens.get("id_token"));
-            session.put("accessToken", tokens.get("access_token"));
+            userService.createSession(session, code);
         } catch (JsonSyntaxException | IllegalStateException e) {
             logger.error(e.getMessage());
             Results.redirect("/servererror");
