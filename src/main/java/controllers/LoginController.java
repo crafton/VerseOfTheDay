@@ -23,10 +23,6 @@ import utilities.Utils;
 import java.util.Map;
 
 
-/**
- * Created by Crafton Williams on 13/06/2016.
- */
-
 public class LoginController {
 
     @Inject

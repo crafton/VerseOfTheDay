@@ -99,7 +99,7 @@ public class UserController {
 
             Integer recordsTotal = userService.getTotalRecords();
 
-            JsonObject usersJson = userService.getUserRecords(start, length, search);
+            JsonObject usersJson = userService.findUserRecordsWithPaging(start, length, search);
             Integer recordsFiltered = usersJson.get("total")
                     .getAsInt();
             List<String[]> usersData = userService.generateDataTableResults(usersJson.getAsJsonArray("users"));

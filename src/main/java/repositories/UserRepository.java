@@ -29,6 +29,16 @@ public class UserRepository {
 
 
     /**
+     * Retrieve users based on a search string. The search will be executed against; name, email, role
+     *
+     * @param search
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public JsonObject findUsers(String search) throws JsonSyntaxException{
+        return findUsersWithPaging(0, 50, search);
+    }
+    /**
      * Retrieve user records for the data table based on specified query
      *
      * @param start
@@ -37,7 +47,7 @@ public class UserRepository {
      * @return JsonObject containing returned records
      * @throws JsonSyntaxException
      */
-    public JsonObject findUsers(Integer start, Integer length, String search) throws JsonSyntaxException {
+    public JsonObject findUsersWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
         String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
                 "OR app_metadata.roles:" + search + "*";
 
