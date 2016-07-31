@@ -48,19 +48,11 @@ public class UserService {
     }
 
     public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
-        try {
-            return userRepository.findUsers(start, length, search);
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return userRepository.findUsers(start, length, search);
     }
 
     public Integer getTotalRecords() throws JsonSyntaxException {
-        try {
-            return userRepository.getTotalUserRecords();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return userRepository.getTotalUserRecords();
     }
 
     /**
@@ -164,12 +156,7 @@ public class UserService {
      * @return
      */
     public JsonObject findUser(String accessToken) throws JsonSyntaxException {
-        try {
-            return userRepository.findUserByToken(accessToken);
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
-
+        return userRepository.findUserByToken(accessToken);
     }
 
     /**
@@ -179,12 +166,7 @@ public class UserService {
      * @return
      */
     private List<String> getUserRoles(String userID) throws JsonSyntaxException {
-        try {
-            return userRepository.findRolesByUserId(userID);
-
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return userRepository.findRolesByUserId(userID);
     }
 
     /**
