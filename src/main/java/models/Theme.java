@@ -1,10 +1,19 @@
 package models;
 
-import org.apache.commons.lang3.StringUtils;
-
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by Crafton Williams on 28/05/2016.
@@ -12,7 +21,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Theme.findAll", query = "SELECT x FROM Theme x "),
-        @NamedQuery(name = "Theme.findByName", query = "SELECT themeName FROM Theme WHERE themeName = :name")
+        @NamedQuery(name = "Theme.findByName", query = "SELECT T.themeName FROM Theme T WHERE T.themeName = :name")
 })
 public class Theme {
 

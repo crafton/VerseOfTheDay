@@ -18,12 +18,9 @@ package conf;
 
 
 import controllers.*;
-import models.Theme;
-import models.Votd;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
-import org.eclipse.jetty.server.Authentication;
 
 public class Routes implements ApplicationRoutes {
 

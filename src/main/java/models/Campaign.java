@@ -35,6 +35,7 @@ public class Campaign {
 	private int campaignDays;
 
 	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "CampaignTheme", joinColumns = @JoinColumn(name = "campaignId", referencedColumnName = "campaignId") , inverseJoinColumns = @JoinColumn(name = "themeId", referencedColumnName = "id") )
 	private List<Theme> themeList;
 
 	public Campaign() {
