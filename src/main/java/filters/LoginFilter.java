@@ -5,9 +5,6 @@ import ninja.*;
 import ninja.cache.NinjaCache;
 
 
-/**
- * Created by Crafton Williams on 17/06/2016.
- */
 public class LoginFilter implements Filter {
 
     @Inject
