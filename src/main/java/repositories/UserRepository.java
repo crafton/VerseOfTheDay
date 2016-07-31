@@ -50,11 +50,7 @@ public class UserRepository {
         params.put("search_engine", "v2");
         params.put("q", queryString);
 
-        try {
-            return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
     }
 
     /**
@@ -73,13 +69,9 @@ public class UserRepository {
 
         JsonObject response = auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
 
-        try {
-            return response
-                    .get("total")
-                    .getAsInt();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return response
+                .get("total")
+                .getAsInt();
     }
 
     /**
@@ -89,12 +81,7 @@ public class UserRepository {
      * @return
      */
     public JsonObject findUserByToken(String accessToken) throws JsonSyntaxException {
-        try {
-            return auth0ApiQuery(null, "/userinfo", accessToken);
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
-
+        return auth0ApiQuery(null, "/userinfo", accessToken);
     }
 
     /**
@@ -109,22 +96,17 @@ public class UserRepository {
         params.put("fields", "app_metadata");
         params.put("include_fields", "true");
 
-        try {
-            JsonObject response = auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi() + "/" + userID);
+        JsonObject response = auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi() + "/" + userID);
 
-            JsonArray rolesArray = response.get("app_metadata")
-                    .getAsJsonObject()
-                    .get("roles")
-                    .getAsJsonArray();
+        JsonArray rolesArray = response.get("app_metadata")
+                .getAsJsonObject()
+                .get("roles")
+                .getAsJsonArray();
 
-            for (JsonElement role : rolesArray) {
-                rolesList.add(role.getAsString());
-            }
-            return rolesList;
-
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
+        for (JsonElement role : rolesArray) {
+            rolesList.add(role.getAsString());
         }
+        return rolesList;
     }
 
     /**
@@ -169,14 +151,9 @@ public class UserRepository {
                 .post(Entity.entity(auth0TokenRequestString, MediaType.APPLICATION_JSON));
 
         JsonObject jsonResponse;
-        try {
-            JsonParser parser = new JsonParser();
-            jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        } catch (IllegalStateException e) {
-            throw new IllegalStateException(e.getMessage());
-        }
+
+        JsonParser parser = new JsonParser();
+        jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
 
         String accessToken = jsonResponse
                 .getAsJsonObject()
@@ -204,11 +181,7 @@ public class UserRepository {
      * @throws JsonSyntaxException
      */
     private JsonObject auth0ApiQueryWithMgmtToken(Map<String, Object> params, String apiPath) throws JsonSyntaxException {
-        try {
-            return auth0ApiQuery(params, apiPath, config.getAuth0MgmtToken());
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return auth0ApiQuery(params, apiPath, config.getAuth0MgmtToken());
     }
 
     /**
@@ -233,11 +206,7 @@ public class UserRepository {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .get(String.class);
 
-        try {
-            return getJsonFromString(response);
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return getJsonFromString(response);
     }
 
     /**
@@ -250,12 +219,7 @@ public class UserRepository {
     private JsonObject getJsonFromString(String someString) throws JsonSyntaxException {
         JsonParser parser = new JsonParser();
 
-        try {
-            return parser.parse(someString).getAsJsonObject();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
-
+        return parser.parse(someString).getAsJsonObject();
     }
 
 

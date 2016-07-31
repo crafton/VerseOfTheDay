@@ -116,36 +116,29 @@ public class VotdService {
             themes = new ArrayList<>();
         }
 
-        try {
-            Votd votd = findById(votdId);
+        Votd votd = findById(votdId);
 
-            if (votd == null) {
-                throw new EntityDoesNotExistException("The VOTD you're trying to update does not exist.");
-            }
-
-            votd.setThemes(themes);
-            votd.setApproved(votdStatus);
-            votd.setDateModified(new Timestamp(System.currentTimeMillis()));
-            getEntityManager().persist(votd);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+        if (votd == null) {
+            throw new EntityDoesNotExistException("The VOTD you're trying to update does not exist.");
         }
+
+        votd.setThemes(themes);
+        votd.setApproved(votdStatus);
+        votd.setDateModified(new Timestamp(System.currentTimeMillis()));
+        getEntityManager().persist(votd);
+
     }
 
     @Transactional
     public void approve(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
 
-        try {
-            Votd votd = findById(votdId);
+        Votd votd = findById(votdId);
 
-            if (votd == null) {
-                throw new EntityDoesNotExistException("You cannot approve a VOTD that does not exist.");
-            }
-            votd.setApproved(true);
-            getEntityManager().persist(votd);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+        if (votd == null) {
+            throw new EntityDoesNotExistException("You cannot approve a VOTD that does not exist.");
         }
+        votd.setApproved(true);
+        getEntityManager().persist(votd);
     }
 
     @Transactional
@@ -161,15 +154,11 @@ public class VotdService {
 
     @Transactional
     public void delete(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
-        try {
-            Votd votd = findById(votdId);
-            if (votd == null) {
-                throw new EntityDoesNotExistException("Cannot delete a VOTD that does not exist.");
-            }
-            getEntityManager().remove(votd);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+        Votd votd = findById(votdId);
+        if (votd == null) {
+            throw new EntityDoesNotExistException("Cannot delete a VOTD that does not exist.");
         }
+        getEntityManager().remove(votd);
     }
 
     /**
@@ -179,7 +168,7 @@ public class VotdService {
      * @param votds
      * @return
      */
-    public List<String[]> generateDataTableResults(List<Votd> votds){
+    public List<String[]> generateDataTableResults(List<Votd> votds) {
 
         String[] votdFields = new String[0];
         List<String[]> votdData = new ArrayList<>();
@@ -223,12 +212,9 @@ public class VotdService {
                 .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
 
         JsonObject verseJsonObject;
-        try {
-            JsonParser parser = new JsonParser();
-            verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+
+        JsonParser parser = new JsonParser();
+        verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
 
         JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")
