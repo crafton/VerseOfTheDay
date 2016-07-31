@@ -187,7 +187,7 @@ public class VotdController {
         try {
             votd.setThemes(themeList);
             votdService.save(votd);
-            //If the votd was saved by a contributor, send a notification to the publishers
+            //If the votd was saved by a contributor, send a notification
             String idToken = context.getSession().get("idToken");
             if (userService.hasRole(idToken, config.getContributorRole())) {
                 sendVotdContributedEmail();
@@ -333,8 +333,7 @@ public class VotdController {
 
         mail.setSubject(config.getContributedVotdMailSubject());
         mail.setFrom(config.getContributedVotdMailFrom());
-        //TODO: get list of publisher emails
-        mail.addTo("");
+        mail.addTo(config.getContributedVotdAddress());
         mail.setBodyHtml(config.getContributedVotdMailHtmlBody());
         mail.setBodyText(config.getContributedVotdMailTextBody());
 

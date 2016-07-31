@@ -32,6 +32,7 @@ public class Config {
     private String contributedVotdMailHtmlBody;
     private String contributedVotdMailTextBody;
     private String contributedVotdMailSubject;
+    private String contributedVotdAddress;
 
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
@@ -61,6 +62,7 @@ public class Config {
         this.contributedVotdMailSubject = ninjaProperties.getWithDefault("mail.votdcontributed.subject", "");
         this.contributedVotdMailHtmlBody = ninjaProperties.getWithDefault("mail.votdcontributed.htmlbody", "");
         this.contributedVotdMailTextBody = ninjaProperties.getWithDefault("mail.votdcontributed.textbody", "");
+        this.contributedVotdAddress = ninjaProperties.getWithDefault("mail.votdcontributed.address", "");
 
         this.rolesList = Arrays.asList(this.memberRole, this.contributorRole, this.publisherRole);
 
@@ -149,5 +151,9 @@ public class Config {
 
     public String getContributedVotdMailSubject() {
         return contributedVotdMailSubject;
+    }
+
+    public String getContributedVotdAddress() {
+        return contributedVotdAddress;
     }
 }

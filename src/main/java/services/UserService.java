@@ -2,23 +2,14 @@ package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
-import ninja.Results;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.slf4j.Logger;
 import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,10 +38,23 @@ public class UserService {
         return (String) ninjaCache.get(idToken);
     }
 
-    public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
-        return userRepository.findUsers(start, length, search);
+    /**
+     *
+     * @param start
+     * @param length
+     * @param search
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public JsonObject findUserRecordsWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
+        return userRepository.findUsersWithPaging(start, length, search);
     }
 
+    /**
+     *
+     * @return
+     * @throws JsonSyntaxException
+     */
     public Integer getTotalRecords() throws JsonSyntaxException {
         return userRepository.getTotalUserRecords();
     }
@@ -229,6 +233,32 @@ public class UserService {
             /*Store only tokens in the session cookie*/
         session.put("idToken", tokens.get("id_token"));
         session.put("accessToken", tokens.get("access_token"));
+    }
+
+    /**
+     * Find all email addresses for contributors
+     *
+     * @param role
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public List<String> findEmailsByRole(String role) throws JsonSyntaxException {
+
+        List<String> roleEmails = new ArrayList<>();
+
+        JsonArray usersAsJson = userRepository.findUsers(role).getAsJsonArray("users");
+
+        if (usersAsJson.isJsonNull() || usersAsJson.size() == 0) {
+            return roleEmails;
+        }
+
+        for (JsonElement user : usersAsJson) {
+            roleEmails.add(user.getAsJsonObject().get("email").getAsString());
+        }
+
+        logger.debug("Retrieved the following contributor email address: " + roleEmails.toString());
+
+        return roleEmails;
     }
 
 }
