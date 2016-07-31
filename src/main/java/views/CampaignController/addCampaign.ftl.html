@@ -16,7 +16,7 @@
 			<label for="themes">Themes</label> <select id="themes" name="themes"
 				multiple="multiple" class="form-control"> <#list themes as
 				theme>
-				<option value="${theme.getThemeId()}">${theme.getThemeName()}</option>
+				<option value="${theme.getId()}">${theme.getThemeName()}</option>
 				<#else>
 				<option value="0">No themes in database</option> </#list>
 			</select>

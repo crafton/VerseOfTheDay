@@ -35,7 +35,7 @@ public class Campaign implements Serializable {
 	private int campaignDays;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "CampaignTheme", joinColumns = @JoinColumn(name = "campaignId", referencedColumnName = "campaignId") , inverseJoinColumns = @JoinColumn(name = "themeId", referencedColumnName = "themeId") )
+	@JoinTable(name = "CampaignTheme", joinColumns = @JoinColumn(name = "campaignId", referencedColumnName = "campaignId") , inverseJoinColumns = @JoinColumn(name = "themeId", referencedColumnName = "id") )
 	private List<Theme> themeList;
 
 	private static final long serialVersionUID = 1L;

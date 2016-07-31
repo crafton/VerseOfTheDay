@@ -19,9 +19,9 @@
 				id="themes" name="themeList" multiple="multiple"
 				class="form-control"> <#list themes as theme> <#if
 				campaign.getThemeList()?seq_contains(theme.getThemeName())>
-				<option value="${theme.getThemeId()}" selected>${theme.getThemeName()}</option>
+				<option value="${theme.getId()}" selected>${theme.getThemeName()}</option>
 				<#else>
-				<option value="${theme.getThemeId()}">${theme.getThemeName()}</option>
+				<option value="${theme.getId()}">${theme.getThemeName()}</option>
 				</#if> </#list>
 			</select>
 		</div>
