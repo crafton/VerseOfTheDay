@@ -38,13 +38,13 @@ public class ThemeServiceTest extends NinjaDaoTestBase {
 
     @Test(expected = IllegalArgumentException.class)
     public void findByIdWhenIdIsNull() throws Exception{
-        themeService.findById(null);
+        themeService.findThemeById(null);
     }
 
     @Test
     public void findAll() throws Exception {
-        themeService.save(theme);
-        List<Theme> themesList = themeService.findAll();
+        themeService.saveTheme(theme);
+        List<Theme> themesList = themeService.findAllThemes();
 
         assertEquals(1, themesList.size());
         assertEquals(themesList.get(0).getThemeName(), "Love");
@@ -52,55 +52,55 @@ public class ThemeServiceTest extends NinjaDaoTestBase {
 
     @Test
     public void findAllWithEmptyDB() throws Exception {
-        List<Theme> themeList = themeService.findAll();
+        List<Theme> themeList = themeService.findAllThemes();
 
         assertEquals(0, themeList.size());
     }
 
     @Test
     public void findByName() throws Exception {
-        themeService.save(theme);
-        String themeName = themeService.findByName("Love");
+        themeService.saveTheme(theme);
+        String themeName = themeService.findThemeByName("Love");
 
         assertEquals("Love", themeName);
     }
 
     @Test(expected = NoResultException.class)
     public void findByNameWithBadName() throws Exception {
-        themeService.findByName("Some fictitious name");
+        themeService.findThemeByName("Some fictitious name");
     }
 
     @Test
     public void findById() throws Exception {
-        Theme t = themeService.findById(100L);
+        Theme t = themeService.findThemeById(100L);
 
         assertNull(t);
 
-        themeService.save(theme);
+        themeService.saveTheme(theme);
 
-        Theme t2 = themeService.findById(1L);
+        Theme t2 = themeService.findThemeById(1L);
 
         assertEquals(theme.getThemeName(), t2.getThemeName());
     }
 
     @Test
     public void delete() throws Exception {
-        themeService.save(theme);
+        themeService.saveTheme(theme);
 
-        Theme t = themeService.findById(1L);
+        Theme t = themeService.findThemeById(1L);
 
         assertEquals(theme.getThemeName(), t.getThemeName());
 
-        themeService.delete(1L);
+        themeService.deleteTheme(1L);
 
-        Theme t1 = themeService.findById(1L);
+        Theme t1 = themeService.findThemeById(1L);
 
         assertNull(t1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void saveIfThemeIsNull() throws Exception{
-        themeService.save(null);
+        themeService.saveTheme(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -108,30 +108,30 @@ public class ThemeServiceTest extends NinjaDaoTestBase {
         Theme theme = new Theme();
         theme.setThemeName("");
         theme.setCreatedBy("John Tom");
-        themeService.save(theme);
+        themeService.saveTheme(theme);
     }
     @Test(expected = EntityAlreadyExistsException.class)
     public void saveThemeAlreadyExists() throws Exception{
-        themeService.save(theme);
+        themeService.saveTheme(theme);
 
-        themeService.save(theme);
+        themeService.saveTheme(theme);
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void deleteThemeWithNullID() throws Exception{
-        themeService.delete(null);
+        themeService.deleteTheme(null);
     }
 
     @Test(expected = EntityDoesNotExistException.class)
     public void deleteThemeWithNonExistent() throws Exception {
-        themeService.delete(1L);
+        themeService.deleteTheme(1L);
     }
 
     @Test(expected = EntityBeingUsedException.class)
     public void deleteThemeBeingUsed() throws Exception{
 
-        themeService.save(theme);
+        themeService.saveTheme(theme);
 
         votdService = getInstance(VotdService.class);
         Votd votd = new Votd();
@@ -144,7 +144,7 @@ public class ThemeServiceTest extends NinjaDaoTestBase {
         votd.setThemes(themeList);
         votdService.save(votd);
 
-        themeService.delete(1L);
+        themeService.deleteTheme(1L);
     }
 
 }

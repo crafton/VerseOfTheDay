@@ -35,9 +35,10 @@ public class UserRepository {
      * @return
      * @throws JsonSyntaxException
      */
-    public JsonObject findUsers(String search) throws JsonSyntaxException{
+    public JsonObject findUsers(String search) throws JsonSyntaxException {
         return findUsersWithPaging(0, 50, search);
     }
+
     /**
      * Retrieve user records for the data table based on specified query
      *

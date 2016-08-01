@@ -114,7 +114,7 @@ public class VotdController {
      */
     @FilterWith(ContributorFilter.class)
     public Result createVotd() {
-        List<Theme> themes = themeService.findAll();
+        List<Theme> themes = themeService.findAllThemes();
 
         return Results
                 .ok()
@@ -181,7 +181,7 @@ public class VotdController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeService.findById(Long.parseLong(themeId));
+            Theme theme = themeService.findThemeById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         try {
@@ -218,7 +218,7 @@ public class VotdController {
         Votd votd = votdService.findById(verseid);
 
         //Get all themes
-        List<Theme> themes = themeService.findAll();
+        List<Theme> themes = themeService.findAllThemes();
 
         if (votd == null) {
             flashScope.error("Tried to retrieve a Votd that doesn't exist.");
@@ -258,7 +258,7 @@ public class VotdController {
         List<Theme> themeList = new ArrayList<>();
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeService.findById(Long.parseLong(themeId));
+                Theme theme = themeService.findThemeById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
 

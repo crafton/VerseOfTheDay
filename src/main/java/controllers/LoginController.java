@@ -74,7 +74,7 @@ public class LoginController {
         /*Make sure an authorization code is received before proceeding.*/
         if (StringUtils.isEmpty(code)) {
             logger.error("Authorization code not received.");
-            Results.redirect("/servererror");
+            return Results.redirect("/servererror");
         }
 
         try {

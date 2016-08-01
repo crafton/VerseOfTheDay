@@ -97,7 +97,7 @@ public class VotdServiceTest extends NinjaDaoTestBase {
     @Test
     public void update() throws Exception {
 
-        themeService.save(theme);
+        themeService.saveTheme(theme);
         votdService.save(votd);
 
         assertNull(votd.getThemes());
@@ -112,7 +112,7 @@ public class VotdServiceTest extends NinjaDaoTestBase {
     @Test
     public void updateWithNullThemeList() throws Exception {
 
-        themeService.save(theme);
+        themeService.saveTheme(theme);
         votdService.save(votd);
 
         assertNull(votd.getThemes());
@@ -126,7 +126,7 @@ public class VotdServiceTest extends NinjaDaoTestBase {
 
     @Test(expected = EntityDoesNotExistException.class)
     public void updateWithFakeId() throws Exception {
-        themeService.save(theme);
+        themeService.saveTheme(theme);
         votdService.save(votd);
 
         assertNull(votd.getThemes());
@@ -136,7 +136,7 @@ public class VotdServiceTest extends NinjaDaoTestBase {
 
     @Test(expected = IllegalArgumentException.class)
     public void updateWithNullId() throws Exception {
-        themeService.save(theme);
+        themeService.saveTheme(theme);
         votdService.save(votd);
 
         assertNull(votd.getThemes());
