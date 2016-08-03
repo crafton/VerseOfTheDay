@@ -16,22 +16,19 @@ import java.util.Map;
 
 public class UserService {
 
-    @Inject
-    private NinjaCache ninjaCache;
+    private final NinjaCache ninjaCache;
+    private final Config config;
+    private final Utils utils;
+    private final UserRepository userRepository;
+    private final Logger logger;
 
     @Inject
-    private Config config;
-
-    @Inject
-    private Utils utils;
-
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private UserRepository userRepository;
-
-    public UserService() {
+    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Logger logger) {
+        this.ninjaCache = ninjaCache;
+        this.config = config;
+        this.utils = utils;
+        this.userRepository = userRepository;
+        this.logger = logger;
     }
 
     public String getCurrentUser(String idToken) {
@@ -39,7 +36,6 @@ public class UserService {
     }
 
     /**
-     *
      * @param start
      * @param length
      * @param search
@@ -51,7 +47,6 @@ public class UserService {
     }
 
     /**
-     *
      * @return
      * @throws JsonSyntaxException
      */

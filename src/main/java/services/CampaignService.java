@@ -12,8 +12,12 @@ import repositories.CampaignRepository;
 
 public class CampaignService {
 
+    private final CampaignRepository repository;
+
     @Inject
-    private CampaignRepository repository;
+    public CampaignService(CampaignRepository repository) {
+        this.repository = repository;
+    }
 
     /**
      *
@@ -82,12 +86,7 @@ public class CampaignService {
      * @throws IllegalArgumentException
      */
     public void deleteCampaign(Long campaignId) throws CampaignException, IllegalArgumentException {
-        Campaign campaign = getCampaignById(campaignId);
 
-        if (campaign == null) {
-            throw new CampaignException("The campaign you're trying to update does not exist.");
-        }
-
-        repository.deleteCampaign(campaign);
+        repository.deleteCampaign(campaignId);
     }
 }

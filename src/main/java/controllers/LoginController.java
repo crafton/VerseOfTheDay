@@ -25,23 +25,18 @@ import java.util.Map;
 
 public class LoginController {
 
-    @Inject
-    private Config config;
+    private final Config config;
+    private final Logger logger;
+    private final UserService userService;
+    private final NinjaCache ninjaCache;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private Utils utils;
-
-    @Inject
-    private UserService userService;
-
-    @Inject
-    private NinjaCache ninjaCache;
-
-    @Inject
-    private UserRepository userRepository;
+    public LoginController(Config config, Logger logger, UserService userService, NinjaCache ninjaCache) {
+        this.config = config;
+        this.logger = logger;
+        this.userService = userService;
+        this.ninjaCache = ninjaCache;
+    }
 
     /**
      * Direct to view with auth0 login lock.

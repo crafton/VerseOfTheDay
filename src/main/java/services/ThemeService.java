@@ -17,14 +17,15 @@ import java.util.List;
 
 public class ThemeService {
 
-    @Inject
-    private ThemeRepository themeRepository;
+    private final ThemeRepository themeRepository;
 
-    public ThemeService() {
+    @Inject
+    public ThemeService(ThemeRepository themeRepository) {
+        this.themeRepository = themeRepository;
     }
 
     public List<Theme> findAllThemes() {
-       return themeRepository.findAll();
+        return themeRepository.findAll();
     }
 
     public String findThemeByName(String themeName) throws NoResultException {
@@ -34,6 +35,7 @@ public class ThemeService {
     public Theme findThemeById(Long id) throws IllegalArgumentException {
 
         if (id == null) {
+            System.out.println("is it you?");
             throw new IllegalArgumentException("Parameter must be of type 'Long'.");
         }
 
@@ -50,21 +52,8 @@ public class ThemeService {
     }
 
     public void deleteTheme(Long themeId) throws IllegalArgumentException, EntityDoesNotExistException, EntityBeingUsedException {
-        if (themeId == null) {
-            throw new IllegalArgumentException("Parameter must be of type 'Long'.");
-        }
 
-        Theme theme = findThemeById(themeId);
-
-        if (theme == null) {
-            throw new EntityDoesNotExistException("Theme not found with the supplied themeId.");
-        }
-
-        if (theme.getVotds().size() > 0) {
-            throw new EntityBeingUsedException("Cannot delete this theme, it is already being used.");
-        }
-
-        themeRepository.delete(theme);
+        themeRepository.delete(themeId);
     }
 
 }

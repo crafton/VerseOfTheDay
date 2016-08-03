@@ -29,16 +29,15 @@ import java.util.Optional;
 
 public class VotdService {
 
-    @Inject
-    private Config config;
+    private final Config config;
+    private final Logger logger;
+    private final VotdRepository votdRepository;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private VotdRepository votdRepository;
-
-    public VotdService() {
+    public VotdService(Config config, Logger logger, VotdRepository votdRepository) {
+        this.config = config;
+        this.logger = logger;
+        this.votdRepository = votdRepository;
     }
 
     public List<Votd> findAll() {

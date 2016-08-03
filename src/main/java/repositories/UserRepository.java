@@ -21,12 +21,14 @@ import java.util.Map;
 
 public class UserRepository {
 
-    @Inject
-    private Config config;
+    private final Config config;
+    private final Logger logger;
 
     @Inject
-    private Logger logger;
-
+    public UserRepository(Config config, Logger logger) {
+        this.config = config;
+        this.logger = logger;
+    }
 
     /**
      * Retrieve users based on a search string. The search will be executed against; name, email, role

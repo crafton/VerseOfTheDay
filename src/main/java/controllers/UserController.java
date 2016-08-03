@@ -24,14 +24,16 @@ import java.util.Map;
 @FilterWith({LoginFilter.class, PublisherFilter.class})
 public class UserController {
 
-    @Inject
-    private NinjaCache ninjaCache;
+    private final NinjaCache ninjaCache;
+    private final Logger logger;
+    private final UserService userService;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private UserService userService;
+    public UserController(NinjaCache ninjaCache, Logger logger, UserService userService) {
+        this.ninjaCache = ninjaCache;
+        this.logger = logger;
+        this.userService = userService;
+    }
 
     /**
      *Render view to display all users

@@ -50,7 +50,7 @@ public class Routes implements ApplicationRoutes {
 
         router.GET().route("/theme/list").with(ThemeController.class, "themes");
         router.POST().route("/theme/save").with(ThemeController.class, "saveTheme");
-        router.GET().route("/theme/delete/{theme}").with(ThemeController.class, "deleteTheme");
+        router.GET().route("/theme/delete/{themeid}").with(ThemeController.class, "deleteTheme");
 
         /**
          * Routes for Login/Logout

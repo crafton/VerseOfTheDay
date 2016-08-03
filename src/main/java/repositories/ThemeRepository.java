@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
 import exceptions.EntityAlreadyExistsException;
+import exceptions.EntityBeingUsedException;
+import exceptions.EntityDoesNotExistException;
 import models.Theme;
 
 import javax.persistence.EntityManager;
@@ -14,10 +16,12 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class ThemeRepository {
-    @Inject
-    private Provider<EntityManager> entityManagerProvider;
 
-    public ThemeRepository() {
+    private final Provider<EntityManager> entityManagerProvider;
+
+    @Inject
+    public ThemeRepository(Provider<EntityManager> entityManagerProvider) {
+        this.entityManagerProvider = entityManagerProvider;
     }
 
     @Transactional
@@ -53,8 +57,18 @@ public class ThemeRepository {
     }
 
     @Transactional
-    public void delete(Theme theme) {
-               getEntityManager().remove(theme);
+    public void delete(Long themeId) throws EntityDoesNotExistException, EntityBeingUsedException {
+        Theme theme = findById(themeId);
+
+        if (theme == null) {
+            throw new EntityDoesNotExistException("Theme not found with the supplied themeId.");
+        }
+
+        if (theme.getVotds().size() > 0) {
+            throw new EntityBeingUsedException("Cannot delete this theme, it is already being used.");
+        }
+
+        getEntityManager().remove(theme);
     }
 
     private EntityManager getEntityManager() {

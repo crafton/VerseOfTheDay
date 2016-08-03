@@ -26,11 +26,14 @@ import java.util.List;
 
 public class VotdRepository {
 
-    @Inject
-    private Config config;
+    private final Config config;
+    private final Provider<EntityManager> entityManagerProvider;
 
     @Inject
-    private Provider<EntityManager> entityManagerProvider;
+    public VotdRepository(Config config, Provider<EntityManager> entityManagerProvider) {
+        this.config = config;
+        this.entityManagerProvider = entityManagerProvider;
+    }
 
     @Transactional
     public List<Votd> findAllVerses() {
@@ -145,9 +148,6 @@ public class VotdRepository {
         }
         getEntityManager().remove(votd);
     }
-
-
-
 
     /**
      * Initiate a web service client to retrieve the verses passed in.

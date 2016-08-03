@@ -21,12 +21,16 @@ import java.util.List;
 @FilterWith({LoginFilter.class, PublisherFilter.class})
 public class ThemeController {
 
+    private final ThemeService themeService;
+    private final Logger logger;
+    private final Config config;
+
     @Inject
-    private ThemeService themeService;
-    @Inject
-    private Logger logger;
-    @Inject
-    private Config config;
+    public ThemeController(ThemeService themeService, Logger logger, Config config) {
+        this.themeService = themeService;
+        this.logger = logger;
+        this.config = config;
+    }
 
     /**
      * Retrieve list of themes from database as well as the maximum number of
@@ -75,7 +79,7 @@ public class ThemeController {
      * @param flashScope
      * @return
      */
-    public Result deleteTheme(@PathParam("theme") Long themeId, FlashScope flashScope) {
+    public Result deleteTheme(@PathParam("themeid") Long themeId, FlashScope flashScope) {
         logger.debug("Entered deleteTheme action...");
 
         try {

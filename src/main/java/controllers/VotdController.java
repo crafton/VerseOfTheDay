@@ -35,23 +35,29 @@ import java.util.Map;
 @FilterWith(LoginFilter.class)
 public class VotdController {
 
-    @Inject
-    private Utils utils;
-    @Inject
-    private VotdService votdService;
-    @Inject
-    private ThemeService themeService;
-    @Inject
-    private Logger logger;
-    @Inject
-    private Provider<Mail> mailProvider;
-    @Inject
-    private Postoffice postoffice;
-    @Inject
-    private UserService userService;
-    @Inject
-    private Config config;
+    private final Utils utils;
+    private final VotdService votdService;
+    private final ThemeService themeService;
+    private final Logger logger;
+    private final Provider<Mail> mailProvider;
+    private final Postoffice postoffice;
+    private final UserService userService;
+    private final Config config;
 
+    @Inject
+    public VotdController(Utils utils, VotdService votdService,
+                          ThemeService themeService, Logger logger,
+                          Provider<Mail> mailProvider, Postoffice postoffice,
+                          UserService userService, Config config) {
+        this.utils = utils;
+        this.votdService = votdService;
+        this.themeService = themeService;
+        this.logger = logger;
+        this.mailProvider = mailProvider;
+        this.postoffice = postoffice;
+        this.userService = userService;
+        this.config = config;
+    }
 
     /**
      * Display all votds in the database

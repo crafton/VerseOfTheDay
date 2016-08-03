@@ -1,28 +1,17 @@
 package utilities;
 
-import com.google.gson.*;
 import com.google.inject.Inject;
-import ninja.cache.NinjaCache;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
 import java.util.*;
 
 public class Utils {
 
+    private final Logger logger;
+
     @Inject
-    private Logger logger;
-
-    public Utils() {
-
+    public Utils(Logger logger) {
+        this.logger = logger;
     }
 
     /**
