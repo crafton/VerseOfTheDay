@@ -28,13 +28,13 @@ import ninja.session.FlashScope;
 
 public class CampaignController {
 
-    private final Logger logger;
+    private final static Logger logger = LoggerFactory.getLogger(CampaignController.class);
+
     private final CampaignService campaignService;
     private final ThemeService themeService;
 
     @Inject
-    public CampaignController(Logger logger, CampaignService campaignService, ThemeService themeService) {
-        this.logger = logger;
+    public CampaignController(CampaignService campaignService, ThemeService themeService) {
         this.campaignService = campaignService;
         this.themeService = themeService;
     }

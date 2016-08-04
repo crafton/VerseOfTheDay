@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import org.h2.engine.User;
+import org.slf4j.LoggerFactory;
 import repositories.UserRepository;
 import services.UserService;
 import filters.LoginFilter;
@@ -25,17 +26,17 @@ import java.util.Map;
 
 public class LoginController {
 
-    private final Config config;
-    private final Logger logger;
+    private final static Logger logger = LoggerFactory.getLogger(LoginController.class);
+
     private final UserService userService;
     private final NinjaCache ninjaCache;
+    private final Config config;
 
     @Inject
-    public LoginController(Config config, Logger logger, UserService userService, NinjaCache ninjaCache) {
-        this.config = config;
-        this.logger = logger;
+    public LoginController(UserService userService, NinjaCache ninjaCache, Config config) {
         this.userService = userService;
         this.ninjaCache = ninjaCache;
+        this.config = config;
     }
 
     /**

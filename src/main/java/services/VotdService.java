@@ -12,6 +12,7 @@ import models.Theme;
 import models.Votd;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import repositories.VotdRepository;
 import utilities.Config;
 
@@ -29,14 +30,14 @@ import java.util.Optional;
 
 public class VotdService {
 
+    private static final Logger logger = LoggerFactory.getLogger(VotdService.class);
+
     private final Config config;
-    private final Logger logger;
     private final VotdRepository votdRepository;
 
     @Inject
-    public VotdService(Config config, Logger logger, VotdRepository votdRepository) {
+    public VotdService(Config config, VotdRepository votdRepository) {
         this.config = config;
-        this.logger = logger;
         this.votdRepository = votdRepository;
     }
 

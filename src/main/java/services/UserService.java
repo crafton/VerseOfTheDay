@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
@@ -16,19 +17,19 @@ import java.util.Map;
 
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final NinjaCache ninjaCache;
     private final Config config;
     private final Utils utils;
     private final UserRepository userRepository;
-    private final Logger logger;
 
     @Inject
-    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Logger logger) {
+    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository) {
         this.ninjaCache = ninjaCache;
         this.config = config;
         this.utils = utils;
         this.userRepository = userRepository;
-        this.logger = logger;
     }
 
     public String getCurrentUser(String idToken) {

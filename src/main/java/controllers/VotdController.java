@@ -6,6 +6,7 @@ import com.google.inject.Provider;
 import ninja.postoffice.Mail;
 import ninja.postoffice.Postoffice;
 import org.apache.commons.mail.EmailException;
+import org.slf4j.LoggerFactory;
 import services.ThemeService;
 import services.UserService;
 import services.VotdService;
@@ -35,10 +36,11 @@ import java.util.Map;
 @FilterWith(LoginFilter.class)
 public class VotdController {
 
-    private final Utils utils;
+    private final static Logger logger = LoggerFactory.getLogger(VotdController.class);
+
+    private Utils utils;
     private final VotdService votdService;
     private final ThemeService themeService;
-    private final Logger logger;
     private final Provider<Mail> mailProvider;
     private final Postoffice postoffice;
     private final UserService userService;
@@ -46,13 +48,12 @@ public class VotdController {
 
     @Inject
     public VotdController(Utils utils, VotdService votdService,
-                          ThemeService themeService, Logger logger,
+                          ThemeService themeService,
                           Provider<Mail> mailProvider, Postoffice postoffice,
                           UserService userService, Config config) {
         this.utils = utils;
         this.votdService = votdService;
         this.themeService = themeService;
-        this.logger = logger;
         this.mailProvider = mailProvider;
         this.postoffice = postoffice;
         this.userService = userService;

@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 import services.ThemeService;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
@@ -21,14 +22,14 @@ import java.util.List;
 @FilterWith({LoginFilter.class, PublisherFilter.class})
 public class ThemeController {
 
+    private final static Logger logger = LoggerFactory.getLogger(ThemeController.class);
+
     private final ThemeService themeService;
-    private final Logger logger;
     private final Config config;
 
     @Inject
-    public ThemeController(ThemeService themeService, Logger logger, Config config) {
+    public ThemeController(ThemeService themeService, Config config) {
         this.themeService = themeService;
-        this.logger = logger;
         this.config = config;
     }
 

@@ -5,6 +5,7 @@ import com.google.gson.*;
 import com.google.inject.Inject;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utilities.Config;
 
 import javax.ws.rs.client.Client;
@@ -22,12 +23,11 @@ import java.util.Map;
 public class UserRepository {
 
     private final Config config;
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
 
     @Inject
-    public UserRepository(Config config, Logger logger) {
+    public UserRepository(Config config) {
         this.config = config;
-        this.logger = logger;
     }
 
     /**

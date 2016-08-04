@@ -2,6 +2,7 @@ package controllers;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 import services.UserService;
 import filters.LoginFilter;
 import filters.PublisherFilter;
@@ -24,14 +25,14 @@ import java.util.Map;
 @FilterWith({LoginFilter.class, PublisherFilter.class})
 public class UserController {
 
+    private final static Logger logger = LoggerFactory.getLogger(UserController.class);
+
     private final NinjaCache ninjaCache;
-    private final Logger logger;
     private final UserService userService;
 
     @Inject
-    public UserController(NinjaCache ninjaCache, Logger logger, UserService userService) {
+    public UserController(NinjaCache ninjaCache, UserService userService) {
         this.ninjaCache = ninjaCache;
-        this.logger = logger;
         this.userService = userService;
     }
 
