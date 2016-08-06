@@ -1,6 +1,8 @@
 package controllers;
 
 import com.google.inject.Inject;
+import ninja.Ninja;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.LoggerFactory;
 import services.ThemeService;
 import exceptions.EntityAlreadyExistsException;

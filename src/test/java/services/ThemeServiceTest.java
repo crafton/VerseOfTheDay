@@ -8,143 +8,143 @@ import models.Votd;
 import ninja.NinjaDaoTestBase;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import repositories.ThemeRepository;
 
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 
-public class ThemeServiceTest extends NinjaDaoTestBase {
+public class ThemeServiceTest {
 
-    private VotdService votdService;
     private ThemeService themeService;
+    @Mock
+    private VotdService votdService;
+    @Mock
     private Theme theme;
+    @Mock
+    private ThemeRepository themeRepository;
+
+    public ThemeServiceTest() {
+        MockitoAnnotations.initMocks(this);
+    }
 
 
     @Before
     public void setup() {
-        themeService = getInstance(ThemeService.class);
-
-        theme = new Theme();
-        theme.setThemeName("Love");
-        theme.setCreatedBy("John Smith");
-
-        List<Theme> themes = new ArrayList<>();
-
-        themes.add(theme);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void findByIdWhenIdIsNull() throws Exception{
-        themeService.findThemeById(null);
+        themeService = new ThemeService(themeRepository);
     }
 
     @Test
-    public void findAll() throws Exception {
-        themeService.saveTheme(theme);
-        List<Theme> themesList = themeService.findAllThemes();
+    public void find_theme_by_name() throws Exception {
+        when(themeRepository.findByName("somename")).thenReturn("somestring");
 
-        assertEquals(1, themesList.size());
-        assertEquals(themesList.get(0).getThemeName(), "Love");
-    }
+        String themeName = themeService.findThemeByName("somename");
 
-    @Test
-    public void findAllWithEmptyDB() throws Exception {
-        List<Theme> themeList = themeService.findAllThemes();
+        assertTrue(themeName.contentEquals("somestring"));
 
-        assertEquals(0, themeList.size());
-    }
-
-    @Test
-    public void findByName() throws Exception {
-        themeService.saveTheme(theme);
-        String themeName = themeService.findThemeByName("Love");
-
-        assertEquals("Love", themeName);
+        verify(themeRepository).findByName("somename");
     }
 
     @Test(expected = NoResultException.class)
-    public void findByNameWithBadName() throws Exception {
-        themeService.findThemeByName("Some fictitious name");
+    public void find_theme_by_name_throws_NoresultException_when_theme_doesnt_exist() throws Exception {
+        when(themeRepository.findByName("somenonexistentname")).thenThrow(new NoResultException());
+
+        themeService.findThemeByName("somenonexistentname");
+
+        verify(themeRepository).findByName("somenonexistentname");
     }
 
     @Test
-    public void findById() throws Exception {
-        Theme t = themeService.findThemeById(100L);
+    public void find_theme_by_id() throws Exception {
+        when(themeRepository.findById(1L)).thenReturn(theme);
 
-        assertNull(t);
+        Theme foundTheme = themeService.findThemeById(1L);
 
-        themeService.saveTheme(theme);
+        assertNotNull(foundTheme);
 
-        Theme t2 = themeService.findThemeById(1L);
-
-        assertEquals(theme.getThemeName(), t2.getThemeName());
-    }
-
-    @Test
-    public void delete() throws Exception {
-        themeService.saveTheme(theme);
-
-        Theme t = themeService.findThemeById(1L);
-
-        assertEquals(theme.getThemeName(), t.getThemeName());
-
-        themeService.deleteTheme(1L);
-
-        Theme t1 = themeService.findThemeById(1L);
-
-        assertNull(t1);
+        verify(themeRepository).findById(1L);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void saveIfThemeIsNull() throws Exception{
+    public void find_theme_by_id_when_param_is_null() throws Exception {
+        when(themeRepository.findById(null)).thenThrow(new IllegalArgumentException());
+
+        themeService.findThemeById(null);
+
+        verify(themeRepository).findById(null);
+
+    }
+
+    @Test
+    public void save_theme() throws Exception {
+        when(theme.getThemeName()).thenReturn("Love");
+        doNothing().when(themeRepository).save(theme);
+
+        themeService.saveTheme(theme);
+
+        verify(themeRepository).save(theme);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void save_theme_when_param_is_null() throws Exception {
         themeService.saveTheme(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void saveIfThemeNameisEmpty() throws Exception{
-        Theme theme = new Theme();
-        theme.setThemeName("");
-        theme.setCreatedBy("John Tom");
+    public void save_theme_when_themename_is_empty() throws Exception{
+        when(theme.getThemeName()).thenReturn("");
+
         themeService.saveTheme(theme);
+
+        verify(theme).getThemeName();
     }
+
     @Test(expected = EntityAlreadyExistsException.class)
-    public void saveThemeAlreadyExists() throws Exception{
-        themeService.saveTheme(theme);
+    public void save_theme_that_already_exists() throws Exception{
+        when(theme.getThemeName()).thenReturn("Love");
+        doThrow(EntityAlreadyExistsException.class).when(themeRepository).save(theme);
 
         themeService.saveTheme(theme);
+
+        verify(themeRepository).save(theme);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
-    public void deleteThemeWithNullID() throws Exception{
+    public void delete_theme_when_id_is_null() throws Exception{
+        doThrow(IllegalArgumentException.class).when(themeRepository).delete(null);
+
         themeService.deleteTheme(null);
+
+        verify(themeRepository).delete(null);
+
     }
 
     @Test(expected = EntityDoesNotExistException.class)
-    public void deleteThemeWithNonExistent() throws Exception {
-        themeService.deleteTheme(1L);
-    }
+    public void delete_theme_when_theme_does_not_exist() throws Exception{
+        doThrow(EntityDoesNotExistException.class).when(themeRepository).delete(10L);
 
+        themeService.deleteTheme(10L);
+
+        verify(themeRepository).delete(10L);
+
+    }
     @Test(expected = EntityBeingUsedException.class)
-    public void deleteThemeBeingUsed() throws Exception{
+    public void delete_theme_when_theme_is_being_used() throws Exception{
+        doThrow(EntityBeingUsedException.class).when(themeRepository).delete(10L);
 
-        themeService.saveTheme(theme);
+        themeService.deleteTheme(10L);
 
-        votdService = getInstance(VotdService.class);
-        Votd votd = new Votd();
-        votd.setVerses("Matthew 6:1-8");
-        votd.setCreatedBy("John Smith");
-        votd.setModifiedBy("Jack Thepumpkinking");
-        List<Theme> themeList = new ArrayList<>();
-        themeList.add(theme);
+        verify(themeRepository).delete(10L);
 
-        votd.setThemes(themeList);
-        votdService.save(votd);
-
-        themeService.deleteTheme(1L);
     }
+
+
 
 }

@@ -35,7 +35,6 @@ public class ThemeService {
     public Theme findThemeById(Long id) throws IllegalArgumentException {
 
         if (id == null) {
-            System.out.println("is it you?");
             throw new IllegalArgumentException("Parameter must be of type 'Long'.");
         }
 
