@@ -62,9 +62,15 @@ public class UserService {
      * @param usersJsonList
      * @return
      */
-    public List<String[]> generateDataTableResults(JsonArray usersJsonList) {
+    public List<String[]> generateDataTableResults(JsonArray usersJsonList) throws IllegalArgumentException {
+
+        if (usersJsonList == null || usersJsonList.size() == 0) {
+            logger.warn("User tried to generate a table data set without a json array.");
+            throw new IllegalArgumentException("JsonArray must contain at least one element.");
+        }
+
         List<String[]> usersData = new ArrayList<>();
-        String[] userFields = new String[0];
+        String[] userFields;
 
         for (JsonElement user : usersJsonList) {
             String name;
@@ -86,7 +92,7 @@ public class UserService {
                 }
 
             } catch (NullPointerException npe) {
-                //do nothing data table will get empty list
+                //do nothing data table will get empty roles list
             }
 
             userFields = new String[]{name,
@@ -113,6 +119,8 @@ public class UserService {
      */
     public String generateRolesCheckboxes(String userId) {
         List<String> roles = getUserRoles(userId);
+
+        logger.debug("Roles generated for " + userId + ": " + roles.toString());
 
         String checkBoxString = "";
         String roleDescription = "";
@@ -162,8 +170,8 @@ public class UserService {
     /**
      * Get a list of all roles assigned to the given user
      *
-     * @param userID
-     * @return
+     * @param userID user's unique id
+     * @return List of roles assigned ot the user
      */
     private List<String> getUserRoles(String userID) throws JsonSyntaxException {
         return userRepository.findRolesByUserId(userID);

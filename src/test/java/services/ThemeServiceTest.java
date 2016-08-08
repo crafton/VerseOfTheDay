@@ -4,18 +4,13 @@ import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
-import models.Votd;
-import ninja.NinjaDaoTestBase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import repositories.ThemeRepository;
 
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
