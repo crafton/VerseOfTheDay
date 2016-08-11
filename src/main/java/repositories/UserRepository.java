@@ -53,7 +53,7 @@ public class UserRepository {
      */
     public JsonObject findUsersWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
         String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
-                "OR app_metadata.roles:" + search + "* OR";
+                "OR app_metadata.roles:" + search + "*";
 
         Map<String, Object> params = new HashMap<>();
         params.put("per_page", length);
