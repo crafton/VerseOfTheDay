@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.inject.Inject;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.UserRepository;
@@ -213,6 +214,10 @@ public class UserService {
      */
     public void updateUserRole(String userId, List<String> roles) {
 
+        if(userId == null || roles == null){
+            throw new IllegalArgumentException("updateUserRole parameters cannot be null.");
+        }
+
         Gson gson = new Gson();
         String body = "{\"app_metadata\": { \"roles\": " + gson.toJson(roles) + "} }";
 
@@ -227,6 +232,15 @@ public class UserService {
      * @param code
      */
     public void createSession(Session session, String code) throws JsonSyntaxException, IllegalStateException {
+
+        if(session == null){
+            throw new IllegalArgumentException("The session parameter in createSession cannot be null");
+        }
+
+        if(StringUtils.isEmpty(code)){
+            throw new IllegalArgumentException("The code parameter in createSession cannot be null");
+        }
+
         /*Retrieve authentication tokens from auth0*/
         Map<String, String> tokens = userRepository.getAuthToken(code);
         JsonObject userObject = findUser(tokens.get("access_token"));

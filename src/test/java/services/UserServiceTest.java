@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import ninja.cache.NinjaCache;
+import ninja.session.Session;
+import ninja.session.SessionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,12 +16,12 @@ import utilities.Config;
 import utilities.Utils;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class UserServiceTest {
@@ -33,6 +35,8 @@ public class UserServiceTest {
     private Config config;
     @Mock
     private Utils utils;
+    @Mock
+    private Session session;
 
     public UserServiceTest() {
         MockitoAnnotations.initMocks(this);
@@ -46,32 +50,8 @@ public class UserServiceTest {
     @Test
     public void generateDataTableResults_with_6_items() throws Exception {
 
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name", "crafton");
-
-        JsonPrimitive email = new JsonPrimitive("someemail@gmail.com");
-        JsonPrimitive lastLogin = new JsonPrimitive("lastlogin date");
-        JsonPrimitive createdat = new JsonPrimitive("createdat");
-        JsonPrimitive userId = new JsonPrimitive("sdfhiuhdfus78");
-
-
-        JsonArray jsonArray2 = new JsonArray();
-        JsonPrimitive element = new JsonPrimitive("member");
-        jsonArray2.add(element);
-
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.add("roles", jsonArray2);
-
-        JsonObject outerObject = new JsonObject();
-        outerObject.add("user_metadata", jsonObject);
-        outerObject.add("app_metadata", jsonObject2);
-        outerObject.add("email", email);
-        outerObject.add("last_login", lastLogin);
-        outerObject.add("created_at", createdat);
-        outerObject.add("user_id", userId);
-
         JsonArray jsonArray = new JsonArray();
-        jsonArray.add(outerObject);
+        jsonArray.add(generateJsonUserObject());
 
         List<String[]> tableData = userService.generateDataTableResults(jsonArray);
         assertTrue(tableData.get(0)[1].contentEquals("someemail@gmail.com"));
@@ -159,28 +139,48 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findUser() throws Exception {
-
-    }
-
-    @Test
     public void hasRole() throws Exception {
 
-    }
+        when(ninjaCache.get("somekey")).thenReturn(generateJsonUserObject().toString());
 
-    @Test
-    public void updateUserRole() throws Exception {
+        boolean result = userService.hasRole("somekey", "member");
 
-    }
+        assertTrue(result);
 
-    @Test
-    public void createSession() throws Exception {
-
+        verify(ninjaCache).get("somekey");
     }
 
     @Test
     public void findEmailsByRole() throws Exception {
 
+    }
+
+    private JsonObject generateJsonUserObject(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name", "crafton");
+
+        JsonPrimitive email = new JsonPrimitive("someemail@gmail.com");
+        JsonPrimitive lastLogin = new JsonPrimitive("lastlogin date");
+        JsonPrimitive createdat = new JsonPrimitive("createdat");
+        JsonPrimitive userId = new JsonPrimitive("sdfhiuhdfus78");
+
+
+        JsonArray jsonArray2 = new JsonArray();
+        JsonPrimitive element = new JsonPrimitive("member");
+        jsonArray2.add(element);
+
+        JsonObject jsonObject2 = new JsonObject();
+        jsonObject2.add("roles", jsonArray2);
+
+        JsonObject outerObject = new JsonObject();
+        outerObject.add("user_metadata", jsonObject);
+        outerObject.add("app_metadata", jsonObject2);
+        outerObject.add("email", email);
+        outerObject.add("last_login", lastLogin);
+        outerObject.add("created_at", createdat);
+        outerObject.add("user_id", userId);
+
+        return outerObject;
     }
 
 }
