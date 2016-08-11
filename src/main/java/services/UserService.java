@@ -2,6 +2,7 @@ package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import exceptions.SubscriptionExistsException;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +13,7 @@ import utilities.Config;
 import utilities.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,10 @@ public class UserService {
      */
     public JsonObject findUserRecordsWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
         return userRepository.findUsersWithPaging(start, length, search);
+    }
+
+    public JsonObject findUserById(String id) throws JsonSyntaxException{
+        return userRepository.findUserByUserId(id);
     }
 
     /**
@@ -223,6 +229,80 @@ public class UserService {
 
         userRepository.updateUser(userId, body);
 
+    }
+
+    /**
+     * Add a new subscription record to the user profile
+     *
+     * @param userId
+     * @param campaignId
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public boolean subscribe(String userId, Long campaignId) throws IllegalArgumentException {
+        if(campaignId == null){
+            throw new IllegalArgumentException("updateSubscription parameter cannot be null.");
+        }
+
+        JsonObject userObject = findUserById(userId);
+        JsonArray subscriptionArray = userObject.get("app_metadata")
+                .getAsJsonObject()
+                .get("subscriptions")
+                .getAsJsonArray();
+
+        //check if comapaignId already exists in array
+        for (JsonElement campaign : subscriptionArray){
+            if(campaign.getAsLong() == campaignId){
+                return false;
+            }
+        }
+
+        JsonElement newSubscription = new JsonPrimitive(campaignId);
+        subscriptionArray.add(newSubscription);
+        Gson gson = new Gson();
+        String body = "{\"app_metadata\": { \"subscriptions\": " + gson.toJson(subscriptionArray) + "} }";
+
+        userRepository.updateUser(userId, body);
+
+        return true;
+    }
+
+    /**
+     * Remove a subscription record from the user profile
+     *
+     * @param userId
+     * @param campaignId
+     * @return
+     */
+    public boolean unsubscribe(String userId, Long campaignId){
+        if(campaignId == null){
+            throw new IllegalArgumentException("updateSubscription parameter cannot be null.");
+        }
+
+        JsonObject userObject = findUserById(userId);
+        JsonArray subscriptionArray = userObject.get("app_metadata")
+                .getAsJsonObject()
+                .get("subscriptions")
+                .getAsJsonArray();
+
+        //convert jsonarray to list of json elements
+        List<JsonElement> subscriptionList = new ArrayList<>();
+        for(JsonElement campaign : subscriptionArray){
+            subscriptionList.add(campaign);
+        }
+
+        JsonElement campaignElement = new JsonPrimitive(campaignId);
+        if(subscriptionList.contains(campaignElement)){
+            subscriptionList.remove(campaignElement);
+            Gson gson = new Gson();
+            String body = "{\"app_metadata\": { \"subscriptions\": " + gson.toJson(subscriptionList) + "} }";
+
+            userRepository.updateUser(userId, body);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

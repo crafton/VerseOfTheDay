@@ -4,6 +4,7 @@ package repositories;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import org.glassfish.jersey.message.internal.StringBuilderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.Config;
@@ -52,13 +53,13 @@ public class UserRepository {
      */
     public JsonObject findUsersWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
         String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
-                "OR app_metadata.roles:" + search + "*";
+                "OR app_metadata.roles:" + search + "* OR";
 
         Map<String, Object> params = new HashMap<>();
         params.put("per_page", length);
         params.put("page", start);
         params.put("include_totals", "true");
-        params.put("fields", "name,user_metadata.name,email,last_login,created_at,user_id,app_metadata.roles");
+        params.put("fields", "name,user_metadata.name,email,last_login,created_at,user_id,app_metadata.roles,app_metadata.subscriptions");
         params.put("include_fields", "true");
         params.put("search_engine", "v2");
         params.put("q", queryString);
@@ -121,6 +122,24 @@ public class UserRepository {
         }
         return rolesList;
     }
+
+
+    /**
+     *
+     * @param userID
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public JsonObject findUserByUserId(String userID) throws JsonSyntaxException {
+        Map<String, Object> params = new HashMap<>();
+        params.put("fields", "app_metadata");
+        params.put("include_fields", "true");
+
+        JsonObject response = auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi() + "/" + userID);
+
+        return response;
+    }
+
 
     /**
      * Update user profile
