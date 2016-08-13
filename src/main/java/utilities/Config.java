@@ -36,6 +36,7 @@ public class Config {
 
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
+    public final String DATE_FORMAT = "EEEEE, MMMMM d, yyyy hh:mm aaa";
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {

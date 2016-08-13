@@ -25,6 +25,7 @@ import ninja.Results;
 import ninja.Router;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
+import utilities.Config;
 
 public class CampaignController {
 
@@ -32,11 +33,13 @@ public class CampaignController {
 
     private final CampaignService campaignService;
     private final ThemeService themeService;
+    private final Config config;
 
     @Inject
-    public CampaignController(CampaignService campaignService, ThemeService themeService) {
+    public CampaignController(CampaignService campaignService, ThemeService themeService, Config config) {
         this.campaignService = campaignService;
         this.themeService = themeService;
+        this.config = config;
     }
 
     /**
@@ -44,8 +47,9 @@ public class CampaignController {
      **/
     public Result campaignList() {
 
-        return Results.html().render("campaignList", campaignService.getCampaignList()).render("themeList",
-                themeService.findAllThemes());
+        return Results.html().render("campaignList", campaignService.getCampaignList())
+                .render("themeList", themeService.findAllThemes())
+                .render("dateFormat", config.DATE_FORMAT);
     }
 
     /**
@@ -59,7 +63,7 @@ public class CampaignController {
      * Saving new campaign
      **/
     public Result saveCampaign(Context context, Campaign campaign, FlashScope flashScope) {
-        DateFormat formatter = new SimpleDateFormat("EEEEE, MMMMM d, yyyy hh:mm aaa");
+        DateFormat formatter = new SimpleDateFormat(config.DATE_FORMAT);
 
         List<String> themeIds = context.getParameterValues("themes");
         if (themeIds.isEmpty()) {
