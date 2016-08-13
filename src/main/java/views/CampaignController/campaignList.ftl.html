@@ -25,8 +25,8 @@
 					<td>${campaign.campaignName}</td>
 					<td><#list campaign.themeList as theme>
 						${theme.themeName}<#sep>,</#list></td>
-					<td>${campaign.startDate?string("MMMMM dd, yyyy HH:mm")}</td>
-					<td>${campaign.endDate?string("MMMMM dd, yyyy HH:mm")}</td>
+					<td>${campaign.startDate?string("EEEEE, MMMMM d, yyyy hh:mm aaa")}</td>
+					<td>${campaign.endDate?string("EEEEE, MMMMM d, yyyy hh:mm aaa")}</td>
 					<td>${campaign.campaignDays}</td>
 					<td><a class="fa fa-trash" data-placement="top"
 						data-toggle="confirmation" aria-hidden="true"

@@ -43,6 +43,7 @@ public class CampaignController {
      * Displaying list of campaigns
      **/
     public Result campaignList() {
+
         return Results.html().render("campaignList", campaignService.getCampaignList()).render("themeList",
                 themeService.findAllThemes());
     }
@@ -58,7 +59,7 @@ public class CampaignController {
      * Saving new campaign
      **/
     public Result saveCampaign(Context context, Campaign campaign, FlashScope flashScope) {
-        DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+        DateFormat formatter = new SimpleDateFormat("EEEEE, MMMMM d, yyyy hh:mm aaa");
 
         List<String> themeIds = context.getParameterValues("themes");
         if (themeIds.isEmpty()) {
@@ -79,6 +80,8 @@ public class CampaignController {
             themeList.add(theme);
         }
         campaign.setThemeList(themeList);
+
+        System.out.println(campaign.getStartDate().toString());
 
         try {
             campaignService.save(campaign);
