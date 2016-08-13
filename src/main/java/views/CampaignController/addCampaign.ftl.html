@@ -1,53 +1,75 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
-"List Campaign">
+    "List Campaign">
 
-<div class="panel panel-primary">
-	<div class="panel-heading">
-		<h2 class="panel-title addHeader">Add Campaign</h2>
-	</div>
-	<form action="/campaign/saveCampaign" method="post" id="addForm" data-toggle="validator">
-		<div class="form-group campaignForm ">
-			<label for="campaignName">Campaign Name</label> <input type="text"
-				class="form-control" id="campaignName" name="campaignName"
-				placeholder="Enter Campaign Name" pattern="^[a-zA-Z0-9_]+$" required>
-			<div class="help-block with-errors"></div>
-		</div>
-		<div class="form-group campaignForm">
-			<label for="themes">Themes</label> <select id="themes" name="themes"
-				multiple="multiple" class="form-control"> <#list themes as
-				theme>
-				<option value="${theme.getId()}">${theme.getThemeName()}</option>
-				<#else>
-				<option value="0">No themes in database</option> </#list>
-			</select>
-		</div>
-		<div class="form-group campaignForm">
-			<label for="startDate">Start Date</label>
-			<div class='input-group'>
-				<input type="text" class="form-control startDatePicker"
-					placeholder="MMM DD, YYYY" id="startDate" name="startDate" style ="background-color:white" readonly required/>
-			</div>
-		</div>
-		<div class="form-group campaignForm">
-			<label for="endDate">End Date</label>
-			<div class='input-group'>
-				<input type="text" class="form-control endDatePicker"
-					placeholder="MMM DD, YYYY" id="endDate" name="endDate" style ="background-color:white" readonly required/>
-			</div>
-		</div>
-		<div class="form-group campaignForm">
-			<div class='input-group'>
-				<input type="hidden" class="form-control"
-					placeholder="MMM DD, YYYY" id="campaignDays" name="campaignDays" />
-			</div>
-		</div>
-		<div class="panel-footer">
-			<input type="submit" class="btn btn-primary btn-md " onclick="return onFormSubmit();" value="Save">
-			&nbsp; <a aria-hidden="true" class="btn btn-default btn-md "
-				href="/campaign/list">Cancel</a>
-			<div class="clearfix"></div>
-		</div>
-	</form>
-</div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title">Add Campaign</h2>
+        </div>
+        <div class="panel-body">
+            <form action="/campaign/saveCampaign" class="form-horizontal" method="post" id="addForm" data-toggle="validator">
+
+                <div class="form-group">
+                    <label for="campaignName" class="col-sm-2 control-label">Campaign Name</label>
+                    <div class="col-sm-4 input-group">
+                        <input type="text"
+                               class="form-control" id="campaignName"
+                               name="campaignName"
+                               placeholder="Enter Campaign Name"
+                               pattern="^[a-zA-Z0-9_]+$" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="themes" class="col-sm-2 control-label">Themes</label>
+                    <div class="col-sm-4 input-group">
+                        <select id="themes" name="themes" multiple="multiple">
+                            <#list themes as theme>
+                                <option value="${theme.getId()}">${theme.getThemeName()}</option>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate" class="col-sm-2 control-label">Start Date</label>
+                    <div class='col-sm-4 input-group date' id="startDatePicker">
+                        <input type="text" class="form-control"
+                               placeholder="MMM DD, YYYY" id="startDate" name="startDate" required/>
+                        <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate" class="col-sm-2 control-label">End Date</label>
+                    <div class='col-sm-4 input-group date' id="endDatePicker">
+                        <input type="text" class="form-control"
+                               placeholder="MMM DD, YYYY" id="endDate" name="endDate" required/>
+                        <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class='col-sm-4 input-group'>
+                        <input type="hidden" class="form-control"
+                               placeholder="MMM DD, YYYY" id="campaignDays" name="campaignDays"/>
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    <input type="submit" class="btn btn-primary btn-md " onclick="return onFormSubmit();" value="Save">
+                    &nbsp; <a aria-hidden="true" class="btn btn-default btn-md "
+                              href="/campaign/list">Cancel</a>
+                    <div class="clearfix"></div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+    <script type="text/javascript" src="/assets/js/campaign.js"></script>
 </@layout.myLayout>
 

@@ -1,7 +1,3 @@
-/**
- * Created by craft on 25/03/2016.
- */
-
 //Retrieve the verses
 $("#verifyVerseButton").click(function () {
     $.ajax({
