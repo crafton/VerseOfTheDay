@@ -85,8 +85,6 @@ public class CampaignController {
         }
         campaign.setThemeList(themeList);
 
-        System.out.println(campaign.getStartDate().toString());
-
         try {
             campaignService.save(campaign);
             flashScope.success("Campaign succesfully created");

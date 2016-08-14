@@ -1,10 +1,12 @@
 $(function () {
 	$('#startDatePicker').datetimepicker({
-		format: 'LLLL'
+		format: 'LLLL',
+		stepping: 60
 	});
 	$('#endDatePicker').datetimepicker({
 		useCurrent: false, //Important! See issue #1075
-		format: 'LLLL'
+		format: 'LLLL',
+		stepping: 60
 	});
 	$("#startDatePicker").on("dp.change", function (e) {
 		$('#endDatePicker').data("DateTimePicker").minDate(e.date);
