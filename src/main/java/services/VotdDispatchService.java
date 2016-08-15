@@ -2,16 +2,26 @@ package services;
 
 
 import com.google.gson.JsonObject;
+import com.google.inject.Inject;
 import models.Campaign;
 import models.Theme;
 import models.Votd;
+import repositories.UserRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 public class VotdDispatchService {
 
-    public JsonObject getUsers(Integer start, Integer length, Integer page){
+    private final UserRepository userRepository;
+
+    @Inject
+    public VotdDispatchService(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+
+    public JsonObject getUsers(Integer start, Integer page){
+
         return null;
     }
 

@@ -68,6 +68,28 @@ public class UserRepository {
     }
 
     /**
+     * Find users subscribed to a given campaign
+     *
+     * @param start
+     * @param campaignId
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public JsonObject findSubscribedUsers(Integer start, Long campaignId) throws JsonSyntaxException {
+        String queryString = "app_metadata.subscriptions:" + campaignId;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", start);
+        params.put("include_totals", "true");
+        params.put("fields", "name,email,user_id");
+        params.put("include_fields", "true");
+        params.put("search_engine", "v2");
+        params.put("q", queryString);
+
+        return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
+    }
+
+    /**
      * Retrieve the total number of users from auth0
      *
      * @return Integer. Total number of users
