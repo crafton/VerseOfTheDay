@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Used.findByCampaign", query = "SELECT x FROM VotdUsed x WHERE x.campaignId = :campaignid"),
+    @NamedQuery(name = "Used.findByCampaign", query = "SELECT x.votdId FROM VotdUsed x WHERE x.campaignId = :campaignid"),
     @NamedQuery(name = "Used.findByVotd", query = "SELECT x FROM VotdUsed x WHERE x.votdId = :votdid"),
     @NamedQuery(name = "Used.flushVotds", query = "DELETE FROM VotdUsed x WHERE x.campaignId = :campaignid")
 })

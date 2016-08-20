@@ -24,11 +24,11 @@ public class VotdUsedRepository {
         getEntityManager().persist(votdUsed);
     }
 
-    public List<VotdUsed> findVotdUsedByCampaign(Campaign campaign){
+    public List<Long> findVotdUsedByCampaign(Campaign campaign){
         Query q = getEntityManager().createNamedQuery("Used.findByCampaign");
         q.setParameter("campaignid", campaign.getCampaignId());
 
-        return (List<VotdUsed>) q.getResultList();
+        return (List<Long>) q.getResultList();
     }
 
     public List<VotdUsed> findVotdUsedByVotd(Votd votd){
