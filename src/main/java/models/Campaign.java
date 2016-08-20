@@ -22,7 +22,8 @@ import javax.persistence.NamedQuery;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Campaign.findAll", query = "SELECT x FROM Campaign x")
+    @NamedQuery(name = "Campaign.findAll", query = "SELECT x FROM Campaign x"),
+	@NamedQuery(name = "Campaign.findActive", query = "SELECT x FROM Campaign x WHERE :now BETWEEN x.startDate AND x.endDate")
 })
 public class Campaign {
 

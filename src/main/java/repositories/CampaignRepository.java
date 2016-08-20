@@ -25,7 +25,6 @@ public class CampaignRepository {
     }
 
     /**
-     *
      * @return
      */
     @Transactional
@@ -34,8 +33,15 @@ public class CampaignRepository {
         return q.getResultList();
     }
 
+    @Transactional
+    public List<Campaign> findActiveCampaigns() {
+        Query q = getEntityManager().createNamedQuery("Campaign.findActive");
+        q.setParameter("now", new Timestamp(System.currentTimeMillis()));
+
+        return (List<Campaign>) q.getResultList();
+    }
+
     /**
-     *
      * @param campaignId
      * @return
      * @throws IllegalArgumentException
@@ -46,7 +52,6 @@ public class CampaignRepository {
     }
 
     /**
-     *
      * @param campaign
      * @throws CampaignException
      */
@@ -56,7 +61,6 @@ public class CampaignRepository {
     }
 
     /**
-     *
      * @param campaign
      */
     @Transactional
@@ -65,7 +69,6 @@ public class CampaignRepository {
     }
 
     /**
-     *
      * @param campaignId
      */
     @Transactional
