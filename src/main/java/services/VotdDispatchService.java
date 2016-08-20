@@ -48,13 +48,20 @@ public class VotdDispatchService {
 
         if(!votdList.isEmpty()){
             votdToSend = votdRepository.findVerseById(votdList.get(0));
-            return votdToSend;
         }else{
             //All votds have been used, so flush the used table and start again
             votdUsedRepository.flushVotds(campaign);
             votdToSend = votdRepository.findVerseById(getPotentialVotdList(campaign.getThemeList()).get(0));
-            return votdToSend;
         }
+
+        //Save votd used
+
+        VotdUsed votdUsed = new VotdUsed();
+        votdUsed.setCampaignId(campaign.getCampaignId());
+        votdUsed.setVotd(votdToSend.getId());
+        votdUsedRepository.save(votdUsed);
+
+        return votdToSend;
     }
 
     public List<Long> getPotentialVotdList(List<Theme> themes) {
