@@ -51,15 +51,22 @@ public class VotdDispatch {
         return timeStarted;
     }
 
-    public void setTimeStarted(Timestamp timeStarted) {
-        this.timeStarted = timeStarted;
+    public void setTimeStarted() {
+        this.timeStarted = new Timestamp(System.currentTimeMillis());
     }
 
     public Timestamp getTimeFinished() {
         return timeFinished;
     }
 
-    public void setTimeFinished(Timestamp timeFinished) {
-        this.timeFinished = timeFinished;
+    public void setTimeFinished() {
+        this.timeFinished = new Timestamp(System.currentTimeMillis());
+    }
+
+    public Integer getVotdDispatchUserPages(Integer length) {
+        Double lengthAsDouble = length.doubleValue();
+        Double pages = this.getTotalNumberOfUsers() / lengthAsDouble;
+
+        return (int) Math.ceil(pages);
     }
 }

@@ -32,9 +32,9 @@ public class VotdDispatchService {
         this.votdUsedRepository = votdUsedRepository;
     }
 
-    public JsonObject getUsers(Integer start, Long campaignId) {
+    public JsonObject getUsers(Integer start, Integer length, Long campaignId) {
 
-        return userRepository.findSubscribedUsers(start, campaignId);
+        return userRepository.findSubscribedUsers(start, length, campaignId);
     }
 
     public Votd getVerseToSend(Campaign campaign) {
@@ -64,7 +64,7 @@ public class VotdDispatchService {
         return votdToSend;
     }
 
-    public List<Long> getPotentialVotdList(List<Theme> themes) {
+    private List<Long> getPotentialVotdList(List<Theme> themes) {
 
         List<Long> potentialVotds = new ArrayList<>();
         if (themes != null && !themes.isEmpty()) {
