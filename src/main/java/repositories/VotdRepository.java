@@ -42,8 +42,8 @@ public class VotdRepository {
     }
 
     @Transactional
-    public List<Long> findAllVerseIds() {
-        Query q = getEntityManager().createNamedQuery("Votd.findAllVerseIds");
+    public List<Long> findAllApprovedVerseIds() {
+        Query q = getEntityManager().createNamedQuery("Votd.findAllApprovedVerseIds");
         return (List<Long>) q.getResultList();
     }
 

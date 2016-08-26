@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 public class VotdDispatchService {
 
@@ -42,6 +45,11 @@ public class VotdDispatchService {
 
         List<Long> usedVotdList = votdUsedRepository.findVotdUsedByCampaign(campaign);
 
+        //no applicable verses found
+        if(votdList.isEmpty() && usedVotdList.isEmpty()){
+            return null;
+        }
+
         votdList.removeAll(usedVotdList);
 
         Votd votdToSend;
@@ -51,7 +59,8 @@ public class VotdDispatchService {
         }else{
             //All votds have been used, so flush the used table and start again
             votdUsedRepository.flushVotds(campaign);
-            votdToSend = votdRepository.findVerseById(getPotentialVotdList(campaign.getThemeList()).get(0));
+            List<Long> potentialList = getPotentialVotdList(campaign.getThemeList());
+            votdToSend = votdRepository.findVerseById(potentialList.get(0));
         }
 
         //Save votd used
@@ -71,13 +80,15 @@ public class VotdDispatchService {
             for (Theme theme : themes) {
                 List<Votd> votdList = theme.getVotds();
 
-                Long[] idArray = (Long[]) votdList.stream().map(votd -> votd.getId()).toArray();
-                List<Long> votdIdList = Arrays.asList(idArray);
+                List<Long> votdIdList = votdList.stream()
+                        .filter(Votd::isApproved)
+                        .map(Votd::getId)
+                        .collect(Collectors.toList());
 
                 potentialVotds.addAll(votdIdList);
             }
         } else {
-            potentialVotds = votdRepository.findAllVerseIds();
+            potentialVotds = votdRepository.findAllApprovedVerseIds();
         }
 
         Collections.shuffle(potentialVotds);

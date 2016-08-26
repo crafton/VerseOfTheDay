@@ -2,6 +2,7 @@ package repositories;
 
 
 import com.google.inject.Inject;
+import com.google.inject.persist.Transactional;
 import models.Campaign;
 import models.Votd;
 import models.VotdUsed;
@@ -38,6 +39,7 @@ public class VotdUsedRepository {
         return (List<VotdUsed>) q.getResultList();
     }
 
+    @Transactional
     public void flushVotds(Campaign campaign){
         Query q = getEntityManager().createNamedQuery("Used.flushVotds");
         q.setParameter("campaignid", campaign.getCampaignId());
