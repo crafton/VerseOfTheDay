@@ -102,8 +102,9 @@ public class CampaignController {
     public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
         logger.info("Updating campaign details of campaign: =" + campaignId);
         System.out.println("Updating campaign details of campaign: =" + campaignId);
-        return Results.html().render("campaign", campaignService.getCampaignById(campaignId)).render("themes",
-                themeService.findAllThemes());
+        return Results.html()
+                .render("campaign", campaignService.getCampaignById(campaignId))
+                .render("themes", themeService.findAllThemes());
     }
 
     /**

@@ -3,6 +3,7 @@ package models;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import ninja.scheduler.Schedule;
@@ -21,7 +22,7 @@ public class VotdScheduler {
     private VotdDispatchService votdDispatchService;
     private static final Logger logger = LoggerFactory.getLogger(VotdScheduler.class);
 
-    @Schedule(delay = 10, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
+    @Schedule(delay = 60, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void dispatchAvailableCampaigns() {
 
         List<Campaign> activeCampaigns = votdDispatchService.getActiveCampaigns();
@@ -45,7 +46,7 @@ public class VotdScheduler {
                 logger.info("No subscribers to this campaign. Will no process anything else for this campaign");
                 return;
             }
-            
+
             logger.info("Retrieved subscribed users: " + votdDispatch.getTotalNumberOfUsers());
 
             votdDispatch.setCampaign(campaign);
@@ -60,16 +61,26 @@ public class VotdScheduler {
             Integer pages = votdDispatch.getVotdDispatchUserPages(numberOfUsersPerPage);
 
             logger.info("Retrieved verse: " + votdDispatch.getVotdToBeDispatched().getVerses());
-            for (Integer i = 0; i < pages; i++) {
-                JsonObject users = votdDispatchService.getUsers(i, numberOfUsersPerPage, campaign.getCampaignId());
-                JsonArray userJsonList = users.getAsJsonArray("users");
-                for (JsonElement user : userJsonList) {
-                    String email = user.getAsJsonObject().get("email").getAsString();
-                    logger.info("Sending " + votdDispatch.getVotdToBeDispatched().getVerses() + " to " + email);
+
+            try {
+                //Retrieve the text related to the verse that will be sent
+                String verseToSendText = votdDispatchService.getVerseText(votdDispatch.getVotdToBeDispatched());
+
+                for (Integer i = 0; i < pages; i++) {
+                    JsonObject users = votdDispatchService.getUsers(i, numberOfUsersPerPage, campaign.getCampaignId());
+                    JsonArray userJsonList = users.getAsJsonArray("users");
+                    for (JsonElement user : userJsonList) {
+                        String email = user.getAsJsonObject().get("email").getAsString();
+                        logger.info("Sending " + votdDispatch.getVotdToBeDispatched().getVerses() + " to " + email);
+                    }
                 }
+
+                votdDispatch.setTimeFinished();
+            }catch (JsonSyntaxException je){
+                logger.error("Failed to retrieve the verse text.");
+                //TODO: send notification to admin
             }
 
-            votdDispatch.setTimeFinished();
         }
 
     }
