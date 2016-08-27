@@ -1,13 +1,7 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
     "List Campaign">
 
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 class="panel-title">Your Campaign(s)</h2>
-        </div>
-        <div class="tbl-header">
-            <table id="campaignListTbl" class="stripe hover row-border"
-                   id="tblContentId" data-page-length='10'>
+            <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -35,7 +29,7 @@
                         <td><a class="fa fa-trash" data-placement="top"
                                data-toggle="confirmation" aria-hidden="true"
                                data-title="Are you sure you want to delete this campaign"
-                               data-href="/campaign/delete/${campaign.getCampaignId()}"></a></td>
+                               href="/campaign/delete/${campaign.getCampaignId()}"></a></td>
                         <td><a class="fa fa-pencil" aria-hidden="true"
                                href="/campaign/update/${campaign.getCampaignId()}"></a></td>
                     </tr>
@@ -48,14 +42,13 @@
                 </#list>
                 </tbody>
             </table>
-        </div>
-        <div class="panel-footer">
-            <a class="btn btn-primary btn-md pull-right" id="addNewCampaign"
-               href="/campaign/add">Add New</a>
-            <div class="clearfix"></div>
-        </div>
-    </div>
+
     <script>
-        $('[data-toggle="confirmation"]').confirmation();
+        $('#campaignListTbl').confirmation({
+            selector: '[data-toggle="confirmation"]',
+            href: function (elem) {
+                return $(elem).attr('href');
+            }
+        });
     </script>
 </@layout.myLayout>
