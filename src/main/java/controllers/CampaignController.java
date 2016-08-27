@@ -117,8 +117,9 @@ public class CampaignController {
      * @return
      */
     public Result saveUpdatedCampaign(Context context, FlashScope flashScope) {
-        DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+        DateFormat formatter = new SimpleDateFormat(config.DATE_FORMAT);
         Timestamp startDate = null, endDate = null;
+
         try {
             startDate = new Timestamp(formatter.parse(context.getParameter("startDate")).getTime());
             endDate = new Timestamp(formatter.parse(context.getParameter("endDate")).getTime());
@@ -136,7 +137,7 @@ public class CampaignController {
             }
         }
         try {
-            campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"),
+            campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
                     startDate, endDate, themeList);
             flashScope.success("Campaign updated");
         } catch (CampaignException e) {

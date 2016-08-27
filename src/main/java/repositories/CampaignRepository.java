@@ -61,10 +61,32 @@ public class CampaignRepository {
     }
 
     /**
-     * @param campaign
+     *
+     * @param campaignId
+     * @param campaignName
+     * @param startDate
+     * @param endDate
+     * @param themeList
+     * @throws CampaignException
      */
     @Transactional
-    public void update(Campaign campaign) {
+    public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate, Timestamp endDate,
+                       List<Theme> themeList) throws CampaignException {
+
+        if (themeList == null) {
+            themeList = new ArrayList<>();
+        }
+
+        Campaign campaign = findCampaignById(campaignId);
+
+        if (campaign == null) {
+            throw new CampaignException("The campaign you're trying to update does not exist.");
+        }
+        campaign.setCampaignName(campaignName);
+        campaign.setCampaignDescription(campaignDescription);
+        campaign.setStartDate(startDate);
+        campaign.setEndDate(endDate);
+        campaign.setThemeList(themeList);
         getEntityManager().persist(campaign);
     }
 

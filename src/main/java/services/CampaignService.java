@@ -60,23 +60,9 @@ public class CampaignService {
      * @param themeList
      * @throws CampaignException
      */
-    public void update(Long campaignId, String campaignName, Timestamp startDate, Timestamp endDate,
+    public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate, Timestamp endDate,
                        List<Theme> themeList) throws CampaignException {
-
-        if (themeList == null) {
-            themeList = new ArrayList<>();
-        }
-
-        Campaign campaign = getCampaignById(campaignId);
-
-        if (campaign == null) {
-            throw new CampaignException("The campaign you're trying to update does not exist.");
-        }
-        campaign.setCampaignName(campaignName);
-        campaign.setStartDate(startDate);
-        campaign.setEndDate(endDate);
-        campaign.setThemeList(themeList);
-        repository.update(campaign);
+        repository.update(campaignId, campaignName, campaignDescription, startDate, endDate, themeList);
     }
 
     /**
