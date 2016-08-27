@@ -56,7 +56,9 @@ public class CampaignController {
      * Adding new campaign
      **/
     public Result addCampaign() {
-        return Results.html().render("themes", themeService.findAllThemes());
+        return Results.html()
+                .render("themes", themeService.findAllThemes())
+                .render("dateFormat", config.DATE_FORMAT);
     }
 
     /**
@@ -104,7 +106,8 @@ public class CampaignController {
         System.out.println("Updating campaign details of campaign: =" + campaignId);
         return Results.html()
                 .render("campaign", campaignService.getCampaignById(campaignId))
-                .render("themes", themeService.findAllThemes());
+                .render("themes", themeService.findAllThemes())
+                .render("dateFormat", config.DATE_FORMAT);
     }
 
     /**

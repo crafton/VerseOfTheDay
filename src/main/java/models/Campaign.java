@@ -33,6 +33,7 @@ public class Campaign {
 	private Timestamp startDate;
 	private Timestamp endDate;
 	private String campaignName;
+	private String campaignDescription;
 	private int campaignDays;
 
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -103,4 +104,11 @@ public class Campaign {
 		this.themeList = themeList;
 	}
 
+	public String getCampaignDescription() {
+		return campaignDescription;
+	}
+
+	public void setCampaignDescription(String campaignDescription) {
+		this.campaignDescription = campaignDescription;
+	}
 }
