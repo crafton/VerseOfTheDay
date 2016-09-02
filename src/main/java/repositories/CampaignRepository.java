@@ -70,7 +70,8 @@ public class CampaignRepository {
      * @throws CampaignException
      */
     @Transactional
-    public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate, Timestamp endDate,
+    public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate,
+                       Timestamp endDate, int days,
                        List<Theme> themeList) throws CampaignException {
 
         if (themeList == null) {
@@ -86,6 +87,7 @@ public class CampaignRepository {
         campaign.setCampaignDescription(campaignDescription);
         campaign.setStartDate(startDate);
         campaign.setEndDate(endDate);
+        campaign.setCampaignDays(days);
         campaign.setThemeList(themeList);
         getEntityManager().persist(campaign);
     }

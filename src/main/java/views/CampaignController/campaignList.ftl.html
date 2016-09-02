@@ -1,54 +1,96 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
     "List Campaign">
 
-            <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>
-                <thead>
+    <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>
+        <thead>
+        <tr>
+            <th>Subscribe</th>
+            <th>Name</th>
+            <th>Theme(s)</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Duration</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <#list campaignList as campaign>
+            <tr>
+                <td><input data-on-text="Sub" data-off-text="Unsub" data-size="mini"
+                           data-on-color="success" data-off-color="warning" value=${campaign.getCampaignId()}
+                           type="checkbox" class="subscription" name="subscription${campaign.getCampaignId()}"
+                           id="subscription${campaign.getCampaignId()}"></td>
+                <td>${campaign.campaignName}</td>
+                <td>
+                    <#list campaign.themeList as theme>
+                        ${theme.themeName}
+                        <#sep>,
+                    </#list>
+                </td>
+                <td>${campaign.startDate?string(dateFormat)}</td>
+                <td>${campaign.endDate?string(dateFormat)}</td>
+                <td>${campaign.campaignDays}
+                    <#if campaign.campaignDays == 1>
+                        day
+                        <#else>
+                            days
+                    </#if>
+                </td>
+                <td><i id="campaignDetails" title="Campaign Description" data-placement="left"
+                       data-toggle="campaigninfo" data-trigger="click"
+                       data-html="true" data-content="${campaign.campaignDescription}"
+                       class="fa fa-info-circle" aria-hidden="true"></i></td>
+                <td><a class="fa fa-trash" data-placement="top"
+                       data-toggle="confirmation" aria-hidden="true"
+                       data-title="Are you sure you want to delete this campaign"
+                       href="/campaign/delete/${campaign.getCampaignId()}"></a></td>
+                <td><a class="fa fa-pencil" aria-hidden="true"
+                       href="/campaign/update/${campaign.getCampaignId()}"></a></td>
+            </tr>
+            <#else>
                 <tr>
-                    <th>Name</th>
-                    <th>Theme</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Campaign Duration</th>
-                    <th></th>
-                    <th></th>
+                    <td colspan="5">No ongoing campaigns!!! <a
+                            href="/campaign/add">Want to create one??</a>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                <#list campaignList as campaign>
-                    <tr>
-                        <td>${campaign.campaignName}</td>
-                        <td>
-                            <#list campaign.themeList as theme>
-                                ${theme.themeName}
-                                <#sep>,
-                            </#list>
-                        </td>
-                        <td>${campaign.startDate?string(dateFormat)}</td>
-                        <td>${campaign.endDate?string(dateFormat)}</td>
-                        <td>${campaign.campaignDays}</td>
-                        <td><a class="fa fa-trash" data-placement="top"
-                               data-toggle="confirmation" aria-hidden="true"
-                               data-title="Are you sure you want to delete this campaign"
-                               href="/campaign/delete/${campaign.getCampaignId()}"></a></td>
-                        <td><a class="fa fa-pencil" aria-hidden="true"
-                               href="/campaign/update/${campaign.getCampaignId()}"></a></td>
-                    </tr>
-                    <#else>
-                        <tr>
-                            <td colspan="5">No ongoing campaigns!!! <a
-                                    href="/campaign/add">Want to create one??</a>
-                            </td>
-                        </tr>
-                </#list>
-                </tbody>
-            </table>
+        </#list>
+        </tbody>
+    </table>
 
     <script>
+        $("[class='subscription']").bootstrapSwitch();
+        $("input[class='subscription']").on("switchChange.bootstrapSwitch", function (event, state) {
+            var campaignId = event.target.value;
+            var action = "";
+            if (state == true) {
+                action = "subscribe";
+            } else {
+                action = "unsubscribe";
+            }
+
+            $.ajax({
+                url: "/campaign/" + action + "/" + campaignId,
+                cache: false,
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (xhr, status, errorThro) {
+                    console.log(xhr.responseText);
+                }
+            });
+
+        });
+
         $('#campaignListTbl').confirmation({
             selector: '[data-toggle="confirmation"]',
             href: function (elem) {
                 return $(elem).attr('href');
             }
         });
+
+        $(function () {
+            $('[data-toggle="campaigninfo"]').popover()
+        })
     </script>
 </@layout.myLayout>

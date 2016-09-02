@@ -250,7 +250,7 @@ public class UserService {
                 .get("subscriptions")
                 .getAsJsonArray();
 
-        //check if comapaignId already exists in array
+        //check if campaignId already exists in array
         for (JsonElement campaign : subscriptionArray){
             if(campaign.getAsLong() == campaignId){
                 return false;

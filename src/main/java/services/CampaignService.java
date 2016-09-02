@@ -60,9 +60,10 @@ public class CampaignService {
      * @param themeList
      * @throws CampaignException
      */
-    public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate, Timestamp endDate,
+    public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate,
+                       Timestamp endDate, int days,
                        List<Theme> themeList) throws CampaignException {
-        repository.update(campaignId, campaignName, campaignDescription, startDate, endDate, themeList);
+        repository.update(campaignId, campaignName, campaignDescription, startDate, endDate, days,  themeList);
     }
 
     /**

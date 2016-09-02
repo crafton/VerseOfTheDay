@@ -4,11 +4,18 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import filters.LoginFilter;
+import filters.PublisherFilter;
+import ninja.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +26,12 @@ import services.ThemeService;
 import exceptions.CampaignException;
 import models.Campaign;
 import models.Theme;
-import ninja.Context;
-import ninja.Result;
-import ninja.Results;
-import ninja.Router;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
+import services.UserService;
 import utilities.Config;
 
+@FilterWith(LoginFilter.class)
 public class CampaignController {
 
     private final static Logger logger = LoggerFactory.getLogger(CampaignController.class);
@@ -34,12 +39,14 @@ public class CampaignController {
     private final CampaignService campaignService;
     private final ThemeService themeService;
     private final Config config;
+    private final UserService userService;
 
     @Inject
-    public CampaignController(CampaignService campaignService, ThemeService themeService, Config config) {
+    public CampaignController(CampaignService campaignService, ThemeService themeService, Config config, UserService userService) {
         this.campaignService = campaignService;
         this.themeService = themeService;
         this.config = config;
+        this.userService = userService;
     }
 
     /**
@@ -52,9 +59,45 @@ public class CampaignController {
                 .render("dateFormat", config.DATE_FORMAT);
     }
 
+    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context){
+        if(campaignId == null){
+            return Results.badRequest().text();
+        }
+
+        String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        JsonObject userObject;
+
+        JsonParser parser = new JsonParser();
+        userObject = parser.parse(user).getAsJsonObject();
+        if(userService.subscribe(userObject.get("user_id").getAsString(), campaignId)){
+            return Results.ok().text();
+        }
+
+        return Results.badRequest().text();
+    }
+
+    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context){
+        if(campaignId == null){
+            return Results.badRequest().text();
+        }
+
+        String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        JsonObject userObject;
+
+        JsonParser parser = new JsonParser();
+        userObject = parser.parse(user).getAsJsonObject();
+        if(userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)){
+            return Results.ok().text();
+        }
+
+        return Results.badRequest().text();
+
+    }
+
     /**
      * Adding new campaign
      **/
+    @FilterWith(PublisherFilter.class)
     public Result addCampaign() {
         return Results.html()
                 .render("themes", themeService.findAllThemes())
@@ -64,6 +107,7 @@ public class CampaignController {
     /**
      * Saving new campaign
      **/
+    @FilterWith(PublisherFilter.class)
     public Result saveCampaign(Context context, Campaign campaign, FlashScope flashScope) {
         DateFormat formatter = new SimpleDateFormat(config.DATE_FORMAT);
 
@@ -79,6 +123,11 @@ public class CampaignController {
             flashScope.error("Error creating campaign. Contact the administrator.");
             logger.error("Error parsing date in save campaign" + e.getMessage());
         }
+
+        long duration = campaign.getEndDate().getTime() - campaign.getStartDate().getTime();
+        int days = (int)duration/(1000 * 60 * 60 * 24);
+
+        campaign.setCampaignDays(days);
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
@@ -101,6 +150,7 @@ public class CampaignController {
     /**
      * Rendering campaign for a particular campaign Id which needs to be updated
      **/
+    @FilterWith(PublisherFilter.class)
     public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
         logger.info("Updating campaign details of campaign: =" + campaignId);
         System.out.println("Updating campaign details of campaign: =" + campaignId);
@@ -116,6 +166,7 @@ public class CampaignController {
      * @param context
      * @return
      */
+    @FilterWith(PublisherFilter.class)
     public Result saveUpdatedCampaign(Context context, FlashScope flashScope) {
         DateFormat formatter = new SimpleDateFormat(config.DATE_FORMAT);
         Timestamp startDate = null, endDate = null;
@@ -127,6 +178,10 @@ public class CampaignController {
             flashScope.error("Error updating campaign. Contact the administrator.");
             logger.error("Error parsing date in save campaign" + e.getMessage());
         }
+
+        long duration = endDate.getTime() - startDate.getTime();
+        int days = (int)duration/(1000 * 60 * 60 * 24);
+
         List<String> themeIds = context.getParameterValues("themeList");
         List<Theme> themeList = new ArrayList<>();
 
@@ -138,7 +193,7 @@ public class CampaignController {
         }
         try {
             campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
-                    startDate, endDate, themeList);
+                    startDate, endDate, days, themeList);
             flashScope.success("Campaign updated");
         } catch (CampaignException e) {
             flashScope.error("Error updating campaign. Contact the administrator.");
@@ -147,6 +202,7 @@ public class CampaignController {
         return Results.redirect("/campaign/list");
     }
 
+    @FilterWith(PublisherFilter.class)
     public Result deleteCampaign(@PathParam("campaignId") Long campaignId, FlashScope flashScope) {
 
         try {
