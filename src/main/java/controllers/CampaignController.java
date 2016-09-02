@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import filters.LoginFilter;
+import filters.MemberFilter;
 import filters.PublisherFilter;
 import ninja.*;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class CampaignController {
     /**
      * Displaying list of campaigns
      **/
+    @FilterWith(MemberFilter.class)
     public Result campaignList() {
 
         return Results.html().render("campaignList", campaignService.getCampaignList())
@@ -59,16 +61,20 @@ public class CampaignController {
                 .render("dateFormat", config.DATE_FORMAT);
     }
 
+    @FilterWith(MemberFilter.class)
     public Result subscribe(@PathParam("campaignId") Long campaignId, Context context){
         if(campaignId == null){
             return Results.badRequest().text();
         }
 
         String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
-        JsonObject userObject;
+
+        if(user == null || user.isEmpty()){
+            return Results.badRequest().text();
+        }
 
         JsonParser parser = new JsonParser();
-        userObject = parser.parse(user).getAsJsonObject();
+        JsonObject userObject = parser.parse(user).getAsJsonObject();
         if(userService.subscribe(userObject.get("user_id").getAsString(), campaignId)){
             return Results.ok().text();
         }
@@ -76,16 +82,20 @@ public class CampaignController {
         return Results.badRequest().text();
     }
 
+    @FilterWith(MemberFilter.class)
     public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context){
         if(campaignId == null){
             return Results.badRequest().text();
         }
 
         String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
-        JsonObject userObject;
+
+        if(user == null || user.isEmpty()){
+            return Results.badRequest().text();
+        }
 
         JsonParser parser = new JsonParser();
-        userObject = parser.parse(user).getAsJsonObject();
+        JsonObject userObject = parser.parse(user).getAsJsonObject();
         if(userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)){
             return Results.ok().text();
         }
