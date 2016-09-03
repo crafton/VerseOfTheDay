@@ -80,7 +80,7 @@ public class LoginController {
             Results.redirect("/servererror");
         }
 
-        return Results.redirect("/votd/list");
+        return Results.redirect("/campaign/list");
     }
 
     /**

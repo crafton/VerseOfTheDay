@@ -1,6 +1,8 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
     "List Campaign">
 
+    <a class="btn btn-primary" href="/campaign/add" role="button">New Campaign</a>
+
     <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>
         <thead>
         <tr>
@@ -89,9 +91,7 @@
             </tr>
             <#else>
                 <tr>
-                    <td colspan="5">No ongoing campaigns!!! <a
-                            href="/campaign/add">Want to create one??</a>
-                    </td>
+                    <td colspan="5">No active campaigns</td>
                 </tr>
         </#list>
         </tbody>
