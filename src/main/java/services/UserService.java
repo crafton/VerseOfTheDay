@@ -39,7 +39,7 @@ public class UserService {
         return (String) ninjaCache.get(idToken);
     }
 
-    public void refreshUserProfileInCache(Session session){
+    public void refreshUserProfileInCache(Session session) {
         String accessToken = session.get("accessToken");
         String userAsString = findUser(accessToken).toString();
 
@@ -57,7 +57,7 @@ public class UserService {
         return userRepository.findUsersWithPaging(start, length, search);
     }
 
-    public JsonObject findUserById(String id) throws JsonSyntaxException{
+    public JsonObject findUserById(String id) throws JsonSyntaxException {
         return userRepository.findUserByUserId(id);
     }
 
@@ -227,7 +227,7 @@ public class UserService {
      */
     public void updateUserRole(String userId, List<String> roles) {
 
-        if(userId == null || roles == null){
+        if (userId == null || roles == null) {
             throw new IllegalArgumentException("updateUserRole parameters cannot be null.");
         }
 
@@ -247,7 +247,7 @@ public class UserService {
      * @throws IllegalArgumentException
      */
     public boolean subscribe(String userId, Long campaignId) throws IllegalArgumentException {
-        if(campaignId == null){
+        if (campaignId == null) {
             throw new IllegalArgumentException("updateSubscription parameter cannot be null.");
         }
 
@@ -257,7 +257,7 @@ public class UserService {
                 .get("subscriptions");
 
         JsonArray subscriptionArray = new JsonArray();
-        if(subscriptionElement != null) {
+        if (subscriptionElement != null) {
             subscriptionArray = subscriptionElement
                     .getAsJsonArray();
 
@@ -286,8 +286,8 @@ public class UserService {
      * @param campaignId
      * @return
      */
-    public boolean unsubscribe(String userId, Long campaignId){
-        if(campaignId == null){
+    public boolean unsubscribe(String userId, Long campaignId) {
+        if (campaignId == null) {
             throw new IllegalArgumentException("updateSubscription parameter cannot be null.");
         }
 
@@ -296,7 +296,7 @@ public class UserService {
                 .getAsJsonObject()
                 .get("subscriptions");
 
-        if(subscriptionElement == null){
+        if (subscriptionElement == null) {
             logger.warn("Trying to unsubscribe using non-existent subscription.");
             return false;
         }
@@ -308,7 +308,7 @@ public class UserService {
         subscriptionArray.forEach(subscriptionList::add);
 
         JsonElement campaignElement = new JsonPrimitive(campaignId);
-        if(subscriptionList.contains(campaignElement)){
+        if (subscriptionList.contains(campaignElement)) {
             subscriptionList.remove(campaignElement);
 
             JsonArray remainingSubscriptionArray = new JsonArray();
@@ -325,6 +325,33 @@ public class UserService {
         return false;
     }
 
+    public boolean unsubscribeAll(Long campaignId) {
+        Integer length = 40;
+        Integer totalSubscribers = userRepository.findSubscribedUsers(0, length, campaignId).get("total").getAsInt();
+
+        if (totalSubscribers == 0) {
+            logger.warn("No subscribers for campaign with id: " + campaignId + "...doing nothing.");
+            return false;
+        }
+
+        Double lengthAsDouble = length.doubleValue();
+        Double pagesAsDouble = totalSubscribers / lengthAsDouble;
+        Integer pages = (int) Math.ceil(pagesAsDouble);
+
+        for (int i = 0; i < pages; i++) {
+            JsonObject usersAsObject = userRepository.findSubscribedUsers(i, length, campaignId);
+            JsonArray userJsonList = usersAsObject.getAsJsonArray("users");
+            for (JsonElement user : userJsonList) {
+                String userId = user.getAsJsonObject().get("user_id").getAsString();
+                if (!unsubscribe(userId, campaignId)) {
+                    logger.warn("Failed to unsubscribe user: " + userId + " from campaign: " + campaignId);
+                }
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Create a user session after successful authentication
      *
@@ -333,11 +360,11 @@ public class UserService {
      */
     public void createSession(Session session, String code) throws JsonSyntaxException, IllegalStateException {
 
-        if(session == null){
+        if (session == null) {
             throw new IllegalArgumentException("The session parameter in createSession cannot be null");
         }
 
-        if(StringUtils.isEmpty(code)){
+        if (StringUtils.isEmpty(code)) {
             throw new IllegalArgumentException("The code parameter in createSession cannot be null");
         }
 

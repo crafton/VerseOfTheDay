@@ -70,13 +70,13 @@ public class CampaignController {
         List<Long> subscribedCampaignIds = user.getSubscriptions();
         List<Campaign> subscribedCampaigns = new ArrayList<>();
 
-        if(!subscribedCampaignIds.isEmpty()) {
+        if (!subscribedCampaignIds.isEmpty()) {
             for (Long id : subscribedCampaignIds) {
                 Optional<Campaign> optionalCampaign = campaignList.stream()
                         .filter(item -> item.getCampaignId() == id)
                         .findFirst();
 
-                if(optionalCampaign.isPresent()) {
+                if (optionalCampaign.isPresent()) {
                     subscribedCampaigns.add(optionalCampaign.get());
                     campaignList.remove(optionalCampaign.get());
                 }
@@ -90,20 +90,20 @@ public class CampaignController {
     }
 
     @FilterWith(MemberFilter.class)
-    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context, Session session){
-        if(campaignId == null){
+    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context, Session session) {
+        if (campaignId == null) {
             return Results.badRequest().text();
         }
 
         String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if(user == null || user.isEmpty()){
+        if (user == null || user.isEmpty()) {
             return Results.badRequest().text();
         }
 
         JsonParser parser = new JsonParser();
         JsonObject userObject = parser.parse(user).getAsJsonObject();
-        if(userService.subscribe(userObject.get("user_id").getAsString(), campaignId)){
+        if (userService.subscribe(userObject.get("user_id").getAsString(), campaignId)) {
             userService.refreshUserProfileInCache(session);
             return Results.ok().text();
         }
@@ -112,20 +112,20 @@ public class CampaignController {
     }
 
     @FilterWith(MemberFilter.class)
-    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context, Session session){
-        if(campaignId == null){
+    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context, Session session) {
+        if (campaignId == null) {
             return Results.badRequest().text();
         }
 
         String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if(user == null || user.isEmpty()){
+        if (user == null || user.isEmpty()) {
             return Results.badRequest().text();
         }
 
         JsonParser parser = new JsonParser();
         JsonObject userObject = parser.parse(user).getAsJsonObject();
-        if(userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)){
+        if (userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)) {
             userService.refreshUserProfileInCache(session);
             return Results.ok().text();
         }
@@ -165,7 +165,7 @@ public class CampaignController {
         }
 
         long duration = campaign.getEndDate().getTime() - campaign.getStartDate().getTime();
-        int days = (int)(duration/(1000 * 60 * 60 * 24));
+        int days = (int) (duration / (1000 * 60 * 60 * 24));
 
         campaign.setCampaignDays(days);
 
@@ -220,7 +220,7 @@ public class CampaignController {
         }
 
         long duration = endDate.getTime() - startDate.getTime();
-        int days = (int)(duration/(1000 * 60 * 60 * 24));
+        int days = (int) (duration / (1000 * 60 * 60 * 24));
 
         List<String> themeIds = context.getParameterValues("themeList");
         List<Theme> themeList = new ArrayList<>();
@@ -248,6 +248,12 @@ public class CampaignController {
         try {
             campaignService.deleteCampaign(campaignId);
             flashScope.success("Campaign deleted successfully.");
+
+            if (userService.unsubscribeAll(campaignId)) {
+                logger.info("Successfully unsubscribed all users from campaign: " + campaignId);
+            } else {
+                logger.info("No active subscriptions to remove from campaing: " + campaignId);
+            }
         } catch (CampaignException e) {
             flashScope.error("Campaign, trying to delete, doesn't exist");
             logger.error("Error in deleting campaign" + e.getMessage());
