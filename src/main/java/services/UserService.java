@@ -39,6 +39,13 @@ public class UserService {
         return (String) ninjaCache.get(idToken);
     }
 
+    public void refreshUserProfileInCache(Session session){
+        String accessToken = session.get("accessToken");
+        String userAsString = findUser(accessToken).toString();
+
+        ninjaCache.set(session.get("idToken"), userAsString);
+    }
+
     /**
      * @param start
      * @param length
@@ -245,15 +252,20 @@ public class UserService {
         }
 
         JsonObject userObject = findUserById(userId);
-        JsonArray subscriptionArray = userObject.get("app_metadata")
+        JsonElement subscriptionElement = userObject.get("app_metadata")
                 .getAsJsonObject()
-                .get("subscriptions")
-                .getAsJsonArray();
+                .get("subscriptions");
 
-        //check if campaignId already exists in array
-        for (JsonElement campaign : subscriptionArray){
-            if(campaign.getAsLong() == campaignId){
-                return false;
+        JsonArray subscriptionArray = new JsonArray();
+        if(subscriptionElement != null) {
+            subscriptionArray = subscriptionElement
+                    .getAsJsonArray();
+
+            //check if campaignId already exists in array
+            for (JsonElement campaign : subscriptionArray) {
+                if (campaign.getAsLong() == campaignId) {
+                    return false;
+                }
             }
         }
 
@@ -280,22 +292,30 @@ public class UserService {
         }
 
         JsonObject userObject = findUserById(userId);
-        JsonArray subscriptionArray = userObject.get("app_metadata")
+        JsonElement subscriptionElement = userObject.get("app_metadata")
                 .getAsJsonObject()
-                .get("subscriptions")
-                .getAsJsonArray();
+                .get("subscriptions");
+
+        if(subscriptionElement == null){
+            logger.warn("Trying to unsubscribe using non-existent subscription.");
+            return false;
+        }
+
+        JsonArray subscriptionArray = subscriptionElement.getAsJsonArray();
 
         //convert jsonarray to list of json elements
         List<JsonElement> subscriptionList = new ArrayList<>();
-        for(JsonElement campaign : subscriptionArray){
-            subscriptionList.add(campaign);
-        }
+        subscriptionArray.forEach(subscriptionList::add);
 
         JsonElement campaignElement = new JsonPrimitive(campaignId);
         if(subscriptionList.contains(campaignElement)){
             subscriptionList.remove(campaignElement);
+
+            JsonArray remainingSubscriptionArray = new JsonArray();
+            subscriptionList.forEach(remainingSubscriptionArray::add);
+
             Gson gson = new Gson();
-            String body = "{\"app_metadata\": { \"subscriptions\": " + gson.toJson(subscriptionList) + "} }";
+            String body = "{\"app_metadata\": { \"subscriptions\": " + gson.toJson(remainingSubscriptionArray) + "} }";
 
             userRepository.updateUser(userId, body);
 

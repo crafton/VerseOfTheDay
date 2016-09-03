@@ -75,7 +75,7 @@ public class UserController {
      * @param roles
      * @return
      */
-    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles){
+    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, Session session){
 
         if(StringUtils.isEmpty(userId)){
             logger.warn("User tried to 'updateUserRoles' without supplying a userid.");
@@ -83,6 +83,8 @@ public class UserController {
         }
 
         userService.updateUserRole(userId, Arrays.asList(roles.split(",")));
+
+        userService.refreshUserProfileInCache(session);
 
         return Results.ok().text();
     }

@@ -8,15 +8,20 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import filters.PublisherFilter;
+import models.User;
 import ninja.*;
+import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,15 +59,38 @@ public class CampaignController {
      * Displaying list of campaigns
      **/
     @FilterWith(MemberFilter.class)
-    public Result campaignList() {
+    public Result campaignList(Context context) {
 
-        return Results.html().render("campaignList", campaignService.getCampaignList())
+        String userAsJsonString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        Gson gson = new Gson();
+        User user = gson.fromJson(userAsJsonString, User.class);
+
+        //Re-sort campaign list to move subscribed items to the front
+        List<Campaign> campaignList = campaignService.getCampaignList();
+        List<Long> subscribedCampaignIds = user.getSubscriptions();
+        List<Campaign> subscribedCampaigns = new ArrayList<>();
+
+        if(!subscribedCampaignIds.isEmpty()) {
+            for (Long id : subscribedCampaignIds) {
+                Optional<Campaign> optionalCampaign = campaignList.stream()
+                        .filter(item -> item.getCampaignId() == id)
+                        .findFirst();
+
+                if(optionalCampaign.isPresent()) {
+                    subscribedCampaigns.add(optionalCampaign.get());
+                    campaignList.remove(optionalCampaign.get());
+                }
+            }
+        }
+
+        return Results.html().render("campaignList", campaignList)
                 .render("themeList", themeService.findAllThemes())
-                .render("dateFormat", config.DATE_FORMAT);
+                .render("dateFormat", config.DATE_FORMAT)
+                .render("subscribedCampaignList", subscribedCampaigns);
     }
 
     @FilterWith(MemberFilter.class)
-    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context){
+    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context, Session session){
         if(campaignId == null){
             return Results.badRequest().text();
         }
@@ -76,6 +104,7 @@ public class CampaignController {
         JsonParser parser = new JsonParser();
         JsonObject userObject = parser.parse(user).getAsJsonObject();
         if(userService.subscribe(userObject.get("user_id").getAsString(), campaignId)){
+            userService.refreshUserProfileInCache(session);
             return Results.ok().text();
         }
 
@@ -83,7 +112,7 @@ public class CampaignController {
     }
 
     @FilterWith(MemberFilter.class)
-    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context){
+    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context, Session session){
         if(campaignId == null){
             return Results.badRequest().text();
         }
@@ -97,6 +126,7 @@ public class CampaignController {
         JsonParser parser = new JsonParser();
         JsonObject userObject = parser.parse(user).getAsJsonObject();
         if(userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)){
+            userService.refreshUserProfileInCache(session);
             return Results.ok().text();
         }
 
