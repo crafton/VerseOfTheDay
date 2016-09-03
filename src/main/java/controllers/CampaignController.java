@@ -165,7 +165,7 @@ public class CampaignController {
         }
 
         long duration = campaign.getEndDate().getTime() - campaign.getStartDate().getTime();
-        int days = (int)duration/(1000 * 60 * 60 * 24);
+        int days = (int)(duration/(1000 * 60 * 60 * 24));
 
         campaign.setCampaignDays(days);
 
@@ -220,7 +220,7 @@ public class CampaignController {
         }
 
         long duration = endDate.getTime() - startDate.getTime();
-        int days = (int)duration/(1000 * 60 * 60 * 24);
+        int days = (int)(duration/(1000 * 60 * 60 * 24));
 
         List<String> themeIds = context.getParameterValues("themeList");
         List<Theme> themeList = new ArrayList<>();
