@@ -4,22 +4,23 @@
     <!-- Data Tables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
-    <a class="btn btn-primary" href="/votd/create" role="button">New VoTD</a>
-    <p></p>
-    <table id="votdTable" class="table table-responsive">
-        <thead>
-        <tr>
-            <th>Verses</th>
-            <th>Themes</th>
-            <th>Status</th>
-            <th>Approve</th>
-            <th>Created By</th>
-            <th>Modified By</th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-    </table>
+    <a class="btn btn-raised btn-primary" href="/votd/create" role="button">New VoTD</a>
+    <div class="well">
+        <table id="votdTable" class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Verses</th>
+                <th>Themes</th>
+                <th>Status</th>
+                <th>Approve</th>
+                <th>Created By</th>
+                <th>Modified By</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+        </table>
+    </div>
 
     <script>
         $('#votdTable').confirmation({

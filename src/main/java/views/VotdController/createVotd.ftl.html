@@ -1,12 +1,10 @@
 <#import "../layout/defaultLayout.ftl.html" as layout>
     <@layout.myLayout "Create a VoTD">
 
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 class="panel-title">Create a new VoTD</h2>
-        </div>
-        <div class="panel-body">
-            <form action="/votd/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
+    <div class="well">
+        <form action="/votd/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
+            <fieldset>
+                <legend>Create a new votd</legend>
                 <div class="form-group">
                     <label for="verses" class="col-sm-2 control-label">Verses</label>
                     <div class="col-sm-4">
@@ -26,14 +24,14 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button id="verifyVerseButton" type="button" class="btn btn-primary" data-toggle="modal"
+                        <button id="verifyVerseButton" type="button" class="btn btn-raised btn-primary" data-toggle="modal"
                                 data-target="#verseVerificationModal">Verify
                         </button>
-                        <button id="formSubmitButton" class="btn btn-default" type="submit">Save</button>
+                        <button id="formSubmitButton" class="btn btn-raised btn-default" type="submit">Save</button>
                     </div>
                 </div>
-            </form>
-        </div>
+            </fieldset>
+        </form>
     </div>
 
     <!-- Verse verification modal -->

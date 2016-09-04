@@ -1,101 +1,105 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
     "List Campaign">
 
-    <a class="btn btn-primary" href="/campaign/add" role="button">New Campaign</a>
+    <a class="btn btn-raised btn-primary" href="/campaign/add" role="button">New Campaign</a>
 
-    <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>
-        <thead>
-        <tr>
-            <th>Subscribe</th>
-            <th>Name</th>
-            <th>Theme(s)</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Duration</th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <#list subscribedCampaignList as subscribedCampaign>
+    <div class="well">
+        <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>
+            <thead>
             <tr>
-                <td><input data-on-text="Sub" data-off-text="Unsub" data-size="mini"
-                           data-on-color="success" data-off-color="warning" value=${subscribedCampaign.getCampaignId()}
-                           type="checkbox" class="subscription" name="subscription${subscribedCampaign.getCampaignId()}"
-                           id="subscription${subscribedCampaign.getCampaignId()}" checked></td>
-                <td>${subscribedCampaign.campaignName}</td>
-                <td>
-                    <#list subscribedCampaign.themeList as theme>
-                        ${theme.themeName}
-                        <#sep>,
-                    </#list>
-                </td>
-                <td>${subscribedCampaign.startDate?string(dateFormat)}</td>
-                <td>${subscribedCampaign.endDate?string(dateFormat)}</td>
-                <td>${subscribedCampaign.campaignDays}
-                    <#if subscribedCampaign.campaignDays == 1>
-                        day
-                        <#else>
-                            days
-                    </#if>
-                </td>
-                <td><i title="Campaign Description" data-placement="left"
-                       data-toggle="campaigninfo" data-trigger="click"
-                       data-html="true" data-content="${subscribedCampaign.campaignDescription}"
-                       class="fa fa-info-circle campaignDetails" aria-hidden="true"></i></td>
-                <td><a class="fa fa-trash" data-placement="top"
-                       data-toggle="confirmation" aria-hidden="true"
-                       data-title="Are you sure you want to delete this campaign"
-                       href="/campaign/delete/${subscribedCampaign.getCampaignId()}"></a></td>
-                <td><a class="fa fa-pencil" aria-hidden="true"
-                       href="/campaign/update/${subscribedCampaign.getCampaignId()}"></a></td>
+                <th>Subscribe</th>
+                <th>Name</th>
+                <th>Theme(s)</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Duration</th>
+                <th></th>
+                <th></th>
             </tr>
-            <#else>
+            </thead>
+            <tbody>
+            <#list subscribedCampaignList as subscribedCampaign>
                 <tr>
-
+                    <td><input data-on-text="Subbed" data-off-text="Unsubbed" data-size="mini"
+                               data-on-color="success" data-off-color="warning"
+                               value=${subscribedCampaign.getCampaignId()}
+                               type="checkbox" class="subscription"
+                               name="subscription${subscribedCampaign.getCampaignId()}"
+                               id="subscription${subscribedCampaign.getCampaignId()}" checked></td>
+                    <td>${subscribedCampaign.campaignName}</td>
+                    <td>
+                        <#list subscribedCampaign.themeList as theme>
+                            ${theme.themeName}
+                            <#sep>,
+                        </#list>
+                    </td>
+                    <td>${subscribedCampaign.startDate?string(dateFormat)}</td>
+                    <td>${subscribedCampaign.endDate?string(dateFormat)}</td>
+                    <td>${subscribedCampaign.campaignDays}
+                        <#if subscribedCampaign.campaignDays == 1>
+                            day
+                            <#else>
+                                days
+                        </#if>
+                    </td>
+                    <td><i title="Campaign Description" data-placement="left"
+                           data-toggle="campaigninfo" data-trigger="click"
+                           data-html="true" data-content="${subscribedCampaign.campaignDescription}"
+                           class="material-icons campaignDetails" aria-hidden="true">info</i></td>
+                    <td><a class="material-icons" data-placement="top"
+                           data-toggle="confirmation" aria-hidden="true"
+                           data-title="Are you sure you want to delete this campaign"
+                           href="/campaign/delete/${subscribedCampaign.getCampaignId()}">delete</a></td>
+                    <td><a class="material-icons" aria-hidden="true"
+                           href="/campaign/update/${subscribedCampaign.getCampaignId()}">mode_edit</a></td>
                 </tr>
-        </#list>
+                <#else>
+                    <tr>
 
-        <#list campaignList as campaign>
-            <tr>
-                <td><input data-on-text="Sub" data-off-text="Unsub" data-size="mini"
-                           data-on-color="success" data-off-color="warning" value=${campaign.getCampaignId()}
-                           type="checkbox" class="subscription" name="subscription${campaign.getCampaignId()}"
-                           id="subscription${campaign.getCampaignId()}"></td>
-                <td>${campaign.campaignName}</td>
-                <td>
-                    <#list campaign.themeList as theme>
-                        ${theme.themeName}
-                        <#sep>,
-                    </#list>
-                </td>
-                <td>${campaign.startDate?string(dateFormat)}</td>
-                <td>${campaign.endDate?string(dateFormat)}</td>
-                <td>${campaign.campaignDays}
-                    <#if campaign.campaignDays == 1>
-                        day
-                        <#else>
-                            days
-                    </#if>
-                </td>
-                <td><i title="Campaign Description" data-placement="left"
-                       data-toggle="campaigninfo" data-trigger="click"
-                       data-html="true" data-content="${campaign.campaignDescription}"
-                       class="fa fa-info-circle campaignDetails" aria-hidden="true"></i></td>
-                <td><a class="fa fa-trash" data-placement="top"
-                       data-toggle="confirmation" aria-hidden="true"
-                       data-title="Are you sure you want to delete this campaign"
-                       href="/campaign/delete/${campaign.getCampaignId()}"></a></td>
-                <td><a class="fa fa-pencil" aria-hidden="true"
-                       href="/campaign/update/${campaign.getCampaignId()}"></a></td>
-            </tr>
-            <#else>
+                    </tr>
+            </#list>
+
+            <#list campaignList as campaign>
                 <tr>
-                    <td colspan="5">No active campaigns</td>
+                    <td><input data-on-text="Subbed" data-off-text="Unsubbed" data-size="mini"
+                               data-on-color="success" data-off-color="warning" value=${campaign.getCampaignId()}
+                               type="checkbox" class="subscription" name="subscription${campaign.getCampaignId()}"
+                               id="subscription${campaign.getCampaignId()}"></td>
+                    <td>${campaign.campaignName}</td>
+                    <td>
+                        <#list campaign.themeList as theme>
+                            ${theme.themeName}
+                            <#sep>,
+                        </#list>
+                    </td>
+                    <td>${campaign.startDate?string(dateFormat)}</td>
+                    <td>${campaign.endDate?string(dateFormat)}</td>
+                    <td>${campaign.campaignDays}
+                        <#if campaign.campaignDays == 1>
+                            day
+                            <#else>
+                                days
+                        </#if>
+                    </td>
+                    <td><i title="Campaign Description" data-placement="left"
+                           data-toggle="campaigninfo" data-trigger="click"
+                           data-html="true" data-content="${campaign.campaignDescription}"
+                           class="material-icons campaignDetails" aria-hidden="true">info</i></td>
+                    <td><a class="material-icons" data-placement="top"
+                           data-toggle="confirmation" aria-hidden="true"
+                           data-title="Are you sure you want to delete this campaign"
+                           href="/campaign/delete/${campaign.getCampaignId()}">delete</a></td>
+                    <td><a class="material-icons" aria-hidden="true"
+                           href="/campaign/update/${campaign.getCampaignId()}">mode_edit</a></td>
                 </tr>
-        </#list>
-        </tbody>
-    </table>
+                <#else>
+                    <tr>
+                        <td colspan="5">No active campaigns</td>
+                    </tr>
+            </#list>
+            </tbody>
+        </table>
+    </div>
 
     <script>
         $("[class='subscription']").bootstrapSwitch();

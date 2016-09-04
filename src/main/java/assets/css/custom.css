@@ -32,10 +32,14 @@ h4#clash{
 }
 
 #verseToUpdate {
-    padding-top: 7px;
+    padding-top: 19px;
     margin-bottom: 0;
     float: left;
     font-weight: bold;
+}
+
+#verseToUpdate #verseDetails {
+    vertical-align: bottom;
 }
 
 #verseToUpdate .popover{

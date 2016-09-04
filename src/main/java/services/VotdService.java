@@ -116,14 +116,14 @@ public class VotdService {
             if (votd.isApproved()) {
                 votdApproved = config.APPROVED;
             } else {
-                shouldApproveVotd = "<a class=\"fa fa-thumbs-up\" href=\"/votd/approve/" + votd.getId() + "\" aria-hidden=\"true\"></a>";
+                shouldApproveVotd = "<a class=\"material-icons\" href=\"/votd/approve/" + votd.getId() + "\" aria-hidden=\"true\">thumb_up</a>";
                 votdApproved = config.PENDING;
             }
 
             votdFields = new String[]{votd.getVerses(), votd.getThemesAsString(), votdApproved,
                     shouldApproveVotd, votd.getCreatedBy(), votd.getModifiedBy(),
-                    "<a class=\"fa fa-trash\" data-placement=\"top\" data-toggle=\"confirmation\" aria-hidden=\"true\" href=\"/votd/delete/" + votd.getId() + "\"></a>",
-                    "<a class=\"fa fa-pencil\" aria-hidden=\"true\" href=\"/votd/update/" + votd.getId() + "\"></a>"};
+                    "<a class=\"material-icons\" data-placement=\"top\" data-toggle=\"confirmation\" aria-hidden=\"true\" href=\"/votd/delete/" + votd.getId() + "\">delete</a>",
+                    "<a class=\"material-icons\" aria-hidden=\"true\" href=\"/votd/update/" + votd.getId() + "\">mode_edit</a>"};
 
             votdData.add(votdFields);
         }
