@@ -252,7 +252,7 @@ public class CampaignController {
             if (userService.unsubscribeAll(campaignId)) {
                 logger.info("Successfully unsubscribed all users from campaign: " + campaignId);
             } else {
-                logger.info("No active subscriptions to remove from campaing: " + campaignId);
+                logger.info("No active subscriptions to remove from campaign: " + campaignId);
             }
         } catch (CampaignException e) {
             flashScope.error("Campaign, trying to delete, doesn't exist");

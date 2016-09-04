@@ -48,7 +48,7 @@
                            class="material-icons campaignDetails" aria-hidden="true">info</i></td>
                     <td><a class="material-icons" data-placement="top"
                            data-toggle="confirmation" aria-hidden="true"
-                           data-title="Are you sure you want to delete this campaign"
+                           data-title="Delete campaign"
                            href="/campaign/delete/${subscribedCampaign.getCampaignId()}">delete</a></td>
                     <td><a class="material-icons" aria-hidden="true"
                            href="/campaign/update/${subscribedCampaign.getCampaignId()}">mode_edit</a></td>
@@ -87,7 +87,7 @@
                            class="material-icons campaignDetails" aria-hidden="true">info</i></td>
                     <td><a class="material-icons" data-placement="top"
                            data-toggle="confirmation" aria-hidden="true"
-                           data-title="Are you sure you want to delete this campaign"
+                           data-title="Delete campaign"
                            href="/campaign/delete/${campaign.getCampaignId()}">delete</a></td>
                     <td><a class="material-icons" aria-hidden="true"
                            href="/campaign/update/${campaign.getCampaignId()}">mode_edit</a></td>
@@ -125,12 +125,7 @@
 
         });
 
-        $('#campaignListTbl').confirmation({
-            selector: '[data-toggle="confirmation"]',
-            href: function (elem) {
-                return $(elem).attr('href');
-            }
-        });
+        $('[data-toggle="confirmation"]').confirm();
 
         $(function () {
             $('[data-toggle="campaigninfo"]').popover()
