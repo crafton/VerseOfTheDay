@@ -5,18 +5,20 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
 
-    <table id="usersTable" class="table table-responsive">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Roles</th>
-            <th>Last Login</th>
-            <th>Date Joined</th>
-            <th></th>
-        </tr>
-        </thead>
-    </table>
+    <div class="well">
+        <table id="usersTable" class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Last Login</th>
+                <th>Date Joined</th>
+                <th></th>
+            </tr>
+            </thead>
+        </table>
+    </div>
 
     <div class="modal fade" id="updateRolesModal" role="dialog" aria-labelledby="myModalLabel">
         <#include "updateRoles.ftl.html" />

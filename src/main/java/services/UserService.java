@@ -114,9 +114,9 @@ public class UserService {
                     utils.formatListToHtml(rolesList),
                     user.getAsJsonObject().get("last_login").getAsString(),
                     user.getAsJsonObject().get("created_at").getAsString(),
-                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"fa fa-pencil\" aria-hidden=\"true\" " +
+                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"material-icons\" aria-hidden=\"true\" " +
                             "data-toggle=\"modal\" data-userid=\"" + user.getAsJsonObject().get("user_id").getAsString() + "\" data-username=\"" + name + "\"" +
-                            " data-target=\"#updateRolesModal\"></a>"};
+                            " data-target=\"#updateRolesModal\">mode_edit</a>"};
 
             usersData.add(userFields);
         }
@@ -152,6 +152,7 @@ public class UserService {
                 checkBoxString += "<div class=\"checkbox\">\n" +
                         "                <label>\n" +
                         "                    <input id=\"" + roleType + "\" type=\"checkbox\" value=\"" + roleType + "\" checked>\n" +
+                        "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                         "                    <b>" + roleType + "</b><br/>\n" +
                         "                    <i>" + roleDescription + "</i>\n" +
                         "                </label>\n" +
@@ -160,6 +161,7 @@ public class UserService {
                 checkBoxString += "<div class=\"checkbox\">\n" +
                         "                <label>\n" +
                         "                    <input id=\"" + roleType + "\" type=\"checkbox\" value=\"" + roleType + "\" >\n" +
+                        "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                         "                    <b>" + roleType + "</b><br/>\n" +
                         "                    <i>" + roleDescription + "</i>\n" +
                         "                </label>\n" +

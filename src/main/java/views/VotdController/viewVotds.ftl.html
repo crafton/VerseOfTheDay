@@ -26,7 +26,6 @@
         $('#votdTable').on('click', '[data-toggle="confirmation"]', function (e) {
             e.preventDefault();
             $.confirm({
-                text: "Are you sure?",
                 confirm: function () {
                     top.location.href = e.target.href;
                 },
