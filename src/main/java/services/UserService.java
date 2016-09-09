@@ -3,6 +3,7 @@ package services;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import exceptions.SubscriptionExistsException;
+import models.User;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
 import org.apache.commons.lang.StringUtils;
@@ -12,10 +13,7 @@ import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class UserService {
@@ -352,6 +350,27 @@ public class UserService {
         }
 
         return true;
+    }
+
+    /**
+     *
+     * @param user
+     */
+    public void updateUserSettings(User user) {
+        logger.debug("Updating user settings...");
+
+        Object settingsObject = user.getApp_metadata().get("settings");
+
+        Map<String, String> settings = (Map<String, String>) settingsObject;
+
+        Gson gson = new Gson();
+
+        String updateString = "{\"app_metadata\": { \"settings\": " + gson.toJson(settings) + "} }";
+
+        logger.info("Sending the following update: " + updateString);
+
+        userRepository.updateUser(user.getUser_id(), updateString);
+
     }
 
     /**

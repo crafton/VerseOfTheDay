@@ -2,6 +2,8 @@ package controllers;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import models.User;
+import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.LoggerFactory;
 import services.UserService;
 import filters.LoginFilter;
@@ -16,6 +18,7 @@ import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import utilities.Config;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,15 +32,17 @@ public class UserController {
 
     private final NinjaCache ninjaCache;
     private final UserService userService;
+    private final Config config;
 
     @Inject
-    public UserController(NinjaCache ninjaCache, UserService userService) {
+    public UserController(NinjaCache ninjaCache, UserService userService, Config config) {
         this.ninjaCache = ninjaCache;
         this.userService = userService;
+        this.config = config;
     }
 
     /**
-     *Render view to display all users
+     * Render view to display all users
      *
      * @return
      */
@@ -45,6 +50,18 @@ public class UserController {
 
         return Results
                 .ok()
+                .html();
+    }
+
+    public Result viewProfile(Session session) {
+
+        String userAsJsonString = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
+        Gson gson = new Gson();
+        User user = gson.fromJson(userAsJsonString, User.class);
+
+        return Results
+                .ok()
+                .render("settings", user.getSettings())
                 .html();
     }
 
@@ -56,7 +73,7 @@ public class UserController {
      */
     public Result displayUserRoles(@PathParam("userid") String userId) {
 
-        if(StringUtils.isEmpty(userId)){
+        if (StringUtils.isEmpty(userId)) {
             logger.warn("User tried to query 'displayUserRoles' without a userid.");
             return Results.badRequest().text();
         }
@@ -75,9 +92,9 @@ public class UserController {
      * @param roles
      * @return
      */
-    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, Session session){
+    public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, Session session) {
 
-        if(StringUtils.isEmpty(userId)){
+        if (StringUtils.isEmpty(userId)) {
             logger.warn("User tried to 'updateUserRoles' without supplying a userid.");
             return Results.badRequest().text();
         }
@@ -120,14 +137,14 @@ public class UserController {
                     .ok()
                     .json()
                     .render(userMap);
-        }catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             logger.error(e.getMessage());
             return Results.internalServerError().json();
         }
     }
 
     /**
-     *THIS MIGHT GO AWAY
+     * THIS MIGHT GO AWAY
      *
      * @param flashScope
      * @param session
@@ -149,8 +166,48 @@ public class UserController {
         }
     }
 
+    public Result updateUserSettings(FlashScope flashScope, Session session, Context context) {
+
+        String shouldReceiveCampaignNotifications = context.getParameter("notifications");
+
+        if(shouldReceiveCampaignNotifications == null || shouldReceiveCampaignNotifications.isEmpty()){
+            shouldReceiveCampaignNotifications = "no";
+        }
+
+        logger.info("Received the following value for notifications update: " + shouldReceiveCampaignNotifications);
+
+        String userAsJsonString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        Gson gson = new Gson();
+        User user = gson.fromJson(userAsJsonString, User.class);
+
+        logger.info("Retrieved the following user to update: " + user.getEmail());
+        Object settingsObject = user.getApp_metadata().get("settings");
+
+        Map<String, String> settings;
+
+        if (settingsObject == null) {
+            settings = new HashMap<String, String>();
+        } else {
+            settings = (Map<String, String>) settingsObject;
+        }
+
+        settings.put("campaign_notifications", shouldReceiveCampaignNotifications);
+
+        Map<String, Object> appMetadata = user.getApp_metadata();
+        appMetadata.put("settings", settings);
+
+        logger.info("New app metadata: " + appMetadata.toString());
+
+        user.setApp_metadata(appMetadata);
+
+        userService.updateUserSettings(user);
+        userService.refreshUserProfileInCache(session);
+
+        return Results.redirect("/user/list");
+    }
+
     /**
-     *THIS MIGHT GO AWAY
+     * THIS MIGHT GO AWAY
      *
      * @param context
      * @param session

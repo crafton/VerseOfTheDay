@@ -3,10 +3,7 @@ package models;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class User {
@@ -14,7 +11,7 @@ public class User {
     private String email;
     private String user_id;
     private Map<String, String> user_metadata;
-    private Map<String, List<Object>> app_metadata;
+    private Map<String, Object> app_metadata;
 
     public User() {
     }
@@ -43,16 +40,16 @@ public class User {
         this.user_metadata = user_metadata;
     }
 
-    public Map<String, List<Object>> getApp_metadata() {
+    public Map<String, Object> getApp_metadata() {
         return app_metadata;
     }
 
-    public void setApp_metadata(Map<String, List<Object>> app_metadata) {
+    public void setApp_metadata(Map<String, Object> app_metadata) {
         this.app_metadata = app_metadata;
     }
 
     public List<Long> getSubscriptions() {
-        List<Object> campaignIds = app_metadata.get("subscriptions");
+        List<Object> campaignIds = (List<Object>) app_metadata.get("subscriptions");
 
         if (campaignIds != null) {
             List<Long> campaignIdsAsLong = campaignIds
@@ -62,7 +59,17 @@ public class User {
             return campaignIdsAsLong;
         }
 
-       return new ArrayList<Long>();
+        return new ArrayList<Long>();
+    }
+
+    public Map<String, String> getSettings() {
+        Map<String, String> settings = (Map<String, String>) this.getApp_metadata().get("settings");
+
+        if (settings == null) {
+            return new HashMap<>();
+        }
+
+        return settings;
     }
 
     @Override

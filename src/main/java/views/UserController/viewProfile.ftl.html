@@ -1,0 +1,32 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Profile">
+
+    <div class="well">
+        <form action="/user/updatesettings" method="post" class="form-horizontal" role="form">
+            <fieldset>
+                <legend>Profile</legend>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label for="notifications" class="col-md-4 control-label">
+                            <#if settings["campaign_notifications"]?? && settings["campaign_notifications"] == "yes">
+                            <input id="notifications" name="notifications" type="checkbox" value="yes" checked>
+                                <#else>
+                                    <input id="notifications" name="notifications" type="checkbox" value="yes">
+                                    </#if>
+                            <span class="checkbox-material"></span>
+                            Receive email notifications for new campaigns
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <button id="formSubmitButton" class="btn btn-raised btn-default" type="submit">Save</button>
+                    </div>
+                </div>
+            </fieldset>
+
+        </form>
+    </div>
+
+</@layout.myLayout>

@@ -69,6 +69,9 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/user/displayusers").with(UserController.class, "displayUserData");
         router.GET().route("/user/displayuserroles/{userid}").with(UserController.class, "displayUserRoles");
         router.GET().route("/user/updateroles/{userid}/{roles}").with(UserController.class, "updateUserRoles");
+        router.GET().route("/user/profile").with(UserController.class, "viewProfile");
+
+        router.POST().route("/user/updatesettings").with(UserController.class, "updateUserSettings");
 
 
         /**
