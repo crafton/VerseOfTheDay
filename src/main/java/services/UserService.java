@@ -3,6 +3,8 @@ package services;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import exceptions.SubscriptionExistsException;
+import models.Message;
+import models.Messenger;
 import models.User;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
@@ -24,13 +26,15 @@ public class UserService {
     private final Config config;
     private final Utils utils;
     private final UserRepository userRepository;
+    private final Messenger messenger;
 
     @Inject
-    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository) {
+    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Messenger messenger) {
         this.ninjaCache = ninjaCache;
         this.config = config;
         this.utils = utils;
         this.userRepository = userRepository;
+        this.messenger = messenger;
     }
 
     public String getCurrentUser(String idToken) {
@@ -57,6 +61,34 @@ public class UserService {
 
     public JsonObject findUserById(String id) throws JsonSyntaxException {
         return userRepository.findUserByUserId(id);
+    }
+
+    public void sendNotificationToUsers(Message message) {
+        logger.info("Sending notifications with the following subject: " + message.getSubject());
+        Integer start = 0;
+        Integer length = 1;
+
+        List<String> notificationRecipients = new ArrayList<>();
+        JsonObject userAsJsonObject = userRepository.findUsersToBeNotified(start, length);
+        Integer totalRecords = userAsJsonObject.get("total").getAsInt();
+
+        Double lengthAsDouble = length.doubleValue();
+        Double pages = totalRecords / lengthAsDouble;
+        Integer pagesAsInt = (int) Math.ceil(pages);
+
+        for (int i = 0; i < pagesAsInt; i++) {
+            JsonObject usersAsJsonObject = userRepository.findUsersToBeNotified(i, 40);
+            JsonArray userJsonList = usersAsJsonObject.getAsJsonArray("users");
+            Gson gson = new Gson();
+
+            for (JsonElement jsonElement : userJsonList) {
+                User user = gson.fromJson(jsonElement, User.class);
+                notificationRecipients.add(user.getEmail());
+            }
+
+            message.setRecipients(notificationRecipients);
+            messenger.sendMessage(message);
+        }
     }
 
     /**
@@ -353,7 +385,6 @@ public class UserService {
     }
 
     /**
-     *
      * @param user
      */
     public void updateUserSettings(User user) {

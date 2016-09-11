@@ -5,7 +5,6 @@ import ninja.utils.NinjaProperties;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class Config {
 
@@ -28,11 +27,7 @@ public class Config {
     private String publisherDescription;
     private List<String> rolesList;
 
-    private String contributedVotdMailFrom;
-    private String contributedVotdMailHtmlBody;
-    private String contributedVotdMailTextBody;
-    private String contributedVotdMailSubject;
-    private String contributedVotdAddress;
+    private String mailFrom;
 
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
@@ -60,11 +55,7 @@ public class Config {
         this.publisherRole = ninjaProperties.getWithDefault("role.publishername", "");
         this.publisherDescription = ninjaProperties.getWithDefault("role.publisherdescription", "");
 
-        this.contributedVotdMailFrom = ninjaProperties.getWithDefault("mail.votdcontributed.from", "");
-        this.contributedVotdMailSubject = ninjaProperties.getWithDefault("mail.votdcontributed.subject", "");
-        this.contributedVotdMailHtmlBody = ninjaProperties.getWithDefault("mail.votdcontributed.htmlbody", "");
-        this.contributedVotdMailTextBody = ninjaProperties.getWithDefault("mail.votdcontributed.textbody", "");
-        this.contributedVotdAddress = ninjaProperties.getWithDefault("mail.votdcontributed.address", "");
+        this.mailFrom = ninjaProperties.getWithDefault("mail.from", "");
 
         this.rolesList = Arrays.asList(this.memberRole, this.contributorRole, this.publisherRole);
 
@@ -139,23 +130,7 @@ public class Config {
         return rolesList;
     }
 
-    public String getContributedVotdMailFrom() {
-        return contributedVotdMailFrom;
-    }
-
-    public String getContributedVotdMailHtmlBody() {
-        return contributedVotdMailHtmlBody;
-    }
-
-    public String getContributedVotdMailTextBody() {
-        return contributedVotdMailTextBody;
-    }
-
-    public String getContributedVotdMailSubject() {
-        return contributedVotdMailSubject;
-    }
-
-    public String getContributedVotdAddress() {
-        return contributedVotdAddress;
+    public String getMailFrom() {
+        return mailFrom;
     }
 }

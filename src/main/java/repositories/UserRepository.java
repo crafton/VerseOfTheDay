@@ -90,6 +90,21 @@ public class UserRepository {
         return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
     }
 
+    public JsonObject findUsersToBeNotified(Integer start, Integer length) throws JsonSyntaxException {
+        String queryString = "app_metadata.settings.campaign_notifications:yes";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("per_page", length);
+        params.put("page", start);
+        params.put("include_totals", "true");
+        params.put("fields", "nam,email");
+        params.put("include_fields", "true");
+        params.put("search_engine", "v2");
+        params.put("q", queryString);
+
+        return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
+    }
+
     /**
      * Retrieve the total number of users from auth0
      *

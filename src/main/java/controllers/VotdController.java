@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import ninja.postoffice.Mail;
 import ninja.postoffice.Postoffice;
-import org.apache.commons.mail.EmailException;
 import org.slf4j.LoggerFactory;
 import services.ThemeService;
 import services.UserService;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import utilities.Config;
 import utilities.Utils;
 
-import javax.mail.internet.AddressException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -336,19 +334,7 @@ public class VotdController {
     }
 
     private void sendVotdContributedEmail() {
-        Mail mail = mailProvider.get();
 
-        mail.setSubject(config.getContributedVotdMailSubject());
-        mail.setFrom(config.getContributedVotdMailFrom());
-        mail.addTo(config.getContributedVotdAddress());
-        mail.setBodyHtml(config.getContributedVotdMailHtmlBody());
-        mail.setBodyText(config.getContributedVotdMailTextBody());
-
-        try {
-            postoffice.send(mail);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
 
     }
 

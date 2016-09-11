@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import ninja.scheduler.Schedule;
 import org.slf4j.Logger;
@@ -12,17 +13,23 @@ import org.slf4j.LoggerFactory;
 import repositories.UserRepository;
 import services.VotdDispatchService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class VotdScheduler {
 
-    @Inject
-    private VotdDispatchService votdDispatchService;
     private static final Logger logger = LoggerFactory.getLogger(VotdScheduler.class);
 
-    @Schedule(delay = 60, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
+    @Inject
+    private VotdDispatchService votdDispatchService;
+    @Inject
+    private Messenger messenger;
+    @Inject
+    private Provider<Message> messageProvider;
+
+    @Schedule(delay = 60, initialDelay = 3, timeUnit = TimeUnit.MINUTES)
     public void dispatchAvailableCampaigns() {
 
         List<Campaign> activeCampaigns = votdDispatchService.getActiveCampaigns();
@@ -43,7 +50,7 @@ public class VotdScheduler {
                     .get("total").getAsInt());
 
             if(votdDispatch.getTotalNumberOfUsers() == 0){
-                logger.info("No subscribers to this campaign. Will no process anything else for this campaign");
+                logger.info("No subscribers to this campaign. Will not process anything else for this campaign");
                 return;
             }
 
@@ -57,6 +64,9 @@ public class VotdScheduler {
                 return;
             }
 
+            Message message = messageProvider.get();
+            message.setSubject(verseToSend.getVerses());
+
             votdDispatch.setVotdToBeDispatched(verseToSend);
             Integer pages = votdDispatch.getVotdDispatchUserPages(numberOfUsersPerPage);
 
@@ -65,15 +75,24 @@ public class VotdScheduler {
             try {
                 //Retrieve the text related to the verse that will be sent
                 String verseToSendText = votdDispatchService.getVerseText(votdDispatch.getVotdToBeDispatched());
+                List<Message> messages = new ArrayList<>();
+                message.setBodyHtml(verseToSendText);
 
                 for (Integer i = 0; i < pages; i++) {
                     JsonObject users = votdDispatchService.getUsers(i, numberOfUsersPerPage, campaign.getCampaignId());
                     JsonArray userJsonList = users.getAsJsonArray("users");
+                    List<String> recipients = new ArrayList<>();
                     for (JsonElement user : userJsonList) {
                         String email = user.getAsJsonObject().get("email").getAsString();
+                        recipients.add(email);
                         logger.info("Sending " + votdDispatch.getVotdToBeDispatched().getVerses() + " to " + email);
                     }
+                    message.setRecipients(recipients);
+                    messages.add(message);
                 }
+
+                messenger.setMessages(messages);
+                messenger.sendMessages();
 
                 votdDispatch.setTimeFinished();
             }catch (JsonSyntaxException je){
