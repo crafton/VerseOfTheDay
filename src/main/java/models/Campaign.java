@@ -23,7 +23,7 @@ import javax.persistence.NamedQuery;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Campaign.findAll", query = "SELECT x FROM Campaign x"),
-	@NamedQuery(name = "Campaign.findActive", query = "SELECT x FROM Campaign x WHERE :now BETWEEN x.startDate AND x.endDate")
+	@NamedQuery(name = "Campaign.findActive", query = "SELECT x FROM Campaign x WHERE :now BETWEEN x.startDate AND x.endDate AND :currentTime = x.sendTime")
 })
 public class Campaign {
 
@@ -32,6 +32,7 @@ public class Campaign {
 	private Long campaignId;
 	private Timestamp startDate;
 	private Timestamp endDate;
+	private String sendTime;
 	private String campaignName;
 	private String campaignDescription;
 	private int campaignDays;
@@ -78,6 +79,14 @@ public class Campaign {
 
 	public void setEndDate(Timestamp endDate) {
 		this.endDate = endDate;
+	}
+
+	public String getSendTime() {
+		return sendTime;
+	}
+
+	public void setSendTime(String sendTime) {
+		this.sendTime = sendTime;
 	}
 
 	public String getCampaignName() {

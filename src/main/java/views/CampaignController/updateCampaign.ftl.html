@@ -71,6 +71,18 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="sendTime" class="col-sm-2 control-label">Send Time</label>
+                    <div class='col-sm-4 input-group date' id="sendTimePicker">
+                        <input type="text" class="form-control"
+                               id="sendTime" name="sendTime"
+                               value="${campaign.sendTime}" required/>
+                        <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-time"></span>
+                    </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <div class='col-sm-4 input-group'>
                         <input type="hidden" class="form-control"
                                placeholder="MMM DD, YYYY" id="campaignDays" name="campaignDays"/>

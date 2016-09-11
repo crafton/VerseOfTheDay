@@ -22,7 +22,7 @@ public class Message {
     @Inject
     public Message(Provider<Mail> emailProvider, Config config) {
         this.emailProvider = emailProvider;
-        this.mail = emailProvider.get();
+        this.mail = this.emailProvider.get();
         this.config = config;
         this.setSender(config.getMailFrom());
     }

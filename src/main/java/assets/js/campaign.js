@@ -14,6 +14,11 @@ $(function () {
 	$("#endDatePicker").on("dp.change", function (e) {
 		$('#startDatePicker').data("DateTimePicker").maxDate(e.date);
 	});
+
+	$('#sendTimePicker').datetimepicker({
+		format: 'LT',
+		stepping: 60
+	})
 });
 
 $(document).ready(function(){

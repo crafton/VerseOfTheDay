@@ -168,6 +168,7 @@ public class CampaignController {
         int days = (int) (duration / (1000 * 60 * 60 * 24));
 
         campaign.setCampaignDays(days);
+        campaign.setSendTime(context.getParameter("sendTime"));
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
@@ -233,7 +234,7 @@ public class CampaignController {
         }
         try {
             campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
-                    startDate, endDate, days, themeList);
+                    startDate, endDate, days, themeList, context.getParameter("sendTime"));
             flashScope.success("Campaign updated");
         } catch (CampaignException e) {
             flashScope.error("Error updating campaign. Contact the administrator.");

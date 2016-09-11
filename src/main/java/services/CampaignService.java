@@ -62,8 +62,8 @@ public class CampaignService {
      */
     public void update(Long campaignId, String campaignName, String campaignDescription, Timestamp startDate,
                        Timestamp endDate, int days,
-                       List<Theme> themeList) throws CampaignException {
-        repository.update(campaignId, campaignName, campaignDescription, startDate, endDate, days,  themeList);
+                       List<Theme> themeList, String sendTime) throws CampaignException {
+        repository.update(campaignId, campaignName, campaignDescription, startDate, endDate, days,  themeList, sendTime);
     }
 
     /**

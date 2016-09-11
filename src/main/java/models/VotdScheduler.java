@@ -29,7 +29,7 @@ public class VotdScheduler {
     @Inject
     private Provider<Message> messageProvider;
 
-    @Schedule(delay = 60, initialDelay = 3, timeUnit = TimeUnit.MINUTES)
+    @Schedule(delay = 60, initialDelay = 30, timeUnit = TimeUnit.SECONDS)
     public void dispatchAvailableCampaigns() {
 
         List<Campaign> activeCampaigns = votdDispatchService.getActiveCampaigns();
