@@ -1,14 +1,12 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
     "List Campaign">
 
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 class="panel-title">Update Campaign</h2>
-        </div>
-        <div class="panel-body">
-            <form role="form" action="/campaign/saveUpdateCampaign" class="form-horizontal" method="post"
-                  id="updateForm" data-toggle="validator">
+    <div class="well">
+        <form role="form" action="/campaign/saveUpdateCampaign" class="form-horizontal" method="post"
+              id="updateForm" data-toggle="validator">
 
+            <fieldset>
+                <legend>Update Campaign</legend>
                 <div class="form-group">
                     <label for="campaignName" class="col-sm-2 control-label">Campaign Name</label>
                     <div class="col-sm-4 input-group">
@@ -91,11 +89,12 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button id="formSubmitButton" class="btn btn-raised btn-default" type="submit">Save</button>
+                        <a href="/campaign/list" class="btn btn-raised btn-default">Cancel</a>
+                        <button id="formSubmitButton" class="btn btn-raised btn-primary" type="submit">Save</button>
                     </div>
                 </div>
-            </form>
-        </div>
+            </fieldset>
+        </form>
     </div>
     <script type="text/javascript" src="/assets/js/campaign.js"></script>
 </@layout.myLayout>

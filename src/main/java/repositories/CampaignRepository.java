@@ -46,7 +46,6 @@ public class CampaignRepository {
         String currentTime = localTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
         q.setParameter("currentTime", currentTime);
 
-        logger.info("Current time is: " + currentTime);
         return (List<Campaign>) q.getResultList();
     }
 

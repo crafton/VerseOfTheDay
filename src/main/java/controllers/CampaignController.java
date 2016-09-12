@@ -16,9 +16,11 @@ import javax.inject.Inject;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.inject.Provider;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import filters.PublisherFilter;
+import models.Message;
 import models.User;
 import ninja.*;
 import ninja.session.Session;
@@ -46,13 +48,16 @@ public class CampaignController {
     private final ThemeService themeService;
     private final Config config;
     private final UserService userService;
+    private final Provider<Message> messageProvider;
 
     @Inject
-    public CampaignController(CampaignService campaignService, ThemeService themeService, Config config, UserService userService) {
+    public CampaignController(CampaignService campaignService, ThemeService themeService,
+                              Config config, UserService userService, Provider<Message> messageProvider) {
         this.campaignService = campaignService;
         this.themeService = themeService;
         this.config = config;
         this.userService = userService;
+        this.messageProvider = messageProvider;
     }
 
     /**
@@ -105,6 +110,7 @@ public class CampaignController {
         JsonObject userObject = parser.parse(user).getAsJsonObject();
         if (userService.subscribe(userObject.get("user_id").getAsString(), campaignId)) {
             userService.refreshUserProfileInCache(session);
+            //TODO: Send notification
             return Results.ok().text();
         }
 
@@ -127,6 +133,7 @@ public class CampaignController {
         JsonObject userObject = parser.parse(user).getAsJsonObject();
         if (userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)) {
             userService.refreshUserProfileInCache(session);
+            //TODO: Send notification
             return Results.ok().text();
         }
 
@@ -179,6 +186,7 @@ public class CampaignController {
 
         try {
             campaignService.save(campaign);
+            //TODO: Send notification
             flashScope.success("Campaign succesfully created");
         } catch (CampaignException e) {
             flashScope.error("Error creating campaign. Contact the administrator.");
@@ -193,8 +201,8 @@ public class CampaignController {
      **/
     @FilterWith(PublisherFilter.class)
     public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
-        logger.info("Updating campaign details of campaign: =" + campaignId);
-        System.out.println("Updating campaign details of campaign: =" + campaignId);
+        logger.info("Updating campaign details of campaign: " + campaignId);
+
         return Results.html()
                 .render("campaign", campaignService.getCampaignById(campaignId))
                 .render("themes", themeService.findAllThemes())
@@ -249,6 +257,7 @@ public class CampaignController {
         try {
             campaignService.deleteCampaign(campaignId);
             flashScope.success("Campaign deleted successfully.");
+            //TODO: Send notification
 
             if (userService.unsubscribeAll(campaignId)) {
                 logger.info("Successfully unsubscribed all users from campaign: " + campaignId);
