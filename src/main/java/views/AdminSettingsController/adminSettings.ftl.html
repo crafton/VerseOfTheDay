@@ -1,0 +1,32 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Settings">
+
+    <form action="/admin/settings/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
+        <div class="well">
+            <fieldset>
+                <legend>General Settings</legend>
+                <div class="form-group">
+                    <label for="translation" class="col-sm-2 control-label">Theme</label>
+                    <div class="col-sm-2">
+                        <select class="form-control" id="translation" name="translation" required>
+                            <option>1</option>
+                            </select>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="well">
+            <fieldset>
+                <legend>Message Templates</legend>
+                <div class="form-group">
+                    <label for="welcomeSubject" class="col-sm-2 control-label">Welcome Message Subject</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="welcomeSubject" name="welcomeSubject" value="${(adminSettings.welcomeSubject)!}" required />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+
+</@layout.myLayout>

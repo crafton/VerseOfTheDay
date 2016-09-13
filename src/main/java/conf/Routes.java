@@ -88,7 +88,14 @@ public class Routes implements ApplicationRoutes {
         router.POST().route("/campaign/saveCampaign").with(CampaignController.class, "saveCampaign");
         router.POST().route("/campaign/saveUpdateCampaign").with(CampaignController.class, "saveUpdatedCampaign");
 
- 
+
+        /**
+         * Routes for Settings page
+         */
+
+        router.GET().route("/admin/settings").with(AdminSettingsController.class, "adminSettings");
+        router.POST().route("/admin/settings/save").with(AdminSettingsController.class, "saveSettings");
+
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)
         ///////////////////////////////////////////////////////////////////////    

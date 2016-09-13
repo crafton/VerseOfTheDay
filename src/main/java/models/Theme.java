@@ -15,9 +15,6 @@ import javax.persistence.NamedQuery;
 
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * Created by Crafton Williams on 28/05/2016.
- */
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Theme.findAll", query = "SELECT x FROM Theme x "),
