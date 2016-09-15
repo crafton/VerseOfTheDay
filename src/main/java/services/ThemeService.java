@@ -1,18 +1,13 @@
 package services;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.persist.Transactional;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import repositories.ThemeRepository;
 
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import java.sql.Timestamp;
 import java.util.List;
 
 public class ThemeService {

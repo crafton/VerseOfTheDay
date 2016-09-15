@@ -27,6 +27,7 @@ public class UserService {
     private final Utils utils;
     private final UserRepository userRepository;
     private final Messenger messenger;
+    private static final String APP_METADATA = "app_metadata";
 
     @Inject
     public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Messenger messenger) {
@@ -42,10 +43,10 @@ public class UserService {
     }
 
     public void refreshUserProfileInCache(Session session) {
-        String accessToken = session.get("accessToken");
+        String accessToken = session.get(config.ACCESSTOKEN_NAME);
         String userAsString = findUser(accessToken).toString();
 
-        ninjaCache.set(session.get("idToken"), userAsString);
+        ninjaCache.set(session.get(config.IDTOKEN_NAME), userAsString);
     }
 
     /**
@@ -126,7 +127,7 @@ public class UserService {
             }
 
             try {
-                JsonArray rolesArray = user.getAsJsonObject().get("app_metadata")
+                JsonArray rolesArray = user.getAsJsonObject().get(APP_METADATA)
                         .getAsJsonObject()
                         .get("roles")
                         .getAsJsonArray();
@@ -237,7 +238,7 @@ public class UserService {
 
         JsonObject userProfile = jsonParser.parse(userJsonString).getAsJsonObject();
 
-        JsonArray rolesArray = userProfile.get("app_metadata")
+        JsonArray rolesArray = userProfile.get(APP_METADATA)
                 .getAsJsonObject()
                 .get("roles")
                 .getAsJsonArray();
@@ -284,7 +285,7 @@ public class UserService {
         }
 
         JsonObject userObject = findUserById(userId);
-        JsonElement subscriptionElement = userObject.get("app_metadata")
+        JsonElement subscriptionElement = userObject.get(APP_METADATA)
                 .getAsJsonObject()
                 .get("subscriptions");
 
@@ -324,7 +325,7 @@ public class UserService {
         }
 
         JsonObject userObject = findUserById(userId);
-        JsonElement subscriptionElement = userObject.get("app_metadata")
+        JsonElement subscriptionElement = userObject.get(APP_METADATA)
                 .getAsJsonObject()
                 .get("subscriptions");
 
@@ -428,8 +429,8 @@ public class UserService {
         ninjaCache.set(tokens.get("id_token"), userObject.toString());
 
             /*Store only tokens in the session cookie*/
-        session.put("idToken", tokens.get("id_token"));
-        session.put("accessToken", tokens.get("access_token"));
+        session.put(config.IDTOKEN_NAME, tokens.get("id_token"));
+        session.put(config.ACCESSTOKEN_NAME, tokens.get("access_token"));
     }
 
     /**

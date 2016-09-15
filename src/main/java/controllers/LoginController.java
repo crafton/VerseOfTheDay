@@ -1,27 +1,20 @@
 package controllers;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import org.h2.engine.User;
-import org.slf4j.LoggerFactory;
-import repositories.UserRepository;
-import services.UserService;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
-
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import services.UserService;
 import utilities.Config;
-import utilities.Utils;
-
-import java.util.Map;
 
 
 public class LoginController {

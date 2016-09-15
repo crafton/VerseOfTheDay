@@ -19,7 +19,6 @@ public class AdminSettings {
     private String unsubscribedMessage;
     private String newVotdSubmittedSubject;
     private String newVotdSubmittedMessage;
-    private String votdSubject;
     private String genericMessageFooter;
 
     public AdminSettings(){
@@ -119,14 +118,6 @@ public class AdminSettings {
 
     public void setNewVotdSubmittedMessage(String newVotdSubmittedMessage) {
         this.newVotdSubmittedMessage = newVotdSubmittedMessage;
-    }
-
-    public String getVotdSubject() {
-        return votdSubject;
-    }
-
-    public void setVotdSubject(String votdSubject) {
-        this.votdSubject = votdSubject;
     }
 
     public String getGenericMessageFooter() {

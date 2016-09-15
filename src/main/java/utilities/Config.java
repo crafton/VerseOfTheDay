@@ -34,6 +34,7 @@ public class Config {
     public final String DATE_FORMAT = "EEEEE, MMMMM d, yyyy hh:mm a";
     public final String TIME_FORMAT = "hh:mm a";
     public final String IDTOKEN_NAME = "idToken";
+    public final String ACCESSTOKEN_NAME = "accessToken";
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {

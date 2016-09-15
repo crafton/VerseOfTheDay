@@ -1,10 +1,6 @@
 package controllers;
 
 import com.google.inject.Inject;
-import ninja.Ninja;
-import org.eclipse.jetty.http.HttpStatus;
-import org.slf4j.LoggerFactory;
-import services.ThemeService;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
@@ -17,6 +13,8 @@ import ninja.Results;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import services.ThemeService;
 import utilities.Config;
 
 import java.util.List;

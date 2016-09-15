@@ -1,13 +1,13 @@
 package controllers;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import models.User;
-import org.apache.commons.lang.ObjectUtils;
-import org.slf4j.LoggerFactory;
-import services.UserService;
 import filters.LoginFilter;
 import filters.PublisherFilter;
+import models.User;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
@@ -18,6 +18,8 @@ import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import services.UserService;
 import utilities.Config;
 
 import java.util.Arrays;
