@@ -1,7 +1,6 @@
 package controllers;
 
 import com.google.inject.Inject;
-import services.ThemeService;
 import exceptions.EntityAlreadyExistsException;
 import exceptions.EntityBeingUsedException;
 import exceptions.EntityDoesNotExistException;
@@ -14,6 +13,8 @@ import ninja.Results;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import services.ThemeService;
 import utilities.Config;
 
 import java.util.List;
@@ -21,12 +22,16 @@ import java.util.List;
 @FilterWith({LoginFilter.class, PublisherFilter.class})
 public class ThemeController {
 
+    private final static Logger logger = LoggerFactory.getLogger(ThemeController.class);
+
+    private final ThemeService themeService;
+    private final Config config;
+
     @Inject
-    private ThemeService themeService;
-    @Inject
-    private Logger logger;
-    @Inject
-    private Config config;
+    public ThemeController(ThemeService themeService, Config config) {
+        this.themeService = themeService;
+        this.config = config;
+    }
 
     /**
      * Retrieve list of themes from database as well as the maximum number of
@@ -36,7 +41,7 @@ public class ThemeController {
      */
     public Result themes() {
         logger.debug("Generating themes list...");
-        List<Theme> themes = themeService.findAll();
+        List<Theme> themes = themeService.findAllThemes();
 
         return Results
                 .ok()
@@ -56,7 +61,7 @@ public class ThemeController {
         logger.debug("Entered saveTheme action...");
 
         try {
-            themeService.save(theme);
+            themeService.saveTheme(theme);
         } catch (IllegalArgumentException e) {
             logger.warn("User tried to access the save controller directly.");
             flashScope.error("A theme has not been submitted");
@@ -75,11 +80,11 @@ public class ThemeController {
      * @param flashScope
      * @return
      */
-    public Result deleteTheme(@PathParam("theme") Long themeId, FlashScope flashScope) {
+    public Result deleteTheme(@PathParam("themeid") Long themeId, FlashScope flashScope) {
         logger.debug("Entered deleteTheme action...");
 
         try {
-            themeService.delete(themeId);
+            themeService.deleteTheme(themeId);
             logger.info("Successfully deleted theme.");
             flashScope.success("Successfully deleted theme.");
         } catch (IllegalArgumentException e) {

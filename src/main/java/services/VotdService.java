@@ -12,6 +12,8 @@ import models.Theme;
 import models.Votd;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import repositories.VotdRepository;
 import utilities.Config;
 
 import javax.persistence.EntityManager;
@@ -28,148 +30,72 @@ import java.util.Optional;
 
 public class VotdService {
 
-    @Inject
-    private Provider<EntityManager> entityManagerProvider;
+    private static final Logger logger = LoggerFactory.getLogger(VotdService.class);
+
+    private final Config config;
+    private final VotdRepository votdRepository;
 
     @Inject
-    private Config config;
-
-    @Inject
-    private Logger logger;
-
-    public VotdService() {
+    public VotdService(Config config, VotdRepository votdRepository) {
+        this.config = config;
+        this.votdRepository = votdRepository;
     }
 
-    @Transactional
     public List<Votd> findAll() {
-        Query q = getEntityManager().createNamedQuery("Votd.findAll");
-        return (List<Votd>) q.getResultList();
+        return votdRepository.findAllVerses();
     }
 
-    @Transactional
     public Votd findById(Long votdId) throws IllegalArgumentException {
 
         if (votdId == null) {
             throw new IllegalArgumentException("Parameter must be of type 'Long'.");
         }
-
-        return getEntityManager().find(Votd.class, votdId);
+        return votdRepository.findVerseById(votdId);
     }
 
-    @Transactional
     public String findByVerse(String verseName) throws NoResultException {
-        Query q = getEntityManager().createNamedQuery("Votd.findExistingVerse");
-        q.setParameter("verse", verseName);
-
-        return (String) q.getSingleResult();
+        return votdRepository.findVerseByVerseName(verseName);
     }
 
-    @Transactional
     public List<String> findVersesInChapter(String bookAndChapter) {
-
-        Query q = getEntityManager().createNamedQuery("Votd.findVersesInChapter");
-        q.setParameter("bookchapter", bookAndChapter + "%%");
-
-        return (List<String>) q.getResultList();
+        return votdRepository.findVersesInChapter(bookAndChapter);
     }
 
-    @Transactional
     public List<Votd> wildFind(String param, Integer start, Integer length) {
-
-        Query q = this.buildSearchQuery(param, "Votd.wildFind");
-
-        q.setFirstResult(start);
-        q.setMaxResults(length);
-
-        return (List<Votd>) q.getResultList();
+        return votdRepository.search(param, start, length);
     }
 
-    @Transactional
     public Long countFilteredRecords(String param) throws NoResultException {
-        Query q = this.buildSearchQuery(param, "Votd.wildFindCount");
-
-        return (Long) q.getSingleResult();
+        return votdRepository.countRecordsWithFilter(param);
     }
 
-    @Transactional
     public Long getTotalRecords() throws NoResultException {
-        Query q = getEntityManager().createNamedQuery("Votd.count");
-
-        return (Long) q.getSingleResult();
+        return votdRepository.countTotalRecords();
     }
 
-    @Transactional
     public List<Votd> findAllWithLimit(Integer start, Integer length) {
-        Query q = getEntityManager().createNamedQuery("Votd.findAll");
-        q.setFirstResult(start);
-        q.setMaxResults(length);
-
-        return (List<Votd>) q.getResultList();
+        return votdRepository.findAllWithLimit(start, length);
     }
 
-
-    @Transactional
     public void update(Long votdId, List<Theme> themes, boolean votdStatus)
             throws IllegalArgumentException, EntityDoesNotExistException {
 
-        if (themes == null) {
-            themes = new ArrayList<>();
-        }
-
-        try {
-            Votd votd = findById(votdId);
-
-            if (votd == null) {
-                throw new EntityDoesNotExistException("The VOTD you're trying to update does not exist.");
-            }
-
-            votd.setThemes(themes);
-            votd.setApproved(votdStatus);
-            votd.setDateModified(new Timestamp(System.currentTimeMillis()));
-            getEntityManager().persist(votd);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+        votdRepository.update(votdId, themes, votdStatus);
     }
 
-    @Transactional
     public void approve(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
 
-        try {
-            Votd votd = findById(votdId);
-
-            if (votd == null) {
-                throw new EntityDoesNotExistException("You cannot approve a VOTD that does not exist.");
-            }
-            votd.setApproved(true);
-            getEntityManager().persist(votd);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+        votdRepository.approve(votdId);
     }
 
-    @Transactional
     public void save(Votd votd) throws IllegalArgumentException {
 
-        if (votd == null) {
-            throw new IllegalArgumentException("VOTD must be a valid entry.");
-        }
-
-        votd.setDateCreated(new Timestamp(System.currentTimeMillis()));
-        getEntityManager().persist(votd);
+        votdRepository.save(votd);
     }
 
-    @Transactional
     public void delete(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
-        try {
-            Votd votd = findById(votdId);
-            if (votd == null) {
-                throw new EntityDoesNotExistException("Cannot delete a VOTD that does not exist.");
-            }
-            getEntityManager().remove(votd);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+
+        votdRepository.delete(votdId);
     }
 
     /**
@@ -179,7 +105,7 @@ public class VotdService {
      * @param votds
      * @return
      */
-    public List<String[]> generateDataTableResults(List<Votd> votds){
+    public List<String[]> generateDataTableResults(List<Votd> votds) {
 
         String[] votdFields = new String[0];
         List<String[]> votdData = new ArrayList<>();
@@ -190,14 +116,14 @@ public class VotdService {
             if (votd.isApproved()) {
                 votdApproved = config.APPROVED;
             } else {
-                shouldApproveVotd = "<a class=\"fa fa-thumbs-up\" href=\"/votd/approve/" + votd.getId() + "\" aria-hidden=\"true\"></a>";
+                shouldApproveVotd = "<a class=\"material-icons\" href=\"/votd/approve/" + votd.getId() + "\" aria-hidden=\"true\">thumb_up</a>";
                 votdApproved = config.PENDING;
             }
 
             votdFields = new String[]{votd.getVerses(), votd.getThemesAsString(), votdApproved,
                     shouldApproveVotd, votd.getCreatedBy(), votd.getModifiedBy(),
-                    "<a class=\"fa fa-trash\" data-placement=\"top\" data-toggle=\"confirmation\" aria-hidden=\"true\" href=\"/votd/delete/" + votd.getId() + "\"></a>",
-                    "<a class=\"fa fa-pencil\" aria-hidden=\"true\" href=\"/votd/update/" + votd.getId() + "\"></a>"};
+                    "<a class=\"material-icons\" data-placement=\"top\" data-toggle=\"confirmation\" aria-hidden=\"true\" href=\"/votd/delete/" + votd.getId() + "\">delete</a>",
+                    "<a class=\"material-icons\" aria-hidden=\"true\" href=\"/votd/update/" + votd.getId() + "\">mode_edit</a>"};
 
             votdData.add(votdFields);
         }
@@ -212,23 +138,8 @@ public class VotdService {
      * @return Verse text.
      */
     public String restGetVerses(String verseRange) throws JsonSyntaxException {
-        HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(config.getBibleSearchKey(), "");
-        Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.register(authenticationFeature)
-                .target("https://bibles.org/v2/passages.js");
 
-        String verseTextJson = webTarget
-                .queryParam("q[]", verseRange)
-                .queryParam("version", "eng-ESV")
-                .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
-
-        JsonObject verseJsonObject;
-        try {
-            JsonParser parser = new JsonParser();
-            verseJsonObject = parser.parse(verseTextJson).getAsJsonObject();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange);
 
         JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")
@@ -391,30 +302,6 @@ public class VotdService {
     }
 
     /**
-     * Generic method to build a search query for a verse.
-     *
-     * @param param
-     * @param queryName
-     * @return
-     */
-    private Query buildSearchQuery(String param, String queryName) {
-        Query q = getEntityManager().createNamedQuery(queryName);
-        q.setParameter("verse", param + "%");
-        q.setParameter("modifiedby", param + "%");
-        q.setParameter("createdby", param + "%");
-
-        if (param.contentEquals(config.APPROVED)) {
-            q.setParameter("isapproved", true);
-        } else if (param.contentEquals(config.PENDING)) {
-            q.setParameter("isapproved", false);
-        } else {
-            q.setParameter("isapproved", null);
-        }
-
-        return q;
-    }
-
-    /**
      * Get the verse length based on a verse range.
      *
      * @param verseRange of the format 'Matthew 6:24' or 'Matthew 6:24-28'
@@ -488,7 +375,4 @@ public class VotdService {
         return verses.split("-");
     }
 
-    private EntityManager getEntityManager() {
-        return entityManagerProvider.get();
-    }
 }

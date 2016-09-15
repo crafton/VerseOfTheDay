@@ -2,99 +2,102 @@ package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import exceptions.SubscriptionExistsException;
+import models.Message;
+import models.Messenger;
+import models.User;
 import ninja.cache.NinjaCache;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import ninja.session.Session;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class UserService {
 
-    @Inject
-    private NinjaCache ninjaCache;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    private final NinjaCache ninjaCache;
+    private final Config config;
+    private final Utils utils;
+    private final UserRepository userRepository;
+    private final Messenger messenger;
+    private static final String APP_METADATA = "app_metadata";
 
     @Inject
-    private Config config;
-
-    @Inject
-    private Utils utils;
-
-    @Inject
-    private Logger logger;
-
-    public UserService() {
+    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Messenger messenger) {
+        this.ninjaCache = ninjaCache;
+        this.config = config;
+        this.utils = utils;
+        this.userRepository = userRepository;
+        this.messenger = messenger;
     }
 
     public String getCurrentUser(String idToken) {
         return (String) ninjaCache.get(idToken);
     }
 
+    public void refreshUserProfileInCache(Session session) {
+        String accessToken = session.get(config.ACCESSTOKEN_NAME);
+        String userAsString = findUser(accessToken).toString();
+
+        ninjaCache.set(session.get(config.IDTOKEN_NAME), userAsString);
+    }
+
     /**
-     * Retrieve user records for the data table based on specified query
-     *
      * @param start
      * @param length
      * @param search
-     * @return JsonObject containing returned records
+     * @return
      * @throws JsonSyntaxException
      */
-    public JsonObject getUserRecords(Integer start, Integer length, String search) throws JsonSyntaxException {
+    public JsonObject findUserRecordsWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
+        return userRepository.findUsersWithPaging(start, length, search);
+    }
 
-        String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
-                "OR app_metadata.roles:" + search + "*";
+    public JsonObject findUserById(String id) throws JsonSyntaxException {
+        return userRepository.findUserByUserId(id);
+    }
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("per_page", length);
-        params.put("page", start);
-        params.put("include_totals", "true");
-        params.put("fields", "name,user_metadata.name,email,last_login,created_at,user_id,app_metadata.roles");
-        params.put("include_fields", "true");
-        params.put("search_engine", "v2");
-        params.put("q", queryString);
+    public void sendNotificationToUsers(Message message) {
+        logger.info("Sending notifications with the following subject: " + message.getSubject());
+        Integer start = 0;
+        Integer length = 1;
 
-        try {
-            return utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
+        List<String> notificationRecipients = new ArrayList<>();
+        JsonObject userAsJsonObject = userRepository.findUsersToBeNotified(start, length);
+        Integer totalRecords = userAsJsonObject.get("total").getAsInt();
+
+        Double lengthAsDouble = length.doubleValue();
+        Double pages = totalRecords / lengthAsDouble;
+        Integer pagesAsInt = (int) Math.ceil(pages);
+
+        for (int i = 0; i < pagesAsInt; i++) {
+            JsonObject usersAsJsonObject = userRepository.findUsersToBeNotified(i, 40);
+            JsonArray userJsonList = usersAsJsonObject.getAsJsonArray("users");
+            Gson gson = new Gson();
+
+            for (JsonElement jsonElement : userJsonList) {
+                User user = gson.fromJson(jsonElement, User.class);
+                notificationRecipients.add(user.getEmail());
+            }
+
+            message.setRecipients(notificationRecipients);
+            messenger.sendMessage(message);
         }
     }
 
     /**
-     * Retrieve the total number of users from auth0
-     *
-     * @return Integer. Total number of users
+     * @return
      * @throws JsonSyntaxException
      */
     public Integer getTotalRecords() throws JsonSyntaxException {
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("per_page", "1");
-        params.put("include_totals", "true");
-        params.put("fields", "name");
-        params.put("include_fields", "true");
-        params.put("search_engine", "v2");
-
-        JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
-
-        try {
-            return response
-                    .get("total")
-                    .getAsInt();
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return userRepository.getTotalUserRecords();
     }
 
     /**
@@ -104,9 +107,15 @@ public class UserService {
      * @param usersJsonList
      * @return
      */
-    public List<String[]> generateDataTableResults(JsonArray usersJsonList) {
+    public List<String[]> generateDataTableResults(JsonArray usersJsonList) throws IllegalArgumentException {
+
+        if (usersJsonList == null || usersJsonList.size() == 0) {
+            logger.warn("User tried to generate a table data set without a json array.");
+            throw new IllegalArgumentException("JsonArray must contain at least one element.");
+        }
+
         List<String[]> usersData = new ArrayList<>();
-        String[] userFields = new String[0];
+        String[] userFields;
 
         for (JsonElement user : usersJsonList) {
             String name;
@@ -118,7 +127,7 @@ public class UserService {
             }
 
             try {
-                JsonArray rolesArray = user.getAsJsonObject().get("app_metadata")
+                JsonArray rolesArray = user.getAsJsonObject().get(APP_METADATA)
                         .getAsJsonObject()
                         .get("roles")
                         .getAsJsonArray();
@@ -128,7 +137,7 @@ public class UserService {
                 }
 
             } catch (NullPointerException npe) {
-                //do nothing data table will get empty list
+                //do nothing data table will get empty roles list
             }
 
             userFields = new String[]{name,
@@ -136,9 +145,9 @@ public class UserService {
                     utils.formatListToHtml(rolesList),
                     user.getAsJsonObject().get("last_login").getAsString(),
                     user.getAsJsonObject().get("created_at").getAsString(),
-                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"fa fa-pencil\" aria-hidden=\"true\" " +
+                    "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"material-icons\" aria-hidden=\"true\" " +
                             "data-toggle=\"modal\" data-userid=\"" + user.getAsJsonObject().get("user_id").getAsString() + "\" data-username=\"" + name + "\"" +
-                            " data-target=\"#updateRolesModal\"></a>"};
+                            " data-target=\"#updateRolesModal\">mode_edit</a>"};
 
             usersData.add(userFields);
         }
@@ -156,6 +165,8 @@ public class UserService {
     public String generateRolesCheckboxes(String userId) {
         List<String> roles = getUserRoles(userId);
 
+        logger.debug("Roles generated for " + userId + ": " + roles.toString());
+
         String checkBoxString = "";
         String roleDescription = "";
 
@@ -172,6 +183,7 @@ public class UserService {
                 checkBoxString += "<div class=\"checkbox\">\n" +
                         "                <label>\n" +
                         "                    <input id=\"" + roleType + "\" type=\"checkbox\" value=\"" + roleType + "\" checked>\n" +
+                        "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                         "                    <b>" + roleType + "</b><br/>\n" +
                         "                    <i>" + roleDescription + "</i>\n" +
                         "                </label>\n" +
@@ -180,6 +192,7 @@ public class UserService {
                 checkBoxString += "<div class=\"checkbox\">\n" +
                         "                <label>\n" +
                         "                    <input id=\"" + roleType + "\" type=\"checkbox\" value=\"" + roleType + "\" >\n" +
+                        "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                         "                    <b>" + roleType + "</b><br/>\n" +
                         "                    <i>" + roleDescription + "</i>\n" +
                         "                </label>\n" +
@@ -197,43 +210,18 @@ public class UserService {
      * @param accessToken
      * @return
      */
-    public JsonObject auth0GetUser(String accessToken) throws JsonSyntaxException {
-        try {
-            return utils.auth0ApiQuery(null, "/userinfo", accessToken);
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
-
+    public JsonObject findUser(String accessToken) throws JsonSyntaxException {
+        return userRepository.findUserByToken(accessToken);
     }
 
     /**
      * Get a list of all roles assigned to the given user
      *
-     * @param userID
-     * @return
+     * @param userID user's unique id
+     * @return List of roles assigned ot the user
      */
     private List<String> getUserRoles(String userID) throws JsonSyntaxException {
-        List<String> rolesList = new ArrayList<>();
-        Map<String, Object> params = new HashMap<>();
-        params.put("fields", "app_metadata");
-        params.put("include_fields", "true");
-
-        try {
-            JsonObject response = utils.auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi() + "/" + userID);
-
-            JsonArray rolesArray = response.get("app_metadata")
-                    .getAsJsonObject()
-                    .get("roles")
-                    .getAsJsonArray();
-
-            for (JsonElement role : rolesArray) {
-                rolesList.add(role.getAsString());
-            }
-            return rolesList;
-
-        } catch (JsonSyntaxException e) {
-            throw new JsonSyntaxException(e.getMessage());
-        }
+        return userRepository.findRolesByUserId(userID);
     }
 
     /**
@@ -250,7 +238,7 @@ public class UserService {
 
         JsonObject userProfile = jsonParser.parse(userJsonString).getAsJsonObject();
 
-        JsonArray rolesArray = userProfile.get("app_metadata")
+        JsonArray rolesArray = userProfile.get(APP_METADATA)
                 .getAsJsonObject()
                 .get("roles")
                 .getAsJsonArray();
@@ -272,30 +260,203 @@ public class UserService {
      */
     public void updateUserRole(String userId, List<String> roles) {
 
+        if (userId == null || roles == null) {
+            throw new IllegalArgumentException("updateUserRole parameters cannot be null.");
+        }
+
         Gson gson = new Gson();
         String body = "{\"app_metadata\": { \"roles\": " + gson.toJson(roles) + "} }";
 
-        updateUserProfile(userId, body);
+        userRepository.updateUser(userId, body);
 
     }
 
     /**
-     * Update user profile
+     * Add a new subscription record to the user profile
      *
      * @param userId
-     * @param body
+     * @param campaignId
+     * @return
+     * @throws IllegalArgumentException
      */
-    private void updateUserProfile(String userId, String body) {
+    public boolean subscribe(String userId, Long campaignId) throws IllegalArgumentException {
+        if (campaignId == null) {
+            throw new IllegalArgumentException("updateSubscription parameter cannot be null.");
+        }
 
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("https://" + config.getAuth0Domain() + config.getAuth0UserApi() + "/" + userId);
-        String response = target.property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAuth0MgmtToken())
-                .method("PATCH", Entity.entity(body, MediaType.APPLICATION_JSON), String.class);
+        JsonObject userObject = findUserById(userId);
+        JsonElement subscriptionElement = userObject.get(APP_METADATA)
+                .getAsJsonObject()
+                .get("subscriptions");
 
-        logger.info("Received the following response after updating user profile:" + response);
+        JsonArray subscriptionArray = new JsonArray();
+        if (subscriptionElement != null) {
+            subscriptionArray = subscriptionElement
+                    .getAsJsonArray();
 
+            //check if campaignId already exists in array
+            for (JsonElement campaign : subscriptionArray) {
+                if (campaign.getAsLong() == campaignId) {
+                    return false;
+                }
+            }
+        }
+
+        JsonElement newSubscription = new JsonPrimitive(campaignId);
+        subscriptionArray.add(newSubscription);
+        Gson gson = new Gson();
+        String body = "{\"app_metadata\": { \"subscriptions\": " + gson.toJson(subscriptionArray) + "} }";
+
+        userRepository.updateUser(userId, body);
+
+        return true;
+    }
+
+    /**
+     * Remove a subscription record from the user profile
+     *
+     * @param userId
+     * @param campaignId
+     * @return
+     */
+    public boolean unsubscribe(String userId, Long campaignId) {
+        if (campaignId == null) {
+            throw new IllegalArgumentException("updateSubscription parameter cannot be null.");
+        }
+
+        JsonObject userObject = findUserById(userId);
+        JsonElement subscriptionElement = userObject.get(APP_METADATA)
+                .getAsJsonObject()
+                .get("subscriptions");
+
+        if (subscriptionElement == null) {
+            logger.warn("Trying to unsubscribe using non-existent subscription.");
+            return false;
+        }
+
+        JsonArray subscriptionArray = subscriptionElement.getAsJsonArray();
+
+        //convert jsonarray to list of json elements
+        List<JsonElement> subscriptionList = new ArrayList<>();
+        subscriptionArray.forEach(subscriptionList::add);
+
+        JsonElement campaignElement = new JsonPrimitive(campaignId);
+        if (subscriptionList.contains(campaignElement)) {
+            subscriptionList.remove(campaignElement);
+
+            JsonArray remainingSubscriptionArray = new JsonArray();
+            subscriptionList.forEach(remainingSubscriptionArray::add);
+
+            Gson gson = new Gson();
+            String body = "{\"app_metadata\": { \"subscriptions\": " + gson.toJson(remainingSubscriptionArray) + "} }";
+
+            userRepository.updateUser(userId, body);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean unsubscribeAll(Long campaignId) {
+        Integer length = 40;
+        Integer totalSubscribers = userRepository.findSubscribedUsers(0, length, campaignId).get("total").getAsInt();
+
+        if (totalSubscribers == 0) {
+            logger.warn("No subscribers for campaign with id: " + campaignId + "...doing nothing.");
+            return false;
+        }
+
+        Double lengthAsDouble = length.doubleValue();
+        Double pagesAsDouble = totalSubscribers / lengthAsDouble;
+        Integer pages = (int) Math.ceil(pagesAsDouble);
+
+        for (int i = 0; i < pages; i++) {
+            JsonObject usersAsObject = userRepository.findSubscribedUsers(i, length, campaignId);
+            JsonArray userJsonList = usersAsObject.getAsJsonArray("users");
+            for (JsonElement user : userJsonList) {
+                String userId = user.getAsJsonObject().get("user_id").getAsString();
+                if (!unsubscribe(userId, campaignId)) {
+                    logger.warn("Failed to unsubscribe user: " + userId + " from campaign: " + campaignId);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param user
+     */
+    public void updateUserSettings(User user) {
+        logger.debug("Updating user settings...");
+
+        Object settingsObject = user.getApp_metadata().get("settings");
+
+        Map<String, String> settings = (Map<String, String>) settingsObject;
+
+        Gson gson = new Gson();
+
+        String updateString = "{\"app_metadata\": { \"settings\": " + gson.toJson(settings) + "} }";
+
+        logger.info("Sending the following update: " + updateString);
+
+        userRepository.updateUser(user.getUser_id(), updateString);
+
+    }
+
+    /**
+     * Create a user session after successful authentication
+     *
+     * @param session
+     * @param code
+     */
+    public void createSession(Session session, String code) throws JsonSyntaxException, IllegalStateException {
+
+        if (session == null) {
+            throw new IllegalArgumentException("The session parameter in createSession cannot be null");
+        }
+
+        if (StringUtils.isEmpty(code)) {
+            throw new IllegalArgumentException("The code parameter in createSession cannot be null");
+        }
+
+        /*Retrieve authentication tokens from auth0*/
+        Map<String, String> tokens = userRepository.getAuthToken(code);
+        JsonObject userObject = findUser(tokens.get("access_token"));
+
+            /*Cache user profile so we don't have to query information again for the session*/
+        ninjaCache.set(tokens.get("id_token"), userObject.toString());
+
+            /*Store only tokens in the session cookie*/
+        session.put(config.IDTOKEN_NAME, tokens.get("id_token"));
+        session.put(config.ACCESSTOKEN_NAME, tokens.get("access_token"));
+    }
+
+    /**
+     * Find all email addresses for contributors
+     *
+     * @param role
+     * @return
+     * @throws JsonSyntaxException
+     */
+    public List<String> findEmailsByRole(String role) throws JsonSyntaxException {
+
+        List<String> roleEmails = new ArrayList<>();
+
+        JsonArray usersAsJson = userRepository.findUsers(role).getAsJsonArray("users");
+
+        if (usersAsJson.isJsonNull() || usersAsJson.size() == 0) {
+            return roleEmails;
+        }
+
+        for (JsonElement user : usersAsJson) {
+            roleEmails.add(user.getAsJsonObject().get("email").getAsString());
+        }
+
+        logger.debug("Retrieved the following contributor email address: " + roleEmails.toString());
+
+        return roleEmails;
     }
 
 }

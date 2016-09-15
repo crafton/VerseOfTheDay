@@ -1,46 +1,36 @@
 package controllers;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import services.UserService;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
-
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import services.UserService;
 import utilities.Config;
-import utilities.Utils;
 
-import java.util.Map;
-
-
-/**
- * Created by Crafton Williams on 13/06/2016.
- */
 
 public class LoginController {
 
-    @Inject
-    private Config config;
+    private final static Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    private final UserService userService;
+    private final NinjaCache ninjaCache;
+    private final Config config;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private Utils utils;
-
-    @Inject
-    private UserService userService;
-
-    @Inject
-    private NinjaCache ninjaCache;
+    public LoginController(UserService userService, NinjaCache ninjaCache, Config config) {
+        this.userService = userService;
+        this.ninjaCache = ninjaCache;
+        this.config = config;
+    }
 
     /**
      * Direct to view with auth0 login lock.
@@ -73,26 +63,17 @@ public class LoginController {
         /*Make sure an authorization code is received before proceeding.*/
         if (StringUtils.isEmpty(code)) {
             logger.error("Authorization code not received.");
-            Results.redirect("/servererror");
+            return Results.redirect("/servererror");
         }
 
         try {
-            /*Retrieve authentication tokens from auth0*/
-            Map<String, String> tokens = utils.auth0GetToken(code);
-            JsonObject userObject = userService.auth0GetUser(tokens.get("access_token"));
-
-            /*Cache user profile so we don't have to query information again for the session*/
-            ninjaCache.set(tokens.get("id_token"), userObject.toString());
-
-            /*Store only tokens in the session cookie*/
-            session.put("idToken", tokens.get("id_token"));
-            session.put("accessToken", tokens.get("access_token"));
+            userService.createSession(session, code);
         } catch (JsonSyntaxException | IllegalStateException e) {
             logger.error(e.getMessage());
             Results.redirect("/servererror");
         }
 
-        return Results.redirect("/votd/list");
+        return Results.redirect("/campaign/list");
     }
 
     /**

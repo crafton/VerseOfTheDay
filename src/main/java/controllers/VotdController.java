@@ -2,7 +2,12 @@ package controllers;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import ninja.postoffice.Mail;
+import ninja.postoffice.Postoffice;
+import org.slf4j.LoggerFactory;
 import services.ThemeService;
+import services.UserService;
 import services.VotdService;
 import exceptions.EntityDoesNotExistException;
 import filters.ContributorFilter;
@@ -17,6 +22,7 @@ import ninja.Results;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
+import utilities.Config;
 import utilities.Utils;
 
 import java.util.ArrayList;
@@ -28,15 +34,29 @@ import java.util.Map;
 @FilterWith(LoginFilter.class)
 public class VotdController {
 
-    @Inject
-    private Utils utils;
-    @Inject
-    private VotdService votdService;
-    @Inject
-    private ThemeService themeService;
-    @Inject
-    private Logger logger;
+    private final static Logger logger = LoggerFactory.getLogger(VotdController.class);
 
+    private Utils utils;
+    private final VotdService votdService;
+    private final ThemeService themeService;
+    private final Provider<Mail> mailProvider;
+    private final Postoffice postoffice;
+    private final UserService userService;
+    private final Config config;
+
+    @Inject
+    public VotdController(Utils utils, VotdService votdService,
+                          ThemeService themeService,
+                          Provider<Mail> mailProvider, Postoffice postoffice,
+                          UserService userService, Config config) {
+        this.utils = utils;
+        this.votdService = votdService;
+        this.themeService = themeService;
+        this.mailProvider = mailProvider;
+        this.postoffice = postoffice;
+        this.userService = userService;
+        this.config = config;
+    }
 
     /**
      * Display all votds in the database
@@ -85,7 +105,7 @@ public class VotdController {
                     .ok()
                     .json()
                     .render(votdMap);
-        }catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             logger.error(e.getMessage());
             return Results.badRequest().json();
         }
@@ -94,11 +114,12 @@ public class VotdController {
 
     /**
      * Render view to create a new votd
+     *
      * @return
      */
     @FilterWith(ContributorFilter.class)
     public Result createVotd() {
-        List<Theme> themes = themeService.findAll();
+        List<Theme> themes = themeService.findAllThemes();
 
         return Results
                 .ok()
@@ -107,7 +128,7 @@ public class VotdController {
     }
 
     /**
-     *Retrieve the full versetext from the web service given a verse range
+     * Retrieve the full versetext from the web service given a verse range
      *
      * @param verses verses to retrieve
      * @return
@@ -165,12 +186,17 @@ public class VotdController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeService.findById(Long.parseLong(themeId));
+            Theme theme = themeService.findThemeById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         try {
             votd.setThemes(themeList);
             votdService.save(votd);
+            //If the votd was saved by a contributor, send a notification
+            String idToken = context.getSession().get("idToken");
+            if (userService.hasRole(idToken, config.getContributorRole())) {
+                sendVotdContributedEmail();
+            }
             flashScope.success("Successfully created a new VoTD entry.");
         } catch (IllegalArgumentException e) {
             flashScope.error("Something strange has happened. Contact the administrator.");
@@ -197,7 +223,7 @@ public class VotdController {
         Votd votd = votdService.findById(verseid);
 
         //Get all themes
-        List<Theme> themes = themeService.findAll();
+        List<Theme> themes = themeService.findAllThemes();
 
         if (votd == null) {
             flashScope.error("Tried to retrieve a Votd that doesn't exist.");
@@ -214,7 +240,7 @@ public class VotdController {
                     .render("votd", votd)
                     .render("themes", themes)
                     .render("verseText", verseText);
-        }catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
             logger.error("CFailed web service call to retrieve verses.");
             return Results.redirect("/votd/list");
@@ -237,7 +263,7 @@ public class VotdController {
         List<Theme> themeList = new ArrayList<>();
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeService.findById(Long.parseLong(themeId));
+                Theme theme = themeService.findThemeById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
 
@@ -305,6 +331,11 @@ public class VotdController {
         }
 
         return Results.redirect("/votd/list");
+    }
+
+    private void sendVotdContributedEmail() {
+
+
     }
 
 }

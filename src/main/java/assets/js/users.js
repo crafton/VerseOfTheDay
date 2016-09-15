@@ -1,12 +1,14 @@
-/**
- * Created by craft on 9/07/2016.
- */
 
-$('#usersTable').confirmation({
-    selector: '[data-toggle="confirmation"]',
-    href: function (elem) {
-        return $(elem).attr('href');
-    }
+$('#usersTable').on('click', '[data-toggle="confirmation"]', function (e) {
+    e.preventDefault();
+    $.confirm({
+        confirm: function () {
+            top.location.href = e.target.href;
+        },
+        cancel: function () {
+            // nothing to do
+        }
+    });
 });
 
 $(document).ready(function () {
@@ -18,7 +20,7 @@ $(document).ready(function () {
     });
 });
 
-//Capture modal event and popular with user info
+//Capture modal event and populate with user info
 $('#updateRolesModal').on('show.bs.modal', function (event) {
     var itemClicked = $(event.relatedTarget)
     var recipient = itemClicked.data('username')

@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <artifactId>votd-ninja</artifactId>
-    <!-- If you want to deploy to a war please -->
-    <!-- replace "jar" with "war" and -->
-    <!-- comment ninja-standalone dependency and  -->
-    <!-- uncomment the dependency for ninja-servlet -->
-    <packaging>jar</packaging>
-    <groupId>apps.enoggerabaptist.org</groupId>
-    <version>0.1</version>
+	<artifactId>votd-ninja</artifactId>
+	<!-- If you want to deploy to a war please -->
+	<!-- replace "jar" with "war" and -->
+	<!-- comment ninja-standalone dependency and -->
+	<!-- uncomment the dependency for ninja-servlet -->
+	<packaging>jar</packaging>
+	<groupId>apps.enoggerabaptist.org</groupId>
+	<version>0.1</version>
 
-    <url>http://www.ninjaframework.org</url>
+	<url>http://www.ninjaframework.org</url>
 
     <properties>
         <ninja.version>5.7.0</ninja.version>

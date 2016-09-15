@@ -1,0 +1,102 @@
+<#import "../layout/defaultLayout.ftl.html" as layout>
+    <@layout.myLayout "Settings">
+
+    <form action="/admin/settings/save" method="post" class="form-horizontal" data-toggle="validator" role="form">
+        <div class="well">
+            <fieldset>
+                <legend>General Settings</legend>
+                <div class="form-group">
+                    <label for="translation" class="col-sm-2 control-label">Translation</label>
+                    <div class="col-sm-2">
+                        <select class="form-control" id="translation" name="translation" required>
+                            <option>1</option>
+                            </select>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="well">
+            <fieldset>
+                <legend>Message Templates</legend>
+                <div class="form-group">
+                    <label for="welcomeSubject" class="col-sm-2 control-label">Welcome Message Subject</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="welcomeSubject" name="welcomeSubject" value="${(adminSettings.welcomeSubject)!}" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="welcomeMessage" class="col-sm-2 control-label">Welcome Message</label>
+                    <div class="col-sm-2">
+                        <textarea class="form-control" id="welcomeMessage" name="welcomeMessage" value="${(adminSettings.welcomeMessage)!}" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newCampaignSubject" class="col-sm-2 control-label">New Campaign Subject</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="newCampaignSubject" name="newCampaignSubject" value="${(adminSettings.newCampaignSubject)!}" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newCampaignMessage" class="col-sm-2 control-label">New Campaign Message</label>
+                    <div class="col-sm-2">
+                        <textarea class="form-control" id="newCampaignMessage" name="newCampaignMessage" value="${(adminSettings.newCampaignMessage)!}" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="subscribedSubject" class="col-sm-2 control-label">Subscribed Subject</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="subscribedSubject" name="subscribedSubject" value="${(adminSettings.subscribedSubject)!}" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="subscribedMessage" class="col-sm-2 control-label">Subscribed Message</label>
+                    <div class="col-sm-2">
+                        <textarea class="form-control" id="subscribedMessage" name="subscribedMessage" value="${(adminSettings.subscribedMessage)!}" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="unsubscribedSubject" class="col-sm-2 control-label">Unsubscribed Subject</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="unsubscribedSubject" name="unsubscribedSubject" value="${(adminSettings.unsubscribedSubject)!}" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="unsubscribedMessage" class="col-sm-2 control-label">Unsubscribed Message</label>
+                    <div class="col-sm-2">
+                        <textarea class="form-control" id="unsubscribedMessage" name="unsubscribedMessage" value="${(adminSettings.unsubscribedMessage)!}" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newVotdSubmittedSubject" class="col-sm-2 control-label">New VOTD Submitted Subject</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="newVotdSubmittedSubject" name="newVotdSubmittedSubject" value="${(adminSettings.newVotdSubmittedSubject)!}" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newVotdSubmittedMessage" class="col-sm-2 control-label">New VOTD Submitted Message</label>
+                    <div class="col-sm-2">
+                        <textarea class="form-control" id="newVotdSubmittedMessage" name="newVotdSubmittedMessage" value="${(adminSettings.newVotdSubmittedMessage)!}" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="genericMessageFooter" class="col-sm-2 control-label">Generic Message Footer</label>
+                    <div class="col-sm-2">
+                        <input class="form-control" id="genericMessageFooter" name="genericMessageFooter" value="${(adminSettings.genericMessageFooter)!}" required />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+
+</@layout.myLayout>

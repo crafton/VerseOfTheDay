@@ -4,28 +4,35 @@
     <!-- Data Tables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/u/bs/dt-1.10.12/datatables.min.js"></script>
-
-    <table id="votdTable" class="table table-responsive">
-        <thead>
-        <tr>
-            <th>Verses</th>
-            <th>Themes</th>
-            <th>Status</th>
-            <th>Approve</th>
-            <th>Created By</th>
-            <th>Modified By</th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-    </table>
+    <a class="btn btn-raised btn-primary" href="/votd/create" role="button">New VoTD</a>
+    <div class="well">
+        <table id="votdTable" class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Verses</th>
+                <th>Themes</th>
+                <th>Status</th>
+                <th>Approve</th>
+                <th>Created By</th>
+                <th>Modified By</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+        </table>
+    </div>
 
     <script>
-        $('#votdTable').confirmation({
-            selector: '[data-toggle="confirmation"]',
-            href: function (elem) {
-                return $(elem).attr('href');
-            }
+        $('#votdTable').on('click', '[data-toggle="confirmation"]', function (e) {
+            e.preventDefault();
+            $.confirm({
+                confirm: function () {
+                    top.location.href = e.target.href;
+                },
+                cancel: function () {
+                    // nothing to do
+                }
+            });
         });
 
         $(document).ready(function () {
@@ -36,5 +43,6 @@
                 "ajax": "/votd/displayvotds"
             });
         });
+
     </script>
 </@layout.myLayout>

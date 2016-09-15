@@ -11,10 +11,8 @@
         <!-- Le styles -->
         <link href="/assets/webjars/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
         <!-- Optional Theme -->
-        <link rel="stylesheet" href="/assets/webjars/bootstrap/3.3.4/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="/assets/css/custom.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="/assets/css/bootstrap-switch.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <!-- Latest compiled and minified JavaScript -->
 
         <style type="text/css">
@@ -37,23 +35,34 @@
         <script type="text/javascript" src="/assets/webjars/bootstrap/3.3.4/js/bootstrap.min.js"></script>
         <script src="/assets/js/validator.min.js"></script>
 
+        <!-- Material Stuff -->
+        <link rel="stylesheet" href="/assets/css/bootstrap-material-design.css" type="text/css" />
+        <link rel="stylesheet" href="/assets/css/ripples.css" type="text/css" />
+        <script type="text/javascript" src="/assets/js/material.js"></script>
+        <script type="text/javascript" src="/assets/js/ripples.js"></script>
+
         <!-- Include confirmation lib -->
-        <script type="text/javascript" src="/assets/js/bootstrap-confirmation.min.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.confirm.min.js"></script>
 
         <!-- Include bootstrap-switch -->
+        <link rel="stylesheet" href="/assets/css/bootstrap-switch.min.css">
         <script type="text/javascript" src="/assets/js/bootstrap-switch.min.js"></script>
 
         <!-- Include the multiselect plugin's CSS and JS: -->
         <script type="text/javascript" src="/assets/js/bootstrap-multiselect.js"></script>
-        <link rel="stylesheet" href="/assets/css/bootstrap-multiselect.css" type="text/css"/>
 
+        <!-- Include date-related libs -->
+        <script type="text/javascript" src="/assets/js/moment.min.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-datetimepicker.min.js"></script>
+        <script type="text/javascript" src="/assets/js/moment.min.js"></script>
+        <link rel="stylesheet" href="/assets/css/bootstrap-datetimepicker.min.css" type="text/css"/>
         <!-- Landing Page -->
         <link rel="stylesheet" type="text/css" href="/assets/css/one-page-wonder.css"/>
+
     </head>
     <body>
 
     <div class="container">
-
         <#include "header.ftl.html"/>
 
         <#if (flash.error)??>
@@ -75,5 +84,19 @@
     </div> <!-- /container -->
 
     </body>
+    <script type="text/javascript">
+        $.material.init()
+        $.confirm.options = {
+            text: "Are you sure you want to delete this?",
+            title: "",
+            confirmButton: "Yes",
+            cancelButton: "Cancel",
+            post: false,
+            submitForm: false,
+            confirmButtonClass: "btn-warning btn-raised",
+            cancelButtonClass: "btn-primary btn-raised",
+            dialogClass: "modal-dialog"
+        }
+    </script>
     </html>
 </#macro>

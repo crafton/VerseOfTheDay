@@ -5,11 +5,7 @@ import ninja.utils.NinjaProperties;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Created by Crafton Williams on 14/06/2016.
- */
 public class Config {
 
     private String bibleSearchKey;
@@ -31,13 +27,18 @@ public class Config {
     private String publisherDescription;
     private List<String> rolesList;
 
+    private String mailFrom;
+
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
+    public final String DATE_FORMAT = "EEEEE, MMMMM d, yyyy hh:mm a";
+    public final String TIME_FORMAT = "hh:mm a";
+    public final String IDTOKEN_NAME = "idToken";
+    public final String ACCESSTOKEN_NAME = "accessToken";
 
     @Inject
     private Config(NinjaProperties ninjaProperties) {
         this.maxVerses = ninjaProperties.getIntegerWithDefault("votd.maxverses", 0);
-
 
         this.bibleSearchKey = ninjaProperties.getWithDefault("biblesearch.key", "");
         this.themesMaxCols = ninjaProperties.getIntegerWithDefault("themes.maxcols", 7);
@@ -55,6 +56,8 @@ public class Config {
         this.contributorDescription = ninjaProperties.getWithDefault("role.contributordescription", "");
         this.publisherRole = ninjaProperties.getWithDefault("role.publishername", "");
         this.publisherDescription = ninjaProperties.getWithDefault("role.publisherdescription", "");
+
+        this.mailFrom = ninjaProperties.getWithDefault("mail.from", "");
 
         this.rolesList = Arrays.asList(this.memberRole, this.contributorRole, this.publisherRole);
 
@@ -127,5 +130,9 @@ public class Config {
 
     public List<String> getRolesList() {
         return rolesList;
+    }
+
+    public String getMailFrom() {
+        return mailFrom;
     }
 }

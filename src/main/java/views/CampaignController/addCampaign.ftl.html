@@ -1,0 +1,93 @@
+<#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
+    "List Campaign">
+
+    <div class="well">
+            <form action="/campaign/saveCampaign" class="form-horizontal" method="post" id="addForm"
+                  data-toggle="validator">
+            <fieldset>
+                <legend>Create a new campaign</legend>
+                <div class="form-group">
+                    <label for="campaignName" class="col-sm-2 control-label">Campaign Name</label>
+                    <div class="col-sm-4 input-group">
+                        <input type="text"
+                               class="form-control" id="campaignName"
+                               name="campaignName"
+                               placeholder="Enter Campaign Name"
+                               pattern="^[a-zA-Z0-9_ ]+$" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaignDescription" class="col-sm-2 control-label">Campaign Description</label>
+                    <div class="col-sm-4 input-group">
+                        <textarea type="text"
+                               class="form-control" id="campaignDescription"
+                               name="campaignDescription"
+                               placeholder="Enter Campaign Description" rows="4"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="themes" class="col-sm-2 control-label">Themes</label>
+                    <div class="col-sm-4 input-group">
+                        <select id="themes" name="themes" multiple="multiple">
+                            <#list themes as theme>
+                                <option value="${theme.getId()}">${theme.getThemeName()}</option>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate" class="col-sm-2 control-label">Start Date</label>
+                    <div class='col-sm-4 input-group date' id="startDatePicker">
+                        <input type="text" class="form-control"
+                               id="startDate" name="startDate" required/>
+                        <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate" class="col-sm-2 control-label">End Date</label>
+                    <div class='col-sm-4 input-group date' id="endDatePicker">
+                        <input type="text" class="form-control"
+                               id="endDate" name="endDate" required/>
+                        <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sendTime" class="col-sm-2 control-label">Send Time</label>
+                    <div class='col-sm-4 input-group date' id="sendTimePicker">
+                        <input type="text" class="form-control"
+                               id="sendTime" name="sendTime" required/>
+                        <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-time"></span>
+                    </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class='col-sm-4 input-group'>
+                        <input type="hidden" class="form-control"
+                               placeholder="MMM DD, YYYY" id="campaignDays" name="campaignDays"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <a href="/campaign/list" class="btn btn-raised btn-default">Cancel</a>
+                    <button id="formSubmitButton" class="btn btn-raised btn-primary" type="submit">Save</button>
+                </div>
+            </div>
+            </fieldset>
+            </form>
+
+        </div>
+    <script type="text/javascript" src="/assets/js/campaign.js"></script>
+</@layout.myLayout>
+
