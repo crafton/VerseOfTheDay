@@ -17,18 +17,19 @@ public class AdminSettingsRepository {
     private static final Logger logger = LoggerFactory.getLogger(AdminSettingsRepository.class);
 
     @Inject
-    public AdminSettingsRepository(Provider<EntityManager> entityManagerProvider) {
+    public AdminSettingsRepository(Provider<EntityManager> entityManagerProvider){
         this.entityManagerProvider = entityManagerProvider;
     }
 
     @Transactional
-    public AdminSettings findSettings() {
+    public AdminSettings findSettings(){
         return getEntityManager().find(AdminSettings.class, 1L);
     }
 
     @Transactional
-    public void save(AdminSettings newAdminSettings) {
-        getEntityManager().persist(newAdminSettings);
+    public void save(AdminSettings newAdminSettings){
+
+        getEntityManager().merge(newAdminSettings);
     }
 
     private EntityManager getEntityManager() {

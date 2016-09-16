@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class User {
 
+    private String name;
     private String email;
     private String user_id;
     private Map<String, String> user_metadata;
@@ -18,6 +19,21 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getName() {
+
+        String realName = user_metadata.get("name");
+
+        if(realName == null || realName.isEmpty()){
+            return name;
+        }
+
+        return realName;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setEmail(String email) {

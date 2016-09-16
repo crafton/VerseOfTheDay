@@ -21,14 +21,14 @@ public class AdminSettings {
     private String newVotdSubmittedMessage;
     private String genericMessageFooter;
 
-    public AdminSettings(){
+    public AdminSettings() {
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -126,6 +126,10 @@ public class AdminSettings {
 
     public void setGenericMessageFooter(String genericMessageFooter) {
         this.genericMessageFooter = genericMessageFooter;
+    }
+
+    public String getSalutation(String name) {
+        return "Hi " + name + ",<p></p>";
     }
 
     @Override

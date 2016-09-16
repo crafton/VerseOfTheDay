@@ -43,6 +43,10 @@ public class AdminSettingsController {
             return Results.redirect("/admin/settings");
         }
 
+        if(adminSettings.getId() == null || adminSettings.getId() != 1L){
+            adminSettings.setId(1L);
+        }
+
         adminSettingsRepository.save(adminSettings);
         logger.info("Successfully saved admin settings.");
         flashScope.success("Settings saved.");

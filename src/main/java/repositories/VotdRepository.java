@@ -48,7 +48,7 @@ public class VotdRepository {
     }
 
     @Transactional
-    public Votd findVerseById(Long votdId){
+    public Votd findVerseById(Long votdId) {
         return getEntityManager().find(Votd.class, votdId);
     }
 
@@ -160,7 +160,7 @@ public class VotdRepository {
      *
      * @return
      */
-    public List<String> findAllVersions(){
+    public List<String> findAllVersions() {
         WebTarget webTarget = getVerseServiceWebTarget(config.getBibleSearchVersion());
 
         String versions = webTarget
@@ -189,9 +189,14 @@ public class VotdRepository {
     public JsonObject findVersesByRange(String verseRange, String translation) throws JsonSyntaxException {
         WebTarget webTarget = getVerseServiceWebTarget(config.getBibleSearchUrl());
 
-        if(translation == null || translation.isEmpty()) {
+        if (translation == null || translation.isEmpty()) {
             AdminSettings adminSettings = adminSettingsRepository.findSettings();
-            translation = adminSettings.getVersion();
+
+            if (adminSettings == null || adminSettings.getVersion().isEmpty()) {
+                translation = "eng-ESV";
+            } else {
+                translation = adminSettings.getVersion();
+            }
         }
 
         String verseTextJson = webTarget
@@ -208,7 +213,7 @@ public class VotdRepository {
      *
      * @return
      */
-    private WebTarget getVerseServiceWebTarget(String url){
+    private WebTarget getVerseServiceWebTarget(String url) {
         HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(config.getBibleSearchKey(), "");
         Client client = ClientBuilder.newClient();
         return client.register(authenticationFeature)

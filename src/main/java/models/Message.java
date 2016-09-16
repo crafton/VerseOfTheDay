@@ -78,6 +78,7 @@ public class Message {
         this.mail.setBodyText(bodyText);
     }
 
+
     public Mail getMail(){
         return this.mail;
     }

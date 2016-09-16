@@ -20,8 +20,7 @@ import com.google.inject.Provider;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import filters.PublisherFilter;
-import models.Message;
-import models.User;
+import models.*;
 import ninja.*;
 import ninja.session.Session;
 import org.slf4j.Logger;
@@ -29,11 +28,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 
+import repositories.AdminSettingsRepository;
 import services.CampaignService;
 import services.ThemeService;
 import exceptions.CampaignException;
-import models.Campaign;
-import models.Theme;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import services.UserService;
@@ -49,15 +47,22 @@ public class CampaignController {
     private final Config config;
     private final UserService userService;
     private final Provider<Message> messageProvider;
+    private final AdminSettingsRepository adminSettingsRepository;
+    private final Messenger messenger;
+    private AdminSettings adminSettings;
 
     @Inject
     public CampaignController(CampaignService campaignService, ThemeService themeService,
-                              Config config, UserService userService, Provider<Message> messageProvider) {
+                              Config config, UserService userService, Provider<Message> messageProvider,
+                              AdminSettingsRepository adminSettingsRepository, Messenger messenger) {
         this.campaignService = campaignService;
         this.themeService = themeService;
         this.config = config;
         this.userService = userService;
         this.messageProvider = messageProvider;
+        this.adminSettingsRepository = adminSettingsRepository;
+        this.messenger = messenger;
+        this.adminSettings = this.adminSettingsRepository.findSettings();
     }
 
     /**
@@ -100,17 +105,22 @@ public class CampaignController {
             return Results.badRequest().text();
         }
 
-        String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        String userString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if (user == null || user.isEmpty()) {
+        if (userString == null || userString.isEmpty()) {
             return Results.badRequest().text();
         }
 
-        JsonParser parser = new JsonParser();
-        JsonObject userObject = parser.parse(user).getAsJsonObject();
-        if (userService.subscribe(userObject.get("user_id").getAsString(), campaignId)) {
+        Gson gson = new Gson();
+        User user = gson.fromJson(userString, User.class);
+
+        if (userService.subscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
-            //TODO: Send notification
+            Message message = messageProvider.get();
+            message.setRecipient(user.getEmail());
+            message.setSubject(adminSettings.getSubscribedSubject());
+            message.setBodyHtml(adminSettings.getSalutation(user.getName()) + adminSettings.getSubscribedMessage());
+            messenger.sendMessage(message);
             return Results.ok().text();
         }
 
@@ -123,17 +133,22 @@ public class CampaignController {
             return Results.badRequest().text();
         }
 
-        String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        String userAsString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if (user == null || user.isEmpty()) {
+        if (userAsString == null || userAsString.isEmpty()) {
             return Results.badRequest().text();
         }
 
-        JsonParser parser = new JsonParser();
-        JsonObject userObject = parser.parse(user).getAsJsonObject();
-        if (userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)) {
+        Gson gson = new Gson();
+        User user = gson.fromJson(userAsString, User.class);
+
+        if (userService.unsubscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
-            //TODO: Send notification
+            Message message = messageProvider.get();
+            message.setRecipient(user.getEmail());
+            message.setSubject(adminSettings.getUnsubscribedSubject());
+            message.setBodyHtml(adminSettings.getSalutation(user.getName()) + adminSettings.getUnsubscribedMessage());
+            messenger.sendMessage(message);
             return Results.ok().text();
         }
 

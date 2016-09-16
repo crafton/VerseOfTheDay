@@ -10,9 +10,13 @@
                     <div class="col-sm-2">
                         <select class="form-control" id="version" name="version" required>
                             <#list versions as version>
-                            <option value="${(version)!}">${(version)!}</option>
+                                <#if (adminSettings.getVersion())! == version>
+                                    <option value="${(version)!}" selected>${(version)!}</option>
+                                    <#else>
+                                        <option value="${(version)!}">${(version)!}</option>
+                                </#if>
                             </#list>
-                            </select>
+                        </select>
                     </div>
                 </div>
             </fieldset>
@@ -24,7 +28,8 @@
                 <div class="form-group">
                     <label for="welcomeSubject" class="col-sm-2 control-label">Welcome Message Subject</label>
                     <div class="col-sm-2">
-                        <input class="form-control" id="welcomeSubject" name="welcomeSubject" value="${(adminSettings.getWelcomeSubject())!}" required />
+                        <input class="form-control" id="welcomeSubject" name="welcomeSubject"
+                               value="${(adminSettings.getWelcomeSubject())!}" required/>
                     </div>
                 </div>
 
@@ -38,7 +43,8 @@
                 <div class="form-group">
                     <label for="newCampaignSubject" class="col-sm-2 control-label">New Campaign Subject</label>
                     <div class="col-sm-2">
-                        <input class="form-control" id="newCampaignSubject" name="newCampaignSubject" value="${(adminSettings.getNewCampaignSubject())!}" required />
+                        <input class="form-control" id="newCampaignSubject" name="newCampaignSubject"
+                               value="${(adminSettings.getNewCampaignSubject())!}" required/>
                     </div>
                 </div>
 
@@ -52,7 +58,8 @@
                 <div class="form-group">
                     <label for="subscribedSubject" class="col-sm-2 control-label">Subscribed Subject</label>
                     <div class="col-sm-2">
-                        <input class="form-control" id="subscribedSubject" name="subscribedSubject" value="${(adminSettings.getSubscribedSubject())!}" required />
+                        <input class="form-control" id="subscribedSubject" name="subscribedSubject"
+                               value="${(adminSettings.getSubscribedSubject())!}" required/>
                     </div>
                 </div>
 
@@ -66,7 +73,8 @@
                 <div class="form-group">
                     <label for="unsubscribedSubject" class="col-sm-2 control-label">Unsubscribed Subject</label>
                     <div class="col-sm-2">
-                        <input class="form-control" id="unsubscribedSubject" name="unsubscribedSubject" value="${(adminSettings.getUnsubscribedSubject())!}" required />
+                        <input class="form-control" id="unsubscribedSubject" name="unsubscribedSubject"
+                               value="${(adminSettings.getUnsubscribedSubject())!}" required/>
                     </div>
                 </div>
 
@@ -78,29 +86,34 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="newVotdSubmittedSubject" class="col-sm-2 control-label">New VOTD Submitted Subject</label>
+                    <label for="newVotdSubmittedSubject" class="col-sm-2 control-label">New VOTD Submitted
+                        Subject</label>
                     <div class="col-sm-2">
-                        <input class="form-control" id="newVotdSubmittedSubject" name="newVotdSubmittedSubject" value="${(adminSettings.getNewVotdSubmittedSubject())!}" required />
+                        <input class="form-control" id="newVotdSubmittedSubject" name="newVotdSubmittedSubject"
+                               value="${(adminSettings.getNewVotdSubmittedSubject())!}" required/>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="newVotdSubmittedMessage" class="col-sm-2 control-label">New VOTD Submitted Message</label>
+                    <label for="newVotdSubmittedMessage" class="col-sm-2 control-label">New VOTD Submitted
+                        Message</label>
                     <div class="col-sm-2">
-                        <textarea class="form-control" id="newVotdSubmittedMessage" name="newVotdSubmittedMessage" required>${(adminSettings.getNewVotdSubmittedMessage())!}</textarea>
+                        <textarea class="form-control" id="newVotdSubmittedMessage" name="newVotdSubmittedMessage"
+                                  required>${(adminSettings.getNewVotdSubmittedMessage())!}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="genericMessageFooter" class="col-sm-2 control-label">Generic Message Footer</label>
                     <div class="col-sm-2">
-                        <input class="form-control" id="genericMessageFooter" name="genericMessageFooter" value="${(adminSettings.getGenericMessageFooter())!}" required />
+                        <input class="form-control" id="genericMessageFooter" name="genericMessageFooter"
+                               value="${(adminSettings.getGenericMessageFooter())!}" required/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <input hidden name="settingsid" id="settingsid" value="${(adminSettings.getId())!}">
+                        <input hidden name="id" id="settingsid" value="${(adminSettings.getId())!}">
                         <button id="formSubmitButton" class="btn btn-raised btn-default" type="submit">Save</button>
                     </div>
                 </div>
