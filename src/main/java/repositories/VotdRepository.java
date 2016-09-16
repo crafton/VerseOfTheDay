@@ -1,13 +1,11 @@
 package repositories;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
 import exceptions.EntityDoesNotExistException;
+import models.AdminSettings;
 import models.Theme;
 import models.Votd;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -28,11 +26,13 @@ public class VotdRepository {
 
     private final Config config;
     private final Provider<EntityManager> entityManagerProvider;
+    private final AdminSettingsRepository adminSettingsRepository;
 
     @Inject
-    public VotdRepository(Config config, Provider<EntityManager> entityManagerProvider) {
+    public VotdRepository(Config config, Provider<EntityManager> entityManagerProvider, AdminSettingsRepository adminSettingsRepository) {
         this.config = config;
         this.entityManagerProvider = entityManagerProvider;
+        this.adminSettingsRepository = adminSettingsRepository;
     }
 
     @Transactional
@@ -156,26 +156,63 @@ public class VotdRepository {
     }
 
     /**
+     * Retrieve all bible versions available
+     *
+     * @return
+     */
+    public List<String> findAllVersions(){
+        WebTarget webTarget = getVerseServiceWebTarget(config.getBibleSearchVersion());
+
+        String versions = webTarget
+                .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
+
+        JsonParser parser = new JsonParser();
+        JsonArray versionsArrayAsJson = parser.parse(versions).getAsJsonObject()
+                .getAsJsonObject("response")
+                .getAsJsonArray("versions");
+
+        List<String> versionsAsList = new ArrayList<>();
+
+        for (JsonElement versionElement : versionsArrayAsJson) {
+            versionsAsList.add(versionElement.getAsJsonObject().get("id").getAsString());
+        }
+
+        return versionsAsList;
+    }
+
+    /**
      * Initiate a web service client to retrieve the verses passed in.
      *
      * @param verseRange
      * @return Verse text.
      */
-    public JsonObject findVersesByRange(String verseRange) throws JsonSyntaxException {
-        HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(config.getBibleSearchKey(), "");
-        Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.register(authenticationFeature)
-                .target("https://bibles.org/v2/passages.js");
+    public JsonObject findVersesByRange(String verseRange, String translation) throws JsonSyntaxException {
+        WebTarget webTarget = getVerseServiceWebTarget(config.getBibleSearchUrl());
+
+        if(translation == null || translation.isEmpty()) {
+            AdminSettings adminSettings = adminSettingsRepository.findSettings();
+            translation = adminSettings.getVersion();
+        }
 
         String verseTextJson = webTarget
                 .queryParam("q[]", verseRange)
-                .queryParam("version", "eng-ESV")
+                .queryParam("version", translation)
                 .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
-
-        JsonObject verseJsonObject;
 
         JsonParser parser = new JsonParser();
         return parser.parse(verseTextJson).getAsJsonObject();
+    }
+
+    /**
+     * Get client for web service
+     *
+     * @return
+     */
+    private WebTarget getVerseServiceWebTarget(String url){
+        HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basic(config.getBibleSearchKey(), "");
+        Client client = ClientBuilder.newClient();
+        return client.register(authenticationFeature)
+                .target(url);
     }
 
     /**

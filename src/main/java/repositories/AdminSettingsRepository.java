@@ -2,6 +2,7 @@ package repositories;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.persist.Transactional;
 import models.AdminSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +17,17 @@ public class AdminSettingsRepository {
     private static final Logger logger = LoggerFactory.getLogger(AdminSettingsRepository.class);
 
     @Inject
-    public AdminSettingsRepository(Provider<EntityManager> entityManagerProvider){
+    public AdminSettingsRepository(Provider<EntityManager> entityManagerProvider) {
         this.entityManagerProvider = entityManagerProvider;
     }
 
-    public AdminSettings findSettings(){
+    @Transactional
+    public AdminSettings findSettings() {
         return getEntityManager().find(AdminSettings.class, 1L);
     }
 
-    public void save(AdminSettings newAdminSettings){
-        if(newAdminSettings.getId() == null || newAdminSettings.getId() != 1){
-            throw new IllegalArgumentException("AdminSettings ID not set");
-        }
-
+    @Transactional
+    public void save(AdminSettings newAdminSettings) {
         getEntityManager().persist(newAdminSettings);
     }
 

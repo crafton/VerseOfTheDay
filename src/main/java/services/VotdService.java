@@ -139,7 +139,7 @@ public class VotdService {
      */
     public String restGetVerses(String verseRange) throws JsonSyntaxException {
 
-        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange);
+        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange, "");
 
         JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")

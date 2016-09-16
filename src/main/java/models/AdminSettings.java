@@ -8,7 +8,7 @@ public class AdminSettings {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String translation;
+    private String version;
     private String welcomeSubject;
     private String welcomeMessage;
     private String newCampaignSubject;
@@ -32,12 +32,12 @@ public class AdminSettings {
         this.id = id;
     }
 
-    public String getTranslation() {
-        return translation;
+    public String getVersion() {
+        return version;
     }
 
-    public void setTranslation(String translation) {
-        this.translation = translation;
+    public void setVersion(String translation) {
+        this.version = translation;
     }
 
     public String getWelcomeSubject() {
@@ -126,5 +126,24 @@ public class AdminSettings {
 
     public void setGenericMessageFooter(String genericMessageFooter) {
         this.genericMessageFooter = genericMessageFooter;
+    }
+
+    @Override
+    public String toString() {
+        return "AdminSettings{" +
+                "id=" + id +
+                ", translation='" + version + '\'' +
+                ", welcomeSubject='" + welcomeSubject + '\'' +
+                ", welcomeMessage='" + welcomeMessage + '\'' +
+                ", newCampaignSubject='" + newCampaignSubject + '\'' +
+                ", newCampaignMessage='" + newCampaignMessage + '\'' +
+                ", subscribedSubject='" + subscribedSubject + '\'' +
+                ", subscribedMessage='" + subscribedMessage + '\'' +
+                ", unsubscribedSubject='" + unsubscribedSubject + '\'' +
+                ", unsubscribedMessage='" + unsubscribedMessage + '\'' +
+                ", newVotdSubmittedSubject='" + newVotdSubmittedSubject + '\'' +
+                ", newVotdSubmittedMessage='" + newVotdSubmittedMessage + '\'' +
+                ", genericMessageFooter='" + genericMessageFooter + '\'' +
+                '}';
     }
 }
