@@ -2,6 +2,7 @@ package models;
 
 
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,13 +26,17 @@ public class User {
 
     public String getName() {
 
-        String realName = user_metadata.get("name");
-
-        if(realName == null || realName.isEmpty()){
+        if (user_metadata != null) {
+            String realName = user_metadata.get("name");
+            if (realName == null || realName.isEmpty()) {
+                return name;
+            }
+            return realName;
+        } else if (!StringUtils.isEmpty(name)) {
             return name;
         }
 
-        return realName;
+        return "Name not set";
     }
 
     public void setName(String name) {
@@ -88,6 +93,16 @@ public class User {
         }
 
         return settings;
+    }
+
+    public List<String> getRoles() {
+        List<String> roles = (List<String>) this.getApp_metadata().get("roles");
+
+        if (roles == null) {
+            return new ArrayList<>();
+        }
+
+        return roles;
     }
 
     public String getLast_login() {

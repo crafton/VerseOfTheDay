@@ -114,9 +114,9 @@ public class UserService {
      * @param usersJsonList
      * @return
      */
-    public List<String[]> generateDataTableResults(JsonArray usersJsonList) throws IllegalArgumentException {
+    public List<String[]> generateDataTableResults(List<User> userList) throws IllegalArgumentException {
 
-        if (usersJsonList == null || usersJsonList.size() == 0) {
+        if (userList == null || userList.isEmpty()) {
             logger.warn("User tried to generate a table data set without a json array.");
             throw new IllegalArgumentException("JsonArray must contain at least one element.");
         }
@@ -124,36 +124,19 @@ public class UserService {
         List<String[]> usersData = new ArrayList<>();
         String[] userFields;
 
-        for (JsonElement user : usersJsonList) {
+        for (User user : userList) {
             String name;
-            List<String> rolesList = new ArrayList<>();
-            try {
-                name = user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString();
-            } catch (NullPointerException npe) {
-                name = user.getAsJsonObject().get("name").getAsString();
-            }
+            name = user.getName();
 
-            try {
-                JsonArray rolesArray = user.getAsJsonObject().get("app_metadata")
-                        .getAsJsonObject()
-                        .get("roles")
-                        .getAsJsonArray();
-
-                for (JsonElement role : rolesArray) {
-                    rolesList.add(role.getAsString());
-                }
-
-            } catch (NullPointerException npe) {
-                //do nothing data table will get empty roles list
-            }
+            List<String> rolesList = user.getRoles();
 
             userFields = new String[]{name,
-                    user.getAsJsonObject().get("email").getAsString(),
+                    user.getEmail(),
                     utils.formatListToHtml(rolesList),
-                    user.getAsJsonObject().get("last_login").getAsString(),
-                    user.getAsJsonObject().get("created_at").getAsString(),
+                    user.getLast_login(),
+                    user.getCreated_at(),
                     "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"material-icons\" aria-hidden=\"true\" " +
-                            "data-toggle=\"modal\" data-userid=\"" + user.getAsJsonObject().get("user_id").getAsString() + "\" data-username=\"" + name + "\"" +
+                            "data-toggle=\"modal\" data-userid=\"" + user.getUser_id() + "\" data-username=\"" + name + "\"" +
                             " data-target=\"#updateRolesModal\">mode_edit</a>"};
 
             usersData.add(userFields);

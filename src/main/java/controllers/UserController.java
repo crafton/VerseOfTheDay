@@ -137,7 +137,10 @@ public class UserController {
             JsonObject usersJson = userService.findUserRecordsWithPaging(start, length, search);
             Integer recordsFiltered = usersJson.get("total")
                     .getAsInt();
-            List<String[]> usersData = userService.generateDataTableResults(usersJson.getAsJsonArray("users"));
+            Gson gson = new Gson();
+            User[] users = gson.fromJson(usersJson.getAsJsonArray("users"), User[].class);
+            List<User> userList = Arrays.asList(users);
+            List<String[]> usersData = userService.generateDataTableResults(userList);
 
         /*Format data for ajax callback processing*/
             Map<String, Object> userMap = new HashMap<>();
