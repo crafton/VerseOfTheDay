@@ -186,22 +186,22 @@ public class VotdRepository {
      * @param verseRange
      * @return Verse text.
      */
-    public JsonObject findVersesByRange(String verseRange, String translation) throws JsonSyntaxException {
+    public JsonObject findVersesByRange(String verseRange, String version) throws JsonSyntaxException {
         WebTarget webTarget = getVerseServiceWebTarget(config.getBibleSearchUrl());
 
-        if (translation == null || translation.isEmpty()) {
+        if (version == null || version.isEmpty()) {
             AdminSettings adminSettings = adminSettingsRepository.findSettings();
 
             if (adminSettings == null || adminSettings.getVersion().isEmpty()) {
-                translation = "eng-ESV";
+                version = "eng-ESV";
             } else {
-                translation = adminSettings.getVersion();
+                version = adminSettings.getVersion();
             }
         }
 
         String verseTextJson = webTarget
                 .queryParam("q[]", verseRange)
-                .queryParam("version", translation)
+                .queryParam("version", version)
                 .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
 
         JsonParser parser = new JsonParser();

@@ -34,7 +34,7 @@ public class Config {
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
     public final String DATE_FORMAT = "EEEEE, MMMMM d, yyyy hh:mm a";
-    public final String TIME_FORMAT = "hh:mm a";
+    public final String TIME_FORMAT = "h:mm a";
     public final String IDTOKEN_NAME = "idToken";
     public final String ACCESSTOKEN_NAME = "accessToken";
 

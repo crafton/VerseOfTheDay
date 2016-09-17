@@ -7,6 +7,7 @@ import models.Campaign;
 import models.Theme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utilities.Config;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -23,10 +24,12 @@ public class CampaignRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignRepository.class);
     private final Provider<EntityManager> entityManagerProvider;
+    private final Config config;
 
     @Inject
-    public CampaignRepository(Provider<EntityManager> entityManagerProvider) {
+    public CampaignRepository(Provider<EntityManager> entityManagerProvider, Config config) {
         this.entityManagerProvider = entityManagerProvider;
+        this.config = config;
     }
 
     /**
@@ -43,8 +46,10 @@ public class CampaignRepository {
         Query q = getEntityManager().createNamedQuery("Campaign.findActive");
         q.setParameter("now", new Timestamp(System.currentTimeMillis()));
         LocalTime localTime = LocalTime.now();
-        String currentTime = localTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
+        String currentTime = localTime.format(DateTimeFormatter.ofPattern(config.TIME_FORMAT));
         q.setParameter("currentTime", currentTime);
+
+        logger.info("query time"+ currentTime);
 
         return (List<Campaign>) q.getResultList();
     }
@@ -65,6 +70,7 @@ public class CampaignRepository {
      */
     @Transactional
     public void save(Campaign campaign) throws CampaignException {
+        logger.info("saving time: " + campaign.getSendTime());
         getEntityManager().persist(campaign);
     }
 

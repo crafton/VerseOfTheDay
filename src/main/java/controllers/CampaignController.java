@@ -119,7 +119,8 @@ public class CampaignController {
             Message message = messageProvider.get();
             message.setRecipient(user.getEmail());
             message.setSubject(adminSettings.getSubscribedSubject());
-            message.setBodyHtml(adminSettings.getSalutation(user.getName()) + adminSettings.getSubscribedMessage());
+            message.setSalutation(user.getName());
+            message.setBodyHtml(adminSettings.getSubscribedMessage());
             messenger.sendMessage(message);
             return Results.ok().text();
         }
@@ -147,7 +148,8 @@ public class CampaignController {
             Message message = messageProvider.get();
             message.setRecipient(user.getEmail());
             message.setSubject(adminSettings.getUnsubscribedSubject());
-            message.setBodyHtml(adminSettings.getSalutation(user.getName()) + adminSettings.getUnsubscribedMessage());
+            message.setSalutation(user.getName());
+            message.setBodyHtml(adminSettings.getUnsubscribedMessage());
             messenger.sendMessage(message);
             return Results.ok().text();
         }
@@ -201,8 +203,11 @@ public class CampaignController {
 
         try {
             campaignService.save(campaign);
-            //TODO: Send notification
-            flashScope.success("Campaign succesfully created");
+            Message message = messageProvider.get();
+            message.setSubject(adminSettings.getNewCampaignSubject());
+            message.setBodyHtml(adminSettings.getNewCampaignMessage());
+            userService.sendNotificationToUsers(message);
+            flashScope.success("Campaign successfully created");
         } catch (CampaignException e) {
             flashScope.error("Error creating campaign. Contact the administrator.");
             logger.error("Error in save campaign" + e.getMessage());

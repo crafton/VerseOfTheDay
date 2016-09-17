@@ -2,6 +2,7 @@ package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import exceptions.SubscriptionExistsException;
 import models.Message;
 import models.Messenger;
@@ -27,15 +28,18 @@ public class UserService {
     private final Utils utils;
     private final UserRepository userRepository;
     private final Messenger messenger;
+    private final Provider<Message> messageProvider;
     private static final String APP_METADATA = "app_metadata";
 
     @Inject
-    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Messenger messenger) {
+    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository,
+                       Messenger messenger, Provider<Message> messageProvider) {
         this.ninjaCache = ninjaCache;
         this.config = config;
         this.utils = utils;
         this.userRepository = userRepository;
         this.messenger = messenger;
+        this.messageProvider = messageProvider;
     }
 
     public String getCurrentUser(String idToken) {
@@ -73,12 +77,15 @@ public class UserService {
         JsonObject userAsJsonObject = userRepository.findUsersToBeNotified(start, length);
         Integer totalRecords = userAsJsonObject.get("total").getAsInt();
 
+        length = 100;
         Double lengthAsDouble = length.doubleValue();
         Double pages = totalRecords / lengthAsDouble;
         Integer pagesAsInt = (int) Math.ceil(pages);
 
+        logger.info("Pages of users to send notifications: " + pagesAsInt);
+
         for (int i = 0; i < pagesAsInt; i++) {
-            JsonObject usersAsJsonObject = userRepository.findUsersToBeNotified(i, 40);
+            JsonObject usersAsJsonObject = userRepository.findUsersToBeNotified(i, length);
             JsonArray userJsonList = usersAsJsonObject.getAsJsonArray("users");
             Gson gson = new Gson();
 
@@ -127,7 +134,7 @@ public class UserService {
             }
 
             try {
-                JsonArray rolesArray = user.getAsJsonObject().get(APP_METADATA)
+                JsonArray rolesArray = user.getAsJsonObject().get("app_metadata")
                         .getAsJsonObject()
                         .get("roles")
                         .getAsJsonArray();
@@ -434,7 +441,7 @@ public class UserService {
     }
 
     /**
-     * Find all email addresses for contributors
+     * Find all email addresses for a given role
      *
      * @param role
      * @return

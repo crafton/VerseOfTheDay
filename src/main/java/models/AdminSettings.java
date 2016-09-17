@@ -128,10 +128,6 @@ public class AdminSettings {
         this.genericMessageFooter = genericMessageFooter;
     }
 
-    public String getSalutation(String name) {
-        return "Hi " + name + ",<p></p>";
-    }
-
     @Override
     public String toString() {
         return "AdminSettings{" +

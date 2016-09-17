@@ -137,9 +137,9 @@ public class VotdService {
      * @param verseRange
      * @return Verse text.
      */
-    public String restGetVerses(String verseRange) throws JsonSyntaxException {
+    public String restGetVerses(String verseRange, String version) throws JsonSyntaxException {
 
-        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange, "");
+        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange, version);
 
         JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")
@@ -200,7 +200,7 @@ public class VotdService {
             return "You can only select a maximum of " + maxVerses + " verses.";
         }
 
-        if (restGetVerses(versesTrimmed).isEmpty()) {
+        if (restGetVerses(versesTrimmed, "").isEmpty()) {
             return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
         }
 

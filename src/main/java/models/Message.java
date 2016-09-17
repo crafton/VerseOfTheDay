@@ -15,6 +15,8 @@ public class Message {
     private String bodyHtml;
     private String bodyText;
     private Mail mail;
+    private String salutation;
+    private boolean ignoreSalutation = false;
 
     private final Provider<Mail> emailProvider;
     private final Config config;
@@ -25,6 +27,7 @@ public class Message {
         this.mail = this.emailProvider.get();
         this.config = config;
         this.setSender(config.getMailFrom());
+        this.salutation = "Hi,<p></p>";
     }
 
     public String getSender() {
@@ -42,12 +45,12 @@ public class Message {
 
     public void setRecipients(List<String> recipients) {
         this.recipients = recipients;
-        for(String recipient : recipients){
+        for (String recipient : recipients) {
             this.mail.addBcc(recipient);
         }
     }
 
-    public void setRecipient(String recipient){
+    public void setRecipient(String recipient) {
         this.mail.addTo(recipient);
     }
 
@@ -65,6 +68,10 @@ public class Message {
     }
 
     public void setBodyHtml(String bodyHtml) {
+        if(!ignoreSalutation){
+            bodyHtml = this.salutation + bodyHtml;
+        }
+
         this.bodyHtml = bodyHtml;
         this.mail.setBodyHtml(bodyHtml);
     }
@@ -74,12 +81,22 @@ public class Message {
     }
 
     public void setBodyText(String bodyText) {
+        if(!ignoreSalutation) {
+            bodyText = this.salutation + bodyText;
+        }
         this.bodyText = bodyText;
         this.mail.setBodyText(bodyText);
     }
 
+    public void setSalutation(String name) {
+        this.salutation = "Hi " + name + ",<p></p>";
+    }
 
-    public Mail getMail(){
+    public void setIgnoreSalutation(boolean ignoreSalutation) {
+        this.ignoreSalutation = ignoreSalutation;
+    }
+
+    public Mail getMail() {
         return this.mail;
     }
 }

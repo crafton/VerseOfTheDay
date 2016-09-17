@@ -6,8 +6,23 @@
             <fieldset>
                 <legend>Profile</legend>
                 <div class="form-group">
-                    <div class="checkbox">
-                        <label for="notifications" class="col-md-4 control-label">
+                    <label for="version" class="col-sm-1 control-label">Version</label>
+                    <div class="col-sm-2">
+                        <select class="form-control" id="version" name="version" required>
+                            <#list (versions)! as version>
+                                <#if (settings["version"])! == version>
+                                    <option value="${(version)!}" selected>${(version)!}</option>
+                                    <#else>
+                                        <option value="${(version)!}">${(version)!}</option>
+                                </#if>
+                            </#list>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox col-md-10">
+                        <label for="notifications" class="col-sm-4 control-label">
                             <#if settings["campaign_notifications"]?? && settings["campaign_notifications"] == "yes">
                             <input id="notifications" name="notifications" type="checkbox" value="yes" checked>
                                 <#else>
@@ -20,7 +35,7 @@
                 </div>
 
                 <div class="form-group">
-                    <div class="col-md-4">
+                    <div class="col-sm-4">
                         <button id="formSubmitButton" class="btn btn-raised btn-default" type="submit">Save</button>
                     </div>
                 </div>

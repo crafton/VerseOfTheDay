@@ -11,6 +11,8 @@ public class User {
     private String name;
     private String email;
     private String user_id;
+    private String last_login;
+    private String created_at;
     private Map<String, String> user_metadata;
     private Map<String, Object> app_metadata;
 
@@ -86,6 +88,22 @@ public class User {
         }
 
         return settings;
+    }
+
+    public String getLast_login() {
+        return last_login;
+    }
+
+    public void setLast_login(String last_login) {
+        this.last_login = last_login;
+    }
+
+    public String getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
     }
 
     @Override

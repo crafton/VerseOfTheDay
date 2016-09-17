@@ -76,8 +76,8 @@ public class VotdDispatchService {
         return votdToSend;
     }
 
-    public String getVerseText(Votd verseToSend) throws JsonSyntaxException {
-        return votdService.restGetVerses(verseToSend.getVerses());
+    public String getVerseText(Votd verseToSend, String version) throws JsonSyntaxException {
+        return votdService.restGetVerses(verseToSend.getVerses(), version);
     }
 
     private List<Long> getPotentialVotdList(List<Theme> themes) {

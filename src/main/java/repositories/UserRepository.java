@@ -82,9 +82,10 @@ public class UserRepository {
         params.put("per_page", length);
         params.put("page", start);
         params.put("include_totals", "true");
-        params.put("fields", "name,email,user_id");
+        params.put("fields", "name,email,user_id,user_metadata,app_metadata");
         params.put("include_fields", "true");
         params.put("search_engine", "v2");
+        params.put("sort", "app_metadata.settings.version:1");
         params.put("q", queryString);
 
         return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
@@ -97,7 +98,7 @@ public class UserRepository {
         params.put("per_page", length);
         params.put("page", start);
         params.put("include_totals", "true");
-        params.put("fields", "nam,email");
+        params.put("fields", "name,email");
         params.put("include_fields", "true");
         params.put("search_engine", "v2");
         params.put("q", queryString);

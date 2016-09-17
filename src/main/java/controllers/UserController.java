@@ -7,6 +7,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import filters.LoginFilter;
 import filters.PublisherFilter;
+import models.AdminSettings;
 import models.User;
 import ninja.Context;
 import ninja.FilterWith;
@@ -19,6 +20,8 @@ import ninja.session.Session;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import repositories.AdminSettingsRepository;
+import repositories.VotdRepository;
 import services.UserService;
 import utilities.Config;
 
@@ -35,12 +38,17 @@ public class UserController {
     private final NinjaCache ninjaCache;
     private final UserService userService;
     private final Config config;
+    private final VotdRepository votdRepository;
+    private final AdminSettingsRepository adminSettingsRepository;
 
     @Inject
-    public UserController(NinjaCache ninjaCache, UserService userService, Config config) {
+    public UserController(NinjaCache ninjaCache, UserService userService, Config config,
+                          VotdRepository votdRepository, AdminSettingsRepository adminSettingsRepository) {
         this.ninjaCache = ninjaCache;
         this.userService = userService;
         this.config = config;
+        this.votdRepository = votdRepository;
+        this.adminSettingsRepository = adminSettingsRepository;
     }
 
     /**
@@ -61,9 +69,12 @@ public class UserController {
         Gson gson = new Gson();
         User user = gson.fromJson(userAsJsonString, User.class);
 
+        List<String> versions = votdRepository.findAllVersions();
+
         return Results
                 .ok()
                 .render("settings", user.getSettings())
+                .render("versions", versions)
                 .html();
     }
 
@@ -171,9 +182,15 @@ public class UserController {
     public Result updateUserSettings(FlashScope flashScope, Session session, Context context) {
 
         String shouldReceiveCampaignNotifications = context.getParameter("notifications");
+        String version = context.getParameter("version");
 
-        if(shouldReceiveCampaignNotifications == null || shouldReceiveCampaignNotifications.isEmpty()){
+        if (StringUtils.isEmpty(shouldReceiveCampaignNotifications)) {
             shouldReceiveCampaignNotifications = "no";
+        }
+
+        if(StringUtils.isEmpty(version)){
+            AdminSettings adminSettings = adminSettingsRepository.findSettings();
+            version = adminSettings.getVersion();
         }
 
         logger.info("Received the following value for notifications update: " + shouldReceiveCampaignNotifications);
@@ -194,6 +211,7 @@ public class UserController {
         }
 
         settings.put("campaign_notifications", shouldReceiveCampaignNotifications);
+        settings.put("version", version);
 
         Map<String, Object> appMetadata = user.getApp_metadata();
         appMetadata.put("settings", settings);
@@ -204,6 +222,7 @@ public class UserController {
 
         userService.updateUserSettings(user);
         userService.refreshUserProfileInCache(session);
+        flashScope.success("Updated settings");
 
         return Results.redirect("/user/list");
     }

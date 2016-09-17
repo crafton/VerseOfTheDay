@@ -145,7 +145,7 @@ public class VotdController {
         String versesTrimmed = verses.trim();
 
         /*Call web service to retrieve verses.*/
-        String versesRetrieved = votdService.restGetVerses(versesTrimmed);
+        String versesRetrieved = votdService.restGetVerses(versesTrimmed, "");
 
         /*Find all verses that clash with what we're trying to add to the database*/
         List<String> verseClashes = votdService.findClashes(versesTrimmed);
@@ -232,7 +232,7 @@ public class VotdController {
 
         try {
             //Get verse text
-            String verseText = votdService.restGetVerses(votd.getVerses());
+            String verseText = votdService.restGetVerses(votd.getVerses(), "");
 
             return Results
                     .ok()
