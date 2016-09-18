@@ -1,8 +1,6 @@
 package models;
 
 
-import org.eclipse.jetty.util.annotation.Name;
-
 import javax.persistence.*;
 
 @Entity

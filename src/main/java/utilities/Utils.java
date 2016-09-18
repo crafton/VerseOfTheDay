@@ -1,9 +1,9 @@
 package utilities;
 
 import com.google.inject.Inject;
-
 import org.slf4j.Logger;
-import java.util.*;
+
+import java.util.List;
 
 public class Utils {
 

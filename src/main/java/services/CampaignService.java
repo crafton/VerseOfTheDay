@@ -1,14 +1,13 @@
 package services;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.inject.Inject;
 import exceptions.CampaignException;
 import models.Campaign;
 import models.Theme;
 import repositories.CampaignRepository;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 public class CampaignService {
 

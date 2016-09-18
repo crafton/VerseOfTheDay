@@ -4,7 +4,6 @@ package repositories;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
-import org.glassfish.jersey.message.internal.StringBuilderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.Config;

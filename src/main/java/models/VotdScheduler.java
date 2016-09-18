@@ -1,17 +1,22 @@
 package models;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import ninja.scheduler.Schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import repositories.UserRepository;
 import services.UserService;
 import services.VotdDispatchService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 

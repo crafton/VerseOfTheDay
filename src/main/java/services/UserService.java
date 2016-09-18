@@ -3,7 +3,6 @@ package services;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import exceptions.SubscriptionExistsException;
 import models.Message;
 import models.Messenger;
 import models.User;
@@ -16,7 +15,9 @@ import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class UserService {

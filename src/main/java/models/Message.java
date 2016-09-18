@@ -68,12 +68,13 @@ public class Message {
     }
 
     public void setBodyHtml(String bodyHtml) {
+        String newBodyHtml = bodyHtml;
         if(!ignoreSalutation){
-            bodyHtml = this.salutation + bodyHtml;
+            newBodyHtml = this.salutation + bodyHtml;
         }
 
-        this.bodyHtml = bodyHtml;
-        this.mail.setBodyHtml(bodyHtml);
+        this.bodyHtml = newBodyHtml;
+        this.mail.setBodyHtml(newBodyHtml);
     }
 
     public String getBodyText() {
@@ -81,11 +82,12 @@ public class Message {
     }
 
     public void setBodyText(String bodyText) {
+        String newBodyText = bodyText;
         if(!ignoreSalutation) {
-            bodyText = this.salutation + bodyText;
+            newBodyText = this.salutation + bodyText;
         }
-        this.bodyText = bodyText;
-        this.mail.setBodyText(bodyText);
+        this.bodyText = newBodyText;
+        this.mail.setBodyText(newBodyText);
     }
 
     public void setSalutation(String name) {

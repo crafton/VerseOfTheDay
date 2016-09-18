@@ -1,41 +1,35 @@
 package controllers;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.inject.Provider;
+import exceptions.CampaignException;
 import filters.LoginFilter;
 import filters.MemberFilter;
 import filters.PublisherFilter;
 import models.*;
-import ninja.*;
+import ninja.Context;
+import ninja.FilterWith;
+import ninja.Result;
+import ninja.Results;
+import ninja.params.PathParam;
+import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Singleton;
-
 import repositories.AdminSettingsRepository;
 import services.CampaignService;
 import services.ThemeService;
-import exceptions.CampaignException;
-import ninja.params.PathParam;
-import ninja.session.FlashScope;
 import services.UserService;
 import utilities.Config;
+
+import javax.inject.Inject;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @FilterWith(LoginFilter.class)
 public class CampaignController {
