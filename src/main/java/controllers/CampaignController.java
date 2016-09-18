@@ -44,6 +44,7 @@ public class CampaignController {
     private final AdminSettingsRepository adminSettingsRepository;
     private final Messenger messenger;
     private AdminSettings adminSettings;
+    private static final String CAMPAIGN_ID = "campaignId";
 
     @Inject
     public CampaignController(CampaignService campaignService, ThemeService themeService,
@@ -77,7 +78,7 @@ public class CampaignController {
         if (!subscribedCampaignIds.isEmpty()) {
             for (Long id : subscribedCampaignIds) {
                 Optional<Campaign> optionalCampaign = campaignList.stream()
-                        .filter(item -> item.getCampaignId() == id)
+                        .filter(item -> item.getCampaignId().equals(id))
                         .findFirst();
 
                 if (optionalCampaign.isPresent()) {
@@ -94,7 +95,7 @@ public class CampaignController {
     }
 
     @FilterWith(MemberFilter.class)
-    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context, Session session) {
+    public Result subscribe(@PathParam(CAMPAIGN_ID) Long campaignId, Context context, Session session) {
         if (campaignId == null) {
             return Results.badRequest().text();
         }
@@ -123,7 +124,7 @@ public class CampaignController {
     }
 
     @FilterWith(MemberFilter.class)
-    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context, Session session) {
+    public Result unsubscribe(@PathParam(CAMPAIGN_ID) Long campaignId, Context context, Session session) {
         if (campaignId == null) {
             return Results.badRequest().text();
         }
@@ -214,7 +215,7 @@ public class CampaignController {
      * Rendering campaign for a particular campaign Id which needs to be updated
      **/
     @FilterWith(PublisherFilter.class)
-    public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
+    public Result updateCampaign(@PathParam(CAMPAIGN_ID) Long campaignId) {
         logger.info("Updating campaign details of campaign: " + campaignId);
 
         return Results.html()
@@ -255,7 +256,7 @@ public class CampaignController {
             }
         }
         try {
-            campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
+            campaignService.update(Long.parseLong(context.getParameter(CAMPAIGN_ID)), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
                     startDate, endDate, days, themeList, context.getParameter("sendTime"));
             flashScope.success("Campaign updated");
         } catch (CampaignException e) {
@@ -266,7 +267,7 @@ public class CampaignController {
     }
 
     @FilterWith(PublisherFilter.class)
-    public Result deleteCampaign(@PathParam("campaignId") Long campaignId, FlashScope flashScope) {
+    public Result deleteCampaign(@PathParam(CAMPAIGN_ID) Long campaignId, FlashScope flashScope) {
 
         try {
             campaignService.deleteCampaign(campaignId);

@@ -43,6 +43,7 @@ public class VotdController {
     private final Postoffice postoffice;
     private final UserService userService;
     private final Config config;
+    private static final String THEMES = "themes";
 
     @Inject
     public VotdController(Utils utils, VotdService votdService,
@@ -124,7 +125,7 @@ public class VotdController {
         return Results
                 .ok()
                 .html()
-                .render("themes", themes);
+                .render(THEMES, themes);
     }
 
     /**
@@ -178,7 +179,7 @@ public class VotdController {
         }
 
         //Retrieve the themeIDs selected and convert to list of themes
-        List<String> themeIds = context.getParameterValues("themes");
+        List<String> themeIds = context.getParameterValues(THEMES);
 
         if (themeIds.isEmpty()) {
             votd.setThemes(new ArrayList<Theme>());
@@ -238,7 +239,7 @@ public class VotdController {
                     .ok()
                     .html()
                     .render("votd", votd)
-                    .render("themes", themes)
+                    .render(THEMES, themes)
                     .render("verseText", verseText);
         } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
@@ -258,7 +259,7 @@ public class VotdController {
     public Result saveVotdUpdate(Context context, FlashScope flashScope) {
 
         //Retrieve the themeIDs selected and convert to list of theme objects
-        List<String> themeIds = context.getParameterValues("themes");
+        List<String> themeIds = context.getParameterValues(THEMES);
 
         List<Theme> themeList = new ArrayList<>();
         if (!themeIds.isEmpty()) {
