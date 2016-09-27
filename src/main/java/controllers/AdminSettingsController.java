@@ -2,7 +2,10 @@ package controllers;
 
 
 import com.google.inject.Inject;
+import filters.AdminFilter;
+import filters.LoginFilter;
 import models.AdminSettings;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.session.FlashScope;
@@ -13,8 +16,8 @@ import repositories.VotdRepository;
 
 import java.util.List;
 
+@FilterWith({LoginFilter.class, AdminFilter.class})
 public class AdminSettingsController {
-
 
     private static final Logger logger = LoggerFactory.getLogger(AdminSettingsController.class);
     private final AdminSettingsRepository adminSettingsRepository;

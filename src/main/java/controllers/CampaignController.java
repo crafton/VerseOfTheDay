@@ -111,12 +111,16 @@ public class CampaignController {
 
         if (userService.subscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
-            Message message = messageProvider.get();
-            message.setRecipient(user.getEmail());
-            message.setSubject(adminSettings.getSubscribedSubject());
-            message.setSalutation(user.getName());
-            message.setBodyHtml(adminSettings.getSubscribedMessage());
-            messenger.sendMessage(message);
+            if (adminSettings != null && adminSettings.getId() == 1L) {
+                Message message = messageProvider.get();
+                message.setRecipient(user.getEmail());
+                message.setSubject(adminSettings.getSubscribedSubject());
+                message.setSalutation(user.getName());
+                message.setBodyHtml(adminSettings.getSubscribedMessage());
+                messenger.sendMessage(message);
+            } else {
+                logger.error("Admin settings not setup, campaign emails not set.");
+            }
             return Results.ok().text();
         }
 
@@ -140,12 +144,16 @@ public class CampaignController {
 
         if (userService.unsubscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
-            Message message = messageProvider.get();
-            message.setRecipient(user.getEmail());
-            message.setSubject(adminSettings.getUnsubscribedSubject());
-            message.setSalutation(user.getName());
-            message.setBodyHtml(adminSettings.getUnsubscribedMessage());
-            messenger.sendMessage(message);
+            if (adminSettings != null && adminSettings.getId() == 1L) {
+                Message message = messageProvider.get();
+                message.setRecipient(user.getEmail());
+                message.setSubject(adminSettings.getUnsubscribedSubject());
+                message.setSalutation(user.getName());
+                message.setBodyHtml(adminSettings.getUnsubscribedMessage());
+                messenger.sendMessage(message);
+            } else {
+                logger.error("Admin settings not setup, campaign emails not set.");
+            }
             return Results.ok().text();
         }
 
@@ -198,10 +206,15 @@ public class CampaignController {
 
         try {
             campaignService.save(campaign);
-            Message message = messageProvider.get();
-            message.setSubject(adminSettings.getNewCampaignSubject());
-            message.setBodyHtml(adminSettings.getNewCampaignMessage());
-            userService.sendNotificationToUsers(message);
+
+            if (adminSettings != null && adminSettings.getId() == 1L) {
+                Message message = messageProvider.get();
+                message.setSubject(adminSettings.getNewCampaignSubject());
+                message.setBodyHtml(adminSettings.getNewCampaignMessage());
+                userService.sendNotificationToUsers(message);
+            } else {
+                logger.error("Admin settings not setup, campaign emails not set.");
+            }
             flashScope.success("Campaign successfully created");
         } catch (CampaignException e) {
             flashScope.error("Error creating campaign. Contact the administrator.");

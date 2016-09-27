@@ -12,8 +12,6 @@ public class AdminSettings {
     private Long id;
 
     private String version;
-    private String welcomeSubject;
-    private String welcomeMessage;
     private String newCampaignSubject;
     private String newCampaignMessage;
     private String subscribedSubject;
@@ -41,22 +39,6 @@ public class AdminSettings {
 
     public void setVersion(String translation) {
         this.version = translation;
-    }
-
-    public String getWelcomeSubject() {
-        return welcomeSubject;
-    }
-
-    public void setWelcomeSubject(String welcomSubject) {
-        this.welcomeSubject = welcomSubject;
-    }
-
-    public String getWelcomeMessage() {
-        return welcomeMessage;
-    }
-
-    public void setWelcomeMessage(String welcomeMessage) {
-        this.welcomeMessage = welcomeMessage;
     }
 
     public String getNewCampaignSubject() {
@@ -136,8 +118,6 @@ public class AdminSettings {
         return "AdminSettings{" +
                 "id=" + id +
                 ", translation='" + version + '\'' +
-                ", welcomeSubject='" + welcomeSubject + '\'' +
-                ", welcomeMessage='" + welcomeMessage + '\'' +
                 ", newCampaignSubject='" + newCampaignSubject + '\'' +
                 ", newCampaignMessage='" + newCampaignMessage + '\'' +
                 ", subscribedSubject='" + subscribedSubject + '\'' +

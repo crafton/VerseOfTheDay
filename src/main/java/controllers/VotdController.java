@@ -1,5 +1,6 @@
 package controllers;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -8,6 +9,7 @@ import filters.ContributorFilter;
 import filters.LoginFilter;
 import filters.PublisherFilter;
 import models.Theme;
+import models.User;
 import models.Votd;
 import ninja.Context;
 import ninja.FilterWith;
@@ -17,6 +19,7 @@ import ninja.params.PathParam;
 import ninja.postoffice.Mail;
 import ninja.postoffice.Postoffice;
 import ninja.session.FlashScope;
+import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import services.ThemeService;
@@ -169,7 +172,7 @@ public class VotdController {
      * @return
      */
     @FilterWith(ContributorFilter.class)
-    public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
+    public Result saveVotd(Context context, Votd votd, FlashScope flashScope, Session session) {
 
         String verificationErrorMessage = votdService.verifyVerses(votd.getVerses());
 
@@ -177,6 +180,12 @@ public class VotdController {
             flashScope.error(verificationErrorMessage);
             return Results.redirect("/votd/create");
         }
+
+        String userAsString = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
+        Gson gson = new Gson();
+        User user = gson.fromJson(userAsString, User.class);
+
+        votd.setCreatedBy(user.getName());
 
         //Retrieve the themeIDs selected and convert to list of themes
         List<String> themeIds = context.getParameterValues(THEMES);
@@ -256,7 +265,7 @@ public class VotdController {
      * @return
      */
     @FilterWith(PublisherFilter.class)
-    public Result saveVotdUpdate(Context context, FlashScope flashScope) {
+    public Result saveVotdUpdate(Context context, FlashScope flashScope, Session session) {
 
         //Retrieve the themeIDs selected and convert to list of theme objects
         List<String> themeIds = context.getParameterValues(THEMES);
@@ -267,7 +276,6 @@ public class VotdController {
                 Theme theme = themeService.findThemeById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
-
         }
 
         String votdStatusString = context.getParameter("isApproved");
@@ -280,7 +288,12 @@ public class VotdController {
 
         try {
             Long votdId = Long.parseLong(context.getParameter("verseid"));
-            votdService.update(votdId, themeList, votdStatus);
+
+            String userAsString = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
+            Gson gson = new Gson();
+            User user = gson.fromJson(userAsString, User.class);
+
+            votdService.update(votdId, themeList, votdStatus, user.getName());
         } catch (IllegalArgumentException | EntityDoesNotExistException e) {
             flashScope.error("The VOTD you're trying to update does not exist.");
             return Results.redirect("/votd/list");

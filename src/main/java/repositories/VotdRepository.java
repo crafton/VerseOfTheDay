@@ -104,7 +104,7 @@ public class VotdRepository {
     }
 
     @Transactional
-    public void update(Long votdId, List<Theme> themes, boolean votdStatus)
+    public void update(Long votdId, List<Theme> themes, boolean votdStatus, String updatedBy)
             throws IllegalArgumentException, EntityDoesNotExistException {
 
         if (themes == null) {
@@ -112,6 +112,7 @@ public class VotdRepository {
         }
 
         Votd votd = findVerseById(votdId);
+        votd.setModifiedBy(updatedBy);
 
         if (votd == null) {
             throw new EntityDoesNotExistException("The VOTD you're trying to update does not exist.");

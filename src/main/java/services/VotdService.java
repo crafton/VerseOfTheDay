@@ -66,10 +66,10 @@ public class VotdService {
         return votdRepository.findAllWithLimit(start, length);
     }
 
-    public void update(Long votdId, List<Theme> themes, boolean votdStatus)
+    public void update(Long votdId, List<Theme> themes, boolean votdStatus, String updatedBy)
             throws IllegalArgumentException, EntityDoesNotExistException {
 
-        votdRepository.update(votdId, themes, votdStatus);
+        votdRepository.update(votdId, themes, votdStatus, updatedBy);
     }
 
     public void approve(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
