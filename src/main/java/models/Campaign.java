@@ -23,6 +23,7 @@ public class Campaign {
 	private Timestamp endDate;
 	private String sendTime;
 	private String campaignName;
+	@Column(length = 10000)
 	private String campaignDescription;
 	private int campaignDays;
 

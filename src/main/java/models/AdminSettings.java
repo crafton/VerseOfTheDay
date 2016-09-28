@@ -1,9 +1,6 @@
 package models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class AdminSettings {
@@ -13,12 +10,16 @@ public class AdminSettings {
 
     private String version;
     private String newCampaignSubject;
+    @Column(length = 10000)
     private String newCampaignMessage;
     private String subscribedSubject;
+    @Column(length = 10000)
     private String subscribedMessage;
     private String unsubscribedSubject;
+    @Column(length = 10000)
     private String unsubscribedMessage;
     private String newVotdSubmittedSubject;
+    @Column(length = 10000)
     private String newVotdSubmittedMessage;
     private String genericMessageFooter;
 
