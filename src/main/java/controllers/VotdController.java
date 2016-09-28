@@ -181,9 +181,7 @@ public class VotdController {
             return Results.redirect("/votd/create");
         }
 
-        String userAsString = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
-        Gson gson = new Gson();
-        User user = gson.fromJson(userAsString, User.class);
+        User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
 
         votd.setCreatedBy(user.getName());
 
@@ -289,9 +287,7 @@ public class VotdController {
         try {
             Long votdId = Long.parseLong(context.getParameter("verseid"));
 
-            String userAsString = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
-            Gson gson = new Gson();
-            User user = gson.fromJson(userAsString, User.class);
+            User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
 
             votdService.update(votdId, themeList, votdStatus, user.getName());
         } catch (IllegalArgumentException | EntityDoesNotExistException e) {

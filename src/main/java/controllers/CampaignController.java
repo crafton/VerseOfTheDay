@@ -66,9 +66,7 @@ public class CampaignController {
     @FilterWith(MemberFilter.class)
     public Result campaignList(Context context) {
 
-        String userAsJsonString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
-        Gson gson = new Gson();
-        User user = gson.fromJson(userAsJsonString, User.class);
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
         //Re-sort campaign list to move subscribed items to the front
         List<Campaign> campaignList = campaignService.getCampaignList();
@@ -100,14 +98,11 @@ public class CampaignController {
             return Results.badRequest().text();
         }
 
-        String userString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if (userString == null || userString.isEmpty()) {
+        if (user == null) {
             return Results.badRequest().text();
         }
-
-        Gson gson = new Gson();
-        User user = gson.fromJson(userString, User.class);
 
         if (userService.subscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
@@ -133,14 +128,11 @@ public class CampaignController {
             return Results.badRequest().text();
         }
 
-        String userAsString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if (userAsString == null || userAsString.isEmpty()) {
+        if (user == null) {
             return Results.badRequest().text();
         }
-
-        Gson gson = new Gson();
-        User user = gson.fromJson(userAsString, User.class);
 
         if (userService.unsubscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);

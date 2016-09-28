@@ -43,8 +43,9 @@ public class UserService {
         this.messageProvider = messageProvider;
     }
 
-    public String getCurrentUser(String idToken) {
-        return (String) ninjaCache.get(idToken);
+    public User getCurrentUser(String idToken) {
+        Gson gson = new Gson();
+        return gson.fromJson((String) ninjaCache.get(idToken), User.class);
     }
 
     public void refreshUserProfileInCache(Session session) {

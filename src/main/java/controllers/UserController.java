@@ -65,9 +65,7 @@ public class UserController {
 
     public Result viewProfile(Session session) {
 
-        String userAsJsonString = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
-        Gson gson = new Gson();
-        User user = gson.fromJson(userAsJsonString, User.class);
+        User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
 
         List<String> versions = votdRepository.findAllVersions();
 
@@ -198,9 +196,7 @@ public class UserController {
 
         logger.info("Received the following value for notifications update: " + shouldReceiveCampaignNotifications);
 
-        String userAsJsonString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
-        Gson gson = new Gson();
-        User user = gson.fromJson(userAsJsonString, User.class);
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
         logger.info("Retrieved the following user to update: " + user.getEmail());
         Object settingsObject = user.getApp_metadata().get("settings");
