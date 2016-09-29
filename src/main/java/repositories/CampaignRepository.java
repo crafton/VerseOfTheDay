@@ -59,7 +59,12 @@ public class CampaignRepository {
      * @throws IllegalArgumentException
      */
     @Transactional
-    public Campaign findCampaignById(Long campaignId) {
+    public Campaign findCampaignById(Long campaignId) throws IllegalArgumentException {
+
+        if (campaignId == null) {
+            throw new IllegalArgumentException("Parameter must be of type 'Long'.");
+        }
+
         return getEntityManager().find(Campaign.class, campaignId);
     }
 
@@ -69,7 +74,6 @@ public class CampaignRepository {
      */
     @Transactional
     public void save(Campaign campaign) throws CampaignException {
-        logger.info("saving time: " + campaign.getSendTime());
         getEntityManager().persist(campaign);
     }
 

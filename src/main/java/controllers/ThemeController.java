@@ -14,7 +14,7 @@ import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import services.ThemeService;
+import repositories.ThemeRepository;
 import utilities.Config;
 
 import java.util.List;
@@ -24,12 +24,12 @@ public class ThemeController {
 
     private final static Logger logger = LoggerFactory.getLogger(ThemeController.class);
 
-    private final ThemeService themeService;
+    private final ThemeRepository themeRepository;
     private final Config config;
 
     @Inject
-    public ThemeController(ThemeService themeService, Config config) {
-        this.themeService = themeService;
+    public ThemeController(ThemeRepository themeRepository, Config config) {
+        this.themeRepository = themeRepository;
         this.config = config;
     }
 
@@ -41,7 +41,7 @@ public class ThemeController {
      */
     public Result themes() {
         logger.debug("Generating themes list...");
-        List<Theme> themes = themeService.findAllThemes();
+        List<Theme> themes = themeRepository.findAll();
 
         return Results
                 .ok()
@@ -61,7 +61,7 @@ public class ThemeController {
         logger.debug("Entered saveTheme action...");
 
         try {
-            themeService.saveTheme(theme);
+            themeRepository.save(theme);
         } catch (IllegalArgumentException e) {
             logger.warn("User tried to access the save controller directly.");
             flashScope.error("A theme has not been submitted");
@@ -84,7 +84,7 @@ public class ThemeController {
         logger.debug("Entered deleteTheme action...");
 
         try {
-            themeService.deleteTheme(themeId);
+            themeRepository.delete(themeId);
             logger.info("Successfully deleted theme.");
             flashScope.success("Successfully deleted theme.");
         } catch (IllegalArgumentException e) {

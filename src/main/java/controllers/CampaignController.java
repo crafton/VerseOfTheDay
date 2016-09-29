@@ -16,8 +16,8 @@ import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.AdminSettingsRepository;
-import services.CampaignService;
-import services.ThemeService;
+import repositories.CampaignRepository;
+import repositories.ThemeRepository;
 import services.UserService;
 import utilities.Config;
 
@@ -35,8 +35,8 @@ public class CampaignController {
 
     private final static Logger logger = LoggerFactory.getLogger(CampaignController.class);
 
-    private final CampaignService campaignService;
-    private final ThemeService themeService;
+    private final CampaignRepository campaignRepository;
+    private final ThemeRepository themeRepository;
     private final Config config;
     private final UserService userService;
     private final Provider<Message> messageProvider;
@@ -46,11 +46,11 @@ public class CampaignController {
     private static final String CAMPAIGN_ID = "campaignId";
 
     @Inject
-    public CampaignController(CampaignService campaignService, ThemeService themeService,
+    public CampaignController(CampaignRepository campaignRepository, ThemeRepository themeRepository,
                               Config config, UserService userService, Provider<Message> messageProvider,
                               AdminSettingsRepository adminSettingsRepository, Messenger messenger) {
-        this.campaignService = campaignService;
-        this.themeService = themeService;
+        this.campaignRepository = campaignRepository;
+        this.themeRepository = themeRepository;
         this.config = config;
         this.userService = userService;
         this.messageProvider = messageProvider;
@@ -68,7 +68,7 @@ public class CampaignController {
         User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
         //Re-sort campaign list to move subscribed items to the front
-        List<Campaign> campaignList = campaignService.getCampaignList();
+        List<Campaign> campaignList = campaignRepository.findAll();
         List<Long> subscribedCampaignIds = user.getSubscriptions();
         List<Campaign> subscribedCampaigns = new ArrayList<>();
 
@@ -86,7 +86,7 @@ public class CampaignController {
         }
 
         return Results.html().render("campaignList", campaignList)
-                .render("themeList", themeService.findAllThemes())
+                .render("themeList", themeRepository.findAll())
                 .render("dateFormat", config.DATE_FORMAT)
                 .render("subscribedCampaignList", subscribedCampaigns);
     }
@@ -158,7 +158,7 @@ public class CampaignController {
     @FilterWith(PublisherFilter.class)
     public Result addCampaign() {
         return Results.html()
-                .render("themes", themeService.findAllThemes())
+                .render("themes", themeRepository.findAll())
                 .render("dateFormat", config.DATE_FORMAT);
     }
 
@@ -190,13 +190,13 @@ public class CampaignController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+            Theme theme = themeRepository.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         campaign.setThemeList(themeList);
 
         try {
-            campaignService.save(campaign);
+            campaignRepository.save(campaign);
 
             if (adminSettings != null && adminSettings.getId() == 1L) {
                 Message message = messageProvider.get();
@@ -223,8 +223,8 @@ public class CampaignController {
         logger.info("Updating campaign details of campaign: " + campaignId);
 
         return Results.html()
-                .render("campaign", campaignService.getCampaignById(campaignId))
-                .render("themes", themeService.findAllThemes())
+                .render("campaign", campaignRepository.findCampaignById(campaignId))
+                .render("themes", themeRepository.findAll())
                 .render("dateFormat", config.DATE_FORMAT);
     }
 
@@ -255,12 +255,12 @@ public class CampaignController {
 
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+                Theme theme = themeRepository.findById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
         }
         try {
-            campaignService.update(Long.parseLong(context.getParameter(CAMPAIGN_ID)), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
+            campaignRepository.update(Long.parseLong(context.getParameter(CAMPAIGN_ID)), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
                     startDate, endDate, days, themeList, context.getParameter("sendTime"));
             flashScope.success("Campaign updated");
         } catch (CampaignException e) {
@@ -274,7 +274,7 @@ public class CampaignController {
     public Result deleteCampaign(@PathParam(CAMPAIGN_ID) Long campaignId, FlashScope flashScope) {
 
         try {
-            campaignService.deleteCampaign(campaignId);
+            campaignRepository.deleteCampaign(campaignId);
             flashScope.success("Campaign deleted successfully.");
             //TODO: Send notification
 

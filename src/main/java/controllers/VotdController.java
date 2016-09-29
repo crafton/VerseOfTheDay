@@ -21,7 +21,7 @@ import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import services.ThemeService;
+import repositories.ThemeRepository;
 import services.UserService;
 import services.VotdService;
 import utilities.Config;
@@ -40,7 +40,7 @@ public class VotdController {
 
     private Utils utils;
     private final VotdService votdService;
-    private final ThemeService themeService;
+    private final ThemeRepository themeRepository;
     private final Provider<Mail> mailProvider;
     private final Postoffice postoffice;
     private final UserService userService;
@@ -49,12 +49,12 @@ public class VotdController {
 
     @Inject
     public VotdController(Utils utils, VotdService votdService,
-                          ThemeService themeService,
+                          ThemeRepository themeRepository,
                           Provider<Mail> mailProvider, Postoffice postoffice,
                           UserService userService, Config config) {
         this.utils = utils;
         this.votdService = votdService;
-        this.themeService = themeService;
+        this.themeRepository = themeRepository;
         this.mailProvider = mailProvider;
         this.postoffice = postoffice;
         this.userService = userService;
@@ -122,7 +122,7 @@ public class VotdController {
      */
     @FilterWith(ContributorFilter.class)
     public Result createVotd() {
-        List<Theme> themes = themeService.findAllThemes();
+        List<Theme> themes = themeRepository.findAll();
 
         return Results
                 .ok()
@@ -193,7 +193,7 @@ public class VotdController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+            Theme theme = themeRepository.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         try {
@@ -230,7 +230,7 @@ public class VotdController {
         Votd votd = votdService.findById(verseid);
 
         //Get all themes
-        List<Theme> themes = themeService.findAllThemes();
+        List<Theme> themes = themeRepository.findAll();
 
         if (votd == null) {
             flashScope.error("Tried to retrieve a Votd that doesn't exist.");
@@ -270,7 +270,7 @@ public class VotdController {
         List<Theme> themeList = new ArrayList<>();
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+                Theme theme = themeRepository.findById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
         }

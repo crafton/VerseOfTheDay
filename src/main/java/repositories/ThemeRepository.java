@@ -39,12 +39,21 @@ public class ThemeRepository {
     }
 
     @Transactional
-    public Theme findById(Long id) {
+    public Theme findById(Long id) throws IllegalArgumentException {
+
+        if (id == null) {
+            throw new IllegalArgumentException("Parameter must be of type 'Long'.");
+        }
+
         return getEntityManager().find(Theme.class, id);
     }
 
     @Transactional
-    public void save(Theme theme) throws EntityAlreadyExistsException {
+    public void save(Theme theme) throws EntityAlreadyExistsException, IllegalArgumentException {
+
+        if (theme == null || theme.getThemeName().isEmpty()) {
+            throw new IllegalArgumentException("Parameter must be of type 'Theme'.");
+        }
 
         try {
             findByName(theme.getThemeName());
