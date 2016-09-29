@@ -1,12 +1,9 @@
 package controllers;
 
 import models.Theme;
-import ninja.NinjaTest;
 import ninja.Result;
 import ninja.session.FlashScope;
-import ninja.session.FlashScopeImpl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,7 +13,6 @@ import utilities.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 

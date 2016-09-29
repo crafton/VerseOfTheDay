@@ -190,19 +190,21 @@ public class VotdRepository {
     public JsonObject findVersesByRange(String verseRange, String version) throws JsonSyntaxException {
         WebTarget webTarget = getVerseServiceWebTarget(config.getBibleSearchUrl());
 
-        if (version == null || version.isEmpty()) {
+        String bibleVersion = version;
+
+        if (bibleVersion == null || bibleVersion.isEmpty()) {
             AdminSettings adminSettings = adminSettingsRepository.findSettings();
 
             if (adminSettings == null || adminSettings.getVersion().isEmpty()) {
-                version = "eng-ESV";
+                bibleVersion = "eng-ESV";
             } else {
-                version = adminSettings.getVersion();
+                bibleVersion = adminSettings.getVersion();
             }
         }
 
         String verseTextJson = webTarget
                 .queryParam("q[]", verseRange)
-                .queryParam("version", version)
+                .queryParam("version", bibleVersion)
                 .request(MediaType.TEXT_PLAIN_TYPE).get(String.class);
 
         JsonParser parser = new JsonParser();

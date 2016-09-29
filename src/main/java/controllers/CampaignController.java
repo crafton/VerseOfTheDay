@@ -1,6 +1,5 @@
 package controllers;
 
-import com.google.gson.Gson;
 import com.google.inject.Provider;
 import exceptions.CampaignException;
 import filters.LoginFilter;

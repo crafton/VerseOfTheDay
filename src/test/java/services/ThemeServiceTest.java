@@ -12,7 +12,8 @@ import repositories.ThemeRepository;
 
 import javax.persistence.NoResultException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -32,7 +33,7 @@ public class ThemeServiceTest {
 
 
     @Before
-    public void setup() {
+    public void setUp() {
         themeService = new ThemeService(themeRepository);
     }
 

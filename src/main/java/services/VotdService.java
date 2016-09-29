@@ -278,11 +278,8 @@ public class VotdService {
             range2Lower = Integer.parseInt(range2Array[0]);
             range2Upper = Integer.parseInt(range2Array[1]);
 
-            if (range1Lower <= range2Upper && range2Lower <= range1Upper) {
-                return true;
-            } else {
-                return false;
-            }
+            return range1Lower <= range2Upper && range2Lower <= range1Upper;
+
         } catch (NumberFormatException nex) {
             logger.error("Problem with number range format. Verses don't appear to be integers.");
             return false;
