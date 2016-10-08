@@ -4,6 +4,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import filters.LoginFilter;
 import filters.MemberFilter;
+import models.User;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
@@ -73,7 +74,20 @@ public class LoginController {
             Results.redirect("/servererror");
         }
 
-        return Results.redirect("/campaign/list");
+        String idToken = session.get(config.IDTOKEN_NAME);
+        User user = userService.getCurrentUser(idToken);
+
+        boolean loggedIn = false;
+        String role = "";
+
+        if(user != null){
+            loggedIn = true;
+            role = userService.getHighestRole(idToken);
+        }
+
+        return Results.redirect("/campaign/list")
+                .render("loggedIn", loggedIn)
+                .render("role", role);
     }
 
     /**

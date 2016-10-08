@@ -113,7 +113,7 @@ public class UserService {
      * Reformat query results to what DataTables expects. Ensure fields are added to the
      * array in the same order as the columns headings are displayed.
      *
-     * @param usersList
+     * @param userList
      * @return
      */
     public List<String[]> generateDataTableResults(List<User> userList) throws IllegalArgumentException {
@@ -242,6 +242,22 @@ public class UserService {
         }
 
         return false;
+    }
+
+    public String getHighestRole(String idToken) {
+        if (hasRole(idToken, "admin")) {
+            return "admin";
+        }
+
+        if (hasRole(idToken, config.getPublisherRole())) {
+            return config.getPublisherRole();
+        }
+
+        if (hasRole(idToken, config.getContributorRole())) {
+            return config.getContributorRole();
+        } else {
+            return config.getMemberRole();
+        }
     }
 
     /**

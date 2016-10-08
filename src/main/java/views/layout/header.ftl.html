@@ -1,46 +1,59 @@
 <!-- Navigation -->
 <div class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
-	<div class="container-fluid">
-		<!-- Brand and toggle get grouped for better mobile display -->
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="#">Verse of the Day</a>
-		</div>
-		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li>
-					<a href="/votd/list">VOTD</a>
-				</li>
-				<li>
-					<a href="/theme/list">Themes</a>
-				</li>
-				<li>
-					<a href="/campaign/list">Campaign</a>
-				</li>
-				<li>
-					<a href="/user/list">Users</a>
-				</li>
-				<li>
-					<a href="/admin/settings">Admin</a>
-				</li>
-				<li>
-					<a href="/logout">Logout</a>
-				</li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<li>
-					<a href="/user/profile">Profile</a>
-				</li>
-			</ul>
-		</div>
-		<!-- /.navbar-collapse -->
-	</div>
-	<!-- /.container -->
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Verse of the Day</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" >Setup <b class="caret"></b> </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/votd/list">Votd</a>
+                        </li>
+                        <li>
+                            <a href="/theme/list">Themes</a>
+                        </li>
+                        <li>
+                            <a href="/campaign/list">Campaign</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" >Settings <b class="caret"></b> </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/user/list">Users</a>
+                        </li>
+                        <li>
+                            <a href="/admin/settings">Defaults and Templates</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/user/profile">My Profile</a>
+                </li>
+                <#if loggedIn?>
+                    <li>
+                        <a href="/logout">Logout</a>
+                    </li>
+                </#if>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
 </div>
 
