@@ -17,8 +17,6 @@ public class VotdUsed {
     private Long campaignId;
     private Long votdId;
 
-    public VotdUsed(){}
-
     public Long getId() {
         return id;
     }

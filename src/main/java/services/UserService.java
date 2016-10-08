@@ -113,7 +113,7 @@ public class UserService {
      * Reformat query results to what DataTables expects. Ensure fields are added to the
      * array in the same order as the columns headings are displayed.
      *
-     * @param usersJsonList
+     * @param usersList
      * @return
      */
     public List<String[]> generateDataTableResults(List<User> userList) throws IllegalArgumentException {

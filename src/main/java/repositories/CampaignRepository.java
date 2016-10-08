@@ -48,7 +48,7 @@ public class CampaignRepository {
         String currentTime = localTime.format(DateTimeFormatter.ofPattern(config.TIME_FORMAT));
         q.setParameter("currentTime", currentTime);
 
-        logger.info("query time"+ currentTime);
+        logger.info("query time "+ currentTime);
 
         return (List<Campaign>) q.getResultList();
     }

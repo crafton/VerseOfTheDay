@@ -27,9 +27,6 @@ public class Theme {
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "themes")
     private List<Votd> votds;
 
-    public Theme() {
-    }
-
     public Long getId() {
         return this.id;
     }

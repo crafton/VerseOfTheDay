@@ -20,9 +20,6 @@ public class User {
     private Map<String, String> user_metadata;
     private Map<String, Object> app_metadata;
 
-    public User() {
-    }
-
     public String getEmail() {
         return email;
     }

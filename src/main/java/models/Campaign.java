@@ -31,10 +31,6 @@ public class Campaign {
 	@JoinTable(name = "CampaignTheme", joinColumns = @JoinColumn(name = "campaignId", referencedColumnName = "campaignId") , inverseJoinColumns = @JoinColumn(name = "themeId", referencedColumnName = "id") )
 	private List<Theme> themeList;
 
-	public Campaign() {
-		super();
-	}
-
 	public Long getCampaignId() {
 		return this.campaignId;
 	}

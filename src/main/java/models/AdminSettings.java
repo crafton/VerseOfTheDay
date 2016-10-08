@@ -23,9 +23,6 @@ public class AdminSettings {
     private String newVotdSubmittedMessage;
     private String genericMessageFooter;
 
-    public AdminSettings() {
-    }
-
     public Long getId() {
         return id;
     }

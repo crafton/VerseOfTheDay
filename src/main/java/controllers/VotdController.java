@@ -46,6 +46,7 @@ public class VotdController {
     private final UserService userService;
     private final Config config;
     private static final String THEMES = "themes";
+    private static final String listPath = "/votd/list";
 
     @Inject
     public VotdController(Utils utils, VotdService votdService,
@@ -224,7 +225,7 @@ public class VotdController {
 
         if (verseid == null) {
             flashScope.error("You must supply a valid verse Id.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
 
         Votd votd = votdService.findById(verseid);
@@ -234,7 +235,7 @@ public class VotdController {
 
         if (votd == null) {
             flashScope.error("Tried to retrieve a Votd that doesn't exist.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
 
         try {
@@ -250,7 +251,7 @@ public class VotdController {
         } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
             logger.error("CFailed web service call to retrieve verses.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
     }
 
@@ -291,11 +292,11 @@ public class VotdController {
             votdService.update(votdId, themeList, votdStatus, user.getName());
         } catch (IllegalArgumentException | EntityDoesNotExistException e) {
             flashScope.error("The VOTD you're trying to update does not exist.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
 
         flashScope.success("Verses successfully updated");
-        return Results.redirect("/votd/list");
+        return Results.redirect(listPath);
     }
 
     /**
@@ -317,7 +318,7 @@ public class VotdController {
             flashScope.error("You can't approve a votd that doesn't exist.");
         }
 
-        return Results.redirect("/votd/list");
+        return Results.redirect(listPath);
     }
 
     /**
@@ -339,7 +340,7 @@ public class VotdController {
             flashScope.error("Tried to delete a Votd that doesn't exist");
         }
 
-        return Results.redirect("/votd/list");
+        return Results.redirect(listPath);
     }
 
     private void sendVotdContributedEmail() {
