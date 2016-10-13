@@ -7,6 +7,7 @@ import exceptions.EntityDoesNotExistException;
 import filters.LoginFilter;
 import filters.PublisherFilter;
 import models.Theme;
+import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
@@ -15,6 +16,7 @@ import ninja.session.FlashScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.ThemeRepository;
+import services.UserService;
 import utilities.Config;
 
 import java.util.List;
@@ -26,11 +28,13 @@ public class ThemeController {
 
     private final ThemeRepository themeRepository;
     private final Config config;
+    private final UserService userService;
 
     @Inject
-    public ThemeController(ThemeRepository themeRepository, Config config) {
+    public ThemeController(ThemeRepository themeRepository, Config config, UserService userService) {
         this.themeRepository = themeRepository;
         this.config = config;
+        this.userService = userService;
     }
 
     /**
@@ -39,15 +43,19 @@ public class ThemeController {
      *
      * @return
      */
-    public Result themes() {
+    public Result themes(Context context) {
         logger.debug("Generating themes list...");
         List<Theme> themes = themeRepository.findAll();
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
                 .html()
                 .render("themes", themes)
-                .render("maxCols", config.getThemesMaxCols());
+                .render("maxCols", config.getThemesMaxCols())
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**

@@ -34,7 +34,7 @@ public class VotdScheduler {
     @Inject
     private UserService userService;
 
-    @Schedule(delay = 60, initialDelay = 30, timeUnit = TimeUnit.SECONDS)
+    @Schedule(delay = 60, initialDelay = 10, timeUnit = TimeUnit.MINUTES)
     public void dispatchAvailableCampaigns() {
 
         List<Campaign> activeCampaigns = votdDispatchService.getActiveCampaigns();

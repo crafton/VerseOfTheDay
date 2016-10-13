@@ -68,10 +68,14 @@ public class VotdController {
      * @return
      */
     @FilterWith(PublisherFilter.class)
-    public Result viewVotds() {
+    public Result viewVotds(Context context) {
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
+                .render("loggedIn", true)
+                .render("role", role)
                 .html();
     }
 
@@ -122,13 +126,17 @@ public class VotdController {
      * @return
      */
     @FilterWith(ContributorFilter.class)
-    public Result createVotd() {
+    public Result createVotd(Context context) {
         List<Theme> themes = themeRepository.findAll();
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
                 .html()
-                .render(THEMES, themes);
+                .render(THEMES, themes)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**
@@ -250,7 +258,7 @@ public class VotdController {
                     .render("verseText", verseText);
         } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
-            logger.error("CFailed web service call to retrieve verses.");
+            logger.error("Failed web service call to retrieve verses.");
             return Results.redirect(listPath);
         }
     }

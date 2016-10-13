@@ -56,23 +56,30 @@ public class UserController {
      *
      * @return
      */
-    public Result viewUsers() {
+    public Result viewUsers(Context context) {
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
-                .html();
+                .html()
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
-    public Result viewProfile(Session session) {
+    public Result viewProfile(Session session, Context context) {
 
         User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
 
         List<String> versions = votdRepository.findAllVersions();
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
                 .render("settings", user.getSettings())
                 .render("versions", versions)
+                .render("loggedIn", true)
+                .render("role", role)
                 .html();
     }
 

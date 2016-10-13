@@ -15,42 +15,59 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" >Setup <b class="caret"></b> </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="/votd/list">Votd</a>
-                        </li>
-                        <li>
-                            <a href="/theme/list">Themes</a>
-                        </li>
-                        <li>
-                            <a href="/campaign/list">Campaign</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" >Settings <b class="caret"></b> </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="/user/list">Users</a>
-                        </li>
-                        <li>
-                            <a href="/admin/settings">Defaults and Templates</a>
-                        </li>
-                    </ul>
-                </li>
+                <#if role?? && (role == "publisher" || role == "contributor" || role == "admin")>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" data-target="#">Setup <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/votd/list">Votd</a>
+                            </li>
+                            <#if role == "publisher" || role == "admin">
+                                <li>
+                                    <a href="/theme/list">Themes</a>
+                                </li>
+                                <li>
+                                    <a href="/campaign/list">Campaign</a>
+                                </li>
+                            </#if>
+                        </ul>
+                    </li>
+                </#if>
+                <#if role?? && (role == "publisher" || role == "admin")>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" data-target="#">Settings <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/user/list">Users</a>
+                            </li>
+                            <li>
+                                <a href="/admin/settings">Defaults and Templates</a>
+                            </li>
+                        </ul>
+                    </li>
+                </#if>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="/user/profile">My Profile</a>
-                </li>
-                <#if loggedIn?>
+                <#if loggedIn??>
+                    <li>
+                        <a href="/user/profile">My Profile</a>
+                    </li>
                     <li>
                         <a href="/logout">Logout</a>
                     </li>
                 </#if>
             </ul>
+
+            <#if !loggedIn??>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/campaign/list">Login</a>
+                    </li>
+                </ul>
+            </#if>
+
         </div>
         <!-- /.navbar-collapse -->
     </div>

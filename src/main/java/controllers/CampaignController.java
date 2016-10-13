@@ -85,10 +85,14 @@ public class CampaignController {
             }
         }
 
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
+
         return Results.html().render("campaignList", campaignList)
                 .render("themeList", themeRepository.findAll())
                 .render("dateFormat", config.DATE_FORMAT)
-                .render("subscribedCampaignList", subscribedCampaigns);
+                .render("subscribedCampaignList", subscribedCampaigns)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     @FilterWith(MemberFilter.class)
@@ -156,10 +160,15 @@ public class CampaignController {
      * Adding new campaign
      **/
     @FilterWith(PublisherFilter.class)
-    public Result addCampaign() {
+    public Result addCampaign(Context context) {
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
+
         return Results.html()
                 .render("themes", themeRepository.findAll())
-                .render("dateFormat", config.DATE_FORMAT);
+                .render("dateFormat", config.DATE_FORMAT)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**
@@ -219,13 +228,17 @@ public class CampaignController {
      * Rendering campaign for a particular campaign Id which needs to be updated
      **/
     @FilterWith(PublisherFilter.class)
-    public Result updateCampaign(@PathParam(CAMPAIGN_ID) Long campaignId) {
+    public Result updateCampaign(@PathParam(CAMPAIGN_ID) Long campaignId, Context context) {
         logger.info("Updating campaign details of campaign: " + campaignId);
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results.html()
                 .render("campaign", campaignRepository.findCampaignById(campaignId))
                 .render("themes", themeRepository.findAll())
-                .render("dateFormat", config.DATE_FORMAT);
+                .render("dateFormat", config.DATE_FORMAT)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**

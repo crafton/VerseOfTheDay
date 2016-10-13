@@ -69,25 +69,12 @@ public class LoginController {
 
         try {
             userService.createSession(session, code);
-        } catch (JsonSyntaxException | IllegalStateException e) {
+        } catch (JsonSyntaxException | IllegalStateException | NullPointerException e) {
             logger.error(e.getMessage());
             Results.redirect("/servererror");
         }
 
-        String idToken = session.get(config.IDTOKEN_NAME);
-        User user = userService.getCurrentUser(idToken);
-
-        boolean loggedIn = false;
-        String role = "";
-
-        if(user != null){
-            loggedIn = true;
-            role = userService.getHighestRole(idToken);
-        }
-
-        return Results.redirect("/campaign/list")
-                .render("loggedIn", loggedIn)
-                .render("role", role);
+        return Results.redirect("/campaign/list");
     }
 
     /**

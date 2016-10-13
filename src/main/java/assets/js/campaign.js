@@ -17,7 +17,7 @@ $(function () {
 
 	$('#sendTimePicker').datetimepicker({
 		format: 'LT',
-		stepping: 1
+		stepping: 60
 	})
 });
 
