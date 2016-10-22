@@ -7,9 +7,7 @@ import exceptions.EntityDoesNotExistException;
 import filters.ContributorFilter;
 import filters.LoginFilter;
 import filters.PublisherFilter;
-import models.Theme;
-import models.User;
-import models.Votd;
+import models.*;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
@@ -41,8 +39,8 @@ public class VotdController {
     private Utils utils;
     private final VotdService votdService;
     private final ThemeRepository themeRepository;
-    private final Provider<Mail> mailProvider;
-    private final Postoffice postoffice;
+    private final Provider<Message> messageProvider;
+    private final Messenger messenger;
     private final UserService userService;
     private final Config config;
     private static final String THEMES = "themes";
@@ -51,13 +49,13 @@ public class VotdController {
     @Inject
     public VotdController(Utils utils, VotdService votdService,
                           ThemeRepository themeRepository,
-                          Provider<Mail> mailProvider, Postoffice postoffice,
+                          Provider<Message> messageProvider, Messenger messenger,
                           UserService userService, Config config) {
         this.utils = utils;
         this.votdService = votdService;
         this.themeRepository = themeRepository;
-        this.mailProvider = mailProvider;
-        this.postoffice = postoffice;
+        this.messageProvider = messageProvider;
+        this.messenger = messenger;
         this.userService = userService;
         this.config = config;
     }
@@ -211,7 +209,7 @@ public class VotdController {
             //If the votd was saved by a contributor, send a notification
             String idToken = context.getSession().get("idToken");
             if (userService.hasRole(idToken, config.getContributorRole())) {
-                sendVotdContributedEmail();
+                sendVotdContributedEmail(user);
             }
             flashScope.success("Successfully created a new VoTD entry.");
         } catch (IllegalArgumentException e) {
@@ -351,9 +349,16 @@ public class VotdController {
         return Results.redirect(listPath);
     }
 
-    private void sendVotdContributedEmail() {
+    private void sendVotdContributedEmail(User user) {
+        List<String> publishers = userService.findEmailsByRole(config.getPublisherRole());
 
-
+        String sender = user.getName();
+        Message message = messageProvider.get();
+        message.setRecipients(publishers);
+        message.setSubject("New VoTD Contributed");
+        message.setSalutation("Publisher");
+        message.setBodyHtml("<p>" + sender + " has just submitted a new VoTD for approval. Log in and have a look!</p>Cheers!");
+        messenger.sendMessage(message);
     }
 
 }
