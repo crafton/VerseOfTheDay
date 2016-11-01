@@ -226,6 +226,11 @@ public class UserService {
     public boolean hasRole(String idTokenString, String role) {
 
         String userJsonString = (String) ninjaCache.get(idTokenString);
+
+        if (StringUtils.isEmpty(userJsonString)) {
+            return false;
+        }
+
         JsonParser jsonParser = new JsonParser();
 
         JsonObject userProfile = jsonParser.parse(userJsonString).getAsJsonObject();

@@ -1,9 +1,12 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
+body {
+    margin-top: 50px;
+}
+
 #campaignListTbl {
 	width: 100%;
 }
-
 .panel {
     margin-top: 30px;
 }
