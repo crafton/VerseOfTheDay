@@ -3,25 +3,25 @@ package controllers;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import ninja.postoffice.Mail;
-import ninja.postoffice.Postoffice;
-import org.slf4j.LoggerFactory;
-import services.ThemeService;
-import services.UserService;
-import services.VotdService;
 import exceptions.EntityDoesNotExistException;
 import filters.ContributorFilter;
 import filters.LoginFilter;
 import filters.PublisherFilter;
-import models.Theme;
-import models.Votd;
+import models.*;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
+import ninja.postoffice.Mail;
+import ninja.postoffice.Postoffice;
 import ninja.session.FlashScope;
+import ninja.session.Session;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import repositories.ThemeRepository;
+import services.UserService;
+import services.VotdService;
 import utilities.Config;
 import utilities.Utils;
 
@@ -38,22 +38,24 @@ public class VotdController {
 
     private Utils utils;
     private final VotdService votdService;
-    private final ThemeService themeService;
-    private final Provider<Mail> mailProvider;
-    private final Postoffice postoffice;
+    private final ThemeRepository themeRepository;
+    private final Provider<Message> messageProvider;
+    private final Messenger messenger;
     private final UserService userService;
     private final Config config;
+    private static final String THEMES = "themes";
+    private static final String listPath = "/votd/list";
 
     @Inject
     public VotdController(Utils utils, VotdService votdService,
-                          ThemeService themeService,
-                          Provider<Mail> mailProvider, Postoffice postoffice,
+                          ThemeRepository themeRepository,
+                          Provider<Message> messageProvider, Messenger messenger,
                           UserService userService, Config config) {
         this.utils = utils;
         this.votdService = votdService;
-        this.themeService = themeService;
-        this.mailProvider = mailProvider;
-        this.postoffice = postoffice;
+        this.themeRepository = themeRepository;
+        this.messageProvider = messageProvider;
+        this.messenger = messenger;
         this.userService = userService;
         this.config = config;
     }
@@ -64,10 +66,14 @@ public class VotdController {
      * @return
      */
     @FilterWith(PublisherFilter.class)
-    public Result viewVotds() {
+    public Result viewVotds(Context context) {
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
+                .render("loggedIn", true)
+                .render("role", role)
                 .html();
     }
 
@@ -118,13 +124,17 @@ public class VotdController {
      * @return
      */
     @FilterWith(ContributorFilter.class)
-    public Result createVotd() {
-        List<Theme> themes = themeService.findAllThemes();
+    public Result createVotd(Context context) {
+        List<Theme> themes = themeRepository.findAll();
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
                 .html()
-                .render("themes", themes);
+                .render(THEMES, themes)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**
@@ -145,7 +155,7 @@ public class VotdController {
         String versesTrimmed = verses.trim();
 
         /*Call web service to retrieve verses.*/
-        String versesRetrieved = votdService.restGetVerses(versesTrimmed);
+        String versesRetrieved = votdService.restGetVerses(versesTrimmed, "");
 
         /*Find all verses that clash with what we're trying to add to the database*/
         List<String> verseClashes = votdService.findClashes(versesTrimmed);
@@ -168,7 +178,7 @@ public class VotdController {
      * @return
      */
     @FilterWith(ContributorFilter.class)
-    public Result saveVotd(Context context, Votd votd, FlashScope flashScope) {
+    public Result saveVotd(Context context, Votd votd, FlashScope flashScope, Session session) {
 
         String verificationErrorMessage = votdService.verifyVerses(votd.getVerses());
 
@@ -177,8 +187,12 @@ public class VotdController {
             return Results.redirect("/votd/create");
         }
 
+        User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
+
+        votd.setCreatedBy(user.getName());
+
         //Retrieve the themeIDs selected and convert to list of themes
-        List<String> themeIds = context.getParameterValues("themes");
+        List<String> themeIds = context.getParameterValues(THEMES);
 
         if (themeIds.isEmpty()) {
             votd.setThemes(new ArrayList<Theme>());
@@ -186,7 +200,7 @@ public class VotdController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+            Theme theme = themeRepository.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         try {
@@ -195,7 +209,7 @@ public class VotdController {
             //If the votd was saved by a contributor, send a notification
             String idToken = context.getSession().get("idToken");
             if (userService.hasRole(idToken, config.getContributorRole())) {
-                sendVotdContributedEmail();
+                sendVotdContributedEmail(user);
             }
             flashScope.success("Successfully created a new VoTD entry.");
         } catch (IllegalArgumentException e) {
@@ -217,33 +231,33 @@ public class VotdController {
 
         if (verseid == null) {
             flashScope.error("You must supply a valid verse Id.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
 
         Votd votd = votdService.findById(verseid);
 
         //Get all themes
-        List<Theme> themes = themeService.findAllThemes();
+        List<Theme> themes = themeRepository.findAll();
 
         if (votd == null) {
             flashScope.error("Tried to retrieve a Votd that doesn't exist.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
 
         try {
             //Get verse text
-            String verseText = votdService.restGetVerses(votd.getVerses());
+            String verseText = votdService.restGetVerses(votd.getVerses(), "");
 
             return Results
                     .ok()
                     .html()
                     .render("votd", votd)
-                    .render("themes", themes)
+                    .render(THEMES, themes)
                     .render("verseText", verseText);
         } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
-            logger.error("CFailed web service call to retrieve verses.");
-            return Results.redirect("/votd/list");
+            logger.error("Failed web service call to retrieve verses.");
+            return Results.redirect(listPath);
         }
     }
 
@@ -255,18 +269,17 @@ public class VotdController {
      * @return
      */
     @FilterWith(PublisherFilter.class)
-    public Result saveVotdUpdate(Context context, FlashScope flashScope) {
+    public Result saveVotdUpdate(Context context, FlashScope flashScope, Session session) {
 
         //Retrieve the themeIDs selected and convert to list of theme objects
-        List<String> themeIds = context.getParameterValues("themes");
+        List<String> themeIds = context.getParameterValues(THEMES);
 
         List<Theme> themeList = new ArrayList<>();
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+                Theme theme = themeRepository.findById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
-
         }
 
         String votdStatusString = context.getParameter("isApproved");
@@ -279,14 +292,17 @@ public class VotdController {
 
         try {
             Long votdId = Long.parseLong(context.getParameter("verseid"));
-            votdService.update(votdId, themeList, votdStatus);
+
+            User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
+
+            votdService.update(votdId, themeList, votdStatus, user.getName());
         } catch (IllegalArgumentException | EntityDoesNotExistException e) {
             flashScope.error("The VOTD you're trying to update does not exist.");
-            return Results.redirect("/votd/list");
+            return Results.redirect(listPath);
         }
 
         flashScope.success("Verses successfully updated");
-        return Results.redirect("/votd/list");
+        return Results.redirect(listPath);
     }
 
     /**
@@ -308,7 +324,7 @@ public class VotdController {
             flashScope.error("You can't approve a votd that doesn't exist.");
         }
 
-        return Results.redirect("/votd/list");
+        return Results.redirect(listPath);
     }
 
     /**
@@ -330,12 +346,19 @@ public class VotdController {
             flashScope.error("Tried to delete a Votd that doesn't exist");
         }
 
-        return Results.redirect("/votd/list");
+        return Results.redirect(listPath);
     }
 
-    private void sendVotdContributedEmail() {
+    private void sendVotdContributedEmail(User user) {
+        List<String> publishers = userService.findEmailsByRole(config.getPublisherRole());
 
-
+        String sender = user.getName();
+        Message message = messageProvider.get();
+        message.setRecipients(publishers);
+        message.setSubject("New VoTD Contributed");
+        message.setSalutation("Publisher");
+        message.setBodyHtml("<p>" + sender + " has just submitted a new VoTD for approval. Log in and have a look!</p>Cheers!");
+        messenger.sendMessage(message);
     }
 
 }

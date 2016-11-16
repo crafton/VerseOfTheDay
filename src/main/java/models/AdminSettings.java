@@ -8,52 +8,35 @@ public class AdminSettings {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String translation;
-    private String welcomeSubject;
-    private String welcomeMessage;
+    private String version;
     private String newCampaignSubject;
+    @Column(length = 10000)
     private String newCampaignMessage;
     private String subscribedSubject;
+    @Column(length = 10000)
     private String subscribedMessage;
     private String unsubscribedSubject;
+    @Column(length = 10000)
     private String unsubscribedMessage;
     private String newVotdSubmittedSubject;
+    @Column(length = 10000)
     private String newVotdSubmittedMessage;
     private String genericMessageFooter;
-
-    public AdminSettings(){
-    }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getTranslation() {
-        return translation;
+    public String getVersion() {
+        return version;
     }
 
-    public void setTranslation(String translation) {
-        this.translation = translation;
-    }
-
-    public String getWelcomeSubject() {
-        return welcomeSubject;
-    }
-
-    public void setWelcomeSubject(String welcomSubject) {
-        this.welcomeSubject = welcomSubject;
-    }
-
-    public String getWelcomeMessage() {
-        return welcomeMessage;
-    }
-
-    public void setWelcomeMessage(String welcomeMessage) {
-        this.welcomeMessage = welcomeMessage;
+    public void setVersion(String translation) {
+        this.version = translation;
     }
 
     public String getNewCampaignSubject() {
@@ -126,5 +109,22 @@ public class AdminSettings {
 
     public void setGenericMessageFooter(String genericMessageFooter) {
         this.genericMessageFooter = genericMessageFooter;
+    }
+
+    @Override
+    public String toString() {
+        return "AdminSettings{" +
+                "id=" + id +
+                ", translation='" + version + '\'' +
+                ", newCampaignSubject='" + newCampaignSubject + '\'' +
+                ", newCampaignMessage='" + newCampaignMessage + '\'' +
+                ", subscribedSubject='" + subscribedSubject + '\'' +
+                ", subscribedMessage='" + subscribedMessage + '\'' +
+                ", unsubscribedSubject='" + unsubscribedSubject + '\'' +
+                ", unsubscribedMessage='" + unsubscribedMessage + '\'' +
+                ", newVotdSubmittedSubject='" + newVotdSubmittedSubject + '\'' +
+                ", newVotdSubmittedMessage='" + newVotdSubmittedMessage + '\'' +
+                ", genericMessageFooter='" + genericMessageFooter + '\'' +
+                '}';
     }
 }

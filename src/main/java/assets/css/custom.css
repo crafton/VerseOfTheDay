@@ -1,9 +1,12 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
+body {
+    margin-top: 50px;
+}
+
 #campaignListTbl {
 	width: 100%;
 }
-
 .panel {
     margin-top: 30px;
 }
@@ -56,4 +59,34 @@ h4#clash{
 
 .checkbox {
     padding-bottom: 10px;
+}
+
+/*Loader*/
+.signal {
+    border: 5px solid #333;
+    border-radius: 30px;
+    height: 30px;
+    left: 50%;
+    margin: -15px 0 0 -15px;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    width: 30px;
+
+    animation: pulsate 1s ease-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(.1);
+        opacity: 0.0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
 }

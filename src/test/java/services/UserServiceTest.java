@@ -1,12 +1,16 @@
 package services;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
+import com.google.inject.Provider;
+import models.Message;
+import models.Messenger;
+import models.User;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
-import ninja.session.SessionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -16,11 +20,9 @@ import utilities.Config;
 import utilities.Utils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -37,6 +39,10 @@ public class UserServiceTest {
     private Utils utils;
     @Mock
     private Session session;
+    @Mock
+    private Messenger messenger;
+    @Mock
+    private Provider<Message> messageProvider;
 
     public UserServiceTest() {
         MockitoAnnotations.initMocks(this);
@@ -44,7 +50,7 @@ public class UserServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        userService = new UserService(ninjaCache, config, utils, userRepository);
+        userService = new UserService(ninjaCache, config, utils, userRepository, messenger, messageProvider);
     }
 
     @Test
@@ -53,12 +59,16 @@ public class UserServiceTest {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(generateJsonUserObject());
 
-        List<String[]> tableData = userService.generateDataTableResults(jsonArray);
+        Gson gson = new Gson();
+        List<User> userList = gson.fromJson(jsonArray, new TypeToken<List<User>>() {
+        }.getType());
+
+        List<String[]> tableData = userService.generateDataTableResults(userList);
         assertTrue(tableData.get(0)[1].contentEquals("someemail@gmail.com"));
     }
 
     @Test
-    public void generateDataTableResults_without_name_in_usermetadata(){
+    public void generateDataTableResults_without_name_in_usermetadata() {
 
         JsonPrimitive email = new JsonPrimitive("someemail@gmail.com");
         JsonPrimitive lastLogin = new JsonPrimitive("lastlogin date");
@@ -85,7 +95,11 @@ public class UserServiceTest {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(outerObject);
 
-        List<String[]> tableData = userService.generateDataTableResults(jsonArray);
+        Gson gson = new Gson();
+        List<User> userList = gson.fromJson(jsonArray, new TypeToken<List<User>>() {
+        }.getType());
+
+        List<String[]> tableData = userService.generateDataTableResults(userList);
 
         String nameAsString = tableData.get(0)[0];
         assertTrue(nameAsString.contentEquals("crafton"));
@@ -98,18 +112,21 @@ public class UserServiceTest {
         String checkboxesToReturn = "<div class=\"checkbox\">\n" +
                 "                <label>\n" +
                 "                    <input id=\"member\" type=\"checkbox\" value=\"member\" checked>\n" +
+                "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                 "                    <b>member</b><br/>\n" +
                 "                    <i>somedescription</i>\n" +
                 "                </label>\n" +
                 "            </div><div class=\"checkbox\">\n" +
                 "                <label>\n" +
                 "                    <input id=\"publisher\" type=\"checkbox\" value=\"publisher\" checked>\n" +
+                "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                 "                    <b>publisher</b><br/>\n" +
                 "                    <i>somedescription</i>\n" +
                 "                </label>\n" +
                 "            </div><div class=\"checkbox\">\n" +
                 "                <label>\n" +
                 "                    <input id=\"contributor\" type=\"checkbox\" value=\"contributor\" >\n" +
+                "                    <span class=\"checkbox-material\"><span class=\"check\"></span></span>" +
                 "                    <b>contributor</b><br/>\n" +
                 "                    <i>somedescription</i>\n" +
                 "                </label>\n" +
@@ -155,7 +172,7 @@ public class UserServiceTest {
 
     }
 
-    private JsonObject generateJsonUserObject(){
+    private JsonObject generateJsonUserObject() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", "crafton");
 

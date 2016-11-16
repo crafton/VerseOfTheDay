@@ -16,21 +16,44 @@
 
 package controllers;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import ninja.Context;
 import ninja.Result;
 import ninja.Results;
-
-import com.google.inject.Singleton;
+import org.apache.commons.lang.StringUtils;
+import services.UserService;
+import utilities.Config;
 
 
 @Singleton
 public class ApplicationController {
+
+    private final UserService userService;
+    private final Config config;
+
+    @Inject
+    public ApplicationController(UserService userService, Config config){
+        this.userService = userService;
+        this.config = config;
+    }
 
     /**
      * Display the application's main page
      *
      * @return
      */
-    public Result index() {
+    public Result index(Context context) {
+
+        String idToken = context.getSession().get(config.IDTOKEN_NAME);
+
+        if(!StringUtils.isEmpty(idToken)){
+            String role = userService.getHighestRole(idToken);
+
+            return Results.html()
+                    .render("loggedIn", true)
+                    .render("role", role);
+        }
 
         return Results.html();
 
@@ -42,7 +65,18 @@ public class ApplicationController {
      *
      * @return
      */
-    public Result unauthorized() {
+    public Result unauthorized(Context context) {
+
+        String idToken = context.getSession().get(config.IDTOKEN_NAME);
+
+        if(!StringUtils.isEmpty(idToken)){
+            String role = userService.getHighestRole(idToken);
+
+            return Results.html()
+                    .render("loggedIn", true)
+                    .render("role", role);
+        }
+
         return Results.html();
     }
 
@@ -51,7 +85,18 @@ public class ApplicationController {
      *
      * @return
      */
-    public Result servererror() {
+    public Result servererror(Context context) {
+
+        String idToken = context.getSession().get(config.IDTOKEN_NAME);
+
+        if(!StringUtils.isEmpty(idToken)){
+            String role = userService.getHighestRole(idToken);
+
+            return Results.html()
+                    .render("loggedIn", true)
+                    .render("role", role);
+        }
+
         return Results.html();
     }
 

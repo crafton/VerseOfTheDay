@@ -9,6 +9,8 @@ import java.util.List;
 public class Config {
 
     private String bibleSearchKey;
+    private String bibleSearchUrl;
+    private String bibleSearchVersion;
     private Integer maxVerses;
     private Integer themesMaxCols;
     private String auth0ClientId;
@@ -32,7 +34,7 @@ public class Config {
     public final String APPROVED = "Approved";
     public final String PENDING = "Pending";
     public final String DATE_FORMAT = "EEEEE, MMMMM d, yyyy hh:mm a";
-    public final String TIME_FORMAT = "hh:mm a";
+    public final String TIME_FORMAT = "h:mm a";
     public final String IDTOKEN_NAME = "idToken";
     public final String ACCESSTOKEN_NAME = "accessToken";
 
@@ -41,6 +43,8 @@ public class Config {
         this.maxVerses = ninjaProperties.getIntegerWithDefault("votd.maxverses", 0);
 
         this.bibleSearchKey = ninjaProperties.getWithDefault("biblesearch.key", "");
+        this.bibleSearchUrl = ninjaProperties.getWithDefault("biblesearch.url", "");
+        this.bibleSearchVersion = ninjaProperties.getWithDefault("biblesearch.version", "");
         this.themesMaxCols = ninjaProperties.getIntegerWithDefault("themes.maxcols", 7);
         this.auth0ClientId = ninjaProperties.getWithDefault("auth0.clientid", "");
         this.auth0Domain = ninjaProperties.getWithDefault("auth0.domain", "");
@@ -66,6 +70,14 @@ public class Config {
 
     public String getBibleSearchKey() {
         return bibleSearchKey;
+    }
+
+    public String getBibleSearchUrl() {
+        return bibleSearchUrl;
+    }
+
+    public String getBibleSearchVersion() {
+        return bibleSearchVersion;
     }
 
     public Integer getMaxVerses() {

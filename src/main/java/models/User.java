@@ -2,22 +2,45 @@ package models;
 
 
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class User {
 
+    private String name;
     private String email;
     private String user_id;
+    private String last_login;
+    private String created_at;
     private Map<String, String> user_metadata;
     private Map<String, Object> app_metadata;
 
-    public User() {
-    }
-
     public String getEmail() {
         return email;
+    }
+
+    public String getName() {
+
+        if (user_metadata != null) {
+            String realName = user_metadata.get("name");
+            if (realName == null || realName.isEmpty()) {
+                return name;
+            }
+            return realName;
+        } else if (!StringUtils.isEmpty(name)) {
+            return name;
+        }
+
+        return "Name not set";
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setEmail(String email) {
@@ -70,6 +93,32 @@ public class User {
         }
 
         return settings;
+    }
+
+    public List<String> getRoles() {
+        List<String> roles = (List<String>) this.getApp_metadata().get("roles");
+
+        if (roles == null) {
+            return new ArrayList<>();
+        }
+
+        return roles;
+    }
+
+    public String getLast_login() {
+        return last_login;
+    }
+
+    public void setLast_login(String last_login) {
+        this.last_login = last_login;
+    }
+
+    public String getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
     }
 
     @Override

@@ -7,6 +7,7 @@ import exceptions.EntityDoesNotExistException;
 import filters.LoginFilter;
 import filters.PublisherFilter;
 import models.Theme;
+import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
@@ -14,7 +15,8 @@ import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import services.ThemeService;
+import repositories.ThemeRepository;
+import services.UserService;
 import utilities.Config;
 
 import java.util.List;
@@ -24,13 +26,15 @@ public class ThemeController {
 
     private final static Logger logger = LoggerFactory.getLogger(ThemeController.class);
 
-    private final ThemeService themeService;
+    private final ThemeRepository themeRepository;
     private final Config config;
+    private final UserService userService;
 
     @Inject
-    public ThemeController(ThemeService themeService, Config config) {
-        this.themeService = themeService;
+    public ThemeController(ThemeRepository themeRepository, Config config, UserService userService) {
+        this.themeRepository = themeRepository;
         this.config = config;
+        this.userService = userService;
     }
 
     /**
@@ -39,15 +43,19 @@ public class ThemeController {
      *
      * @return
      */
-    public Result themes() {
+    public Result themes(Context context) {
         logger.debug("Generating themes list...");
-        List<Theme> themes = themeService.findAllThemes();
+        List<Theme> themes = themeRepository.findAll();
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
         return Results
                 .ok()
                 .html()
                 .render("themes", themes)
-                .render("maxCols", config.getThemesMaxCols());
+                .render("maxCols", config.getThemesMaxCols())
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**
@@ -61,7 +69,7 @@ public class ThemeController {
         logger.debug("Entered saveTheme action...");
 
         try {
-            themeService.saveTheme(theme);
+            themeRepository.save(theme);
         } catch (IllegalArgumentException e) {
             logger.warn("User tried to access the save controller directly.");
             flashScope.error("A theme has not been submitted");
@@ -84,7 +92,7 @@ public class ThemeController {
         logger.debug("Entered deleteTheme action...");
 
         try {
-            themeService.deleteTheme(themeId);
+            themeRepository.delete(themeId);
             logger.info("Successfully deleted theme.");
             flashScope.success("Successfully deleted theme.");
         } catch (IllegalArgumentException e) {

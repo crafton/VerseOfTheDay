@@ -2,7 +2,7 @@ package services;
 
 import com.google.gson.*;
 import com.google.inject.Inject;
-import exceptions.SubscriptionExistsException;
+import com.google.inject.Provider;
 import models.Message;
 import models.Messenger;
 import models.User;
@@ -15,7 +15,9 @@ import repositories.UserRepository;
 import utilities.Config;
 import utilities.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class UserService {
@@ -27,19 +29,23 @@ public class UserService {
     private final Utils utils;
     private final UserRepository userRepository;
     private final Messenger messenger;
+    private final Provider<Message> messageProvider;
     private static final String APP_METADATA = "app_metadata";
 
     @Inject
-    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository, Messenger messenger) {
+    public UserService(NinjaCache ninjaCache, Config config, Utils utils, UserRepository userRepository,
+                       Messenger messenger, Provider<Message> messageProvider) {
         this.ninjaCache = ninjaCache;
         this.config = config;
         this.utils = utils;
         this.userRepository = userRepository;
         this.messenger = messenger;
+        this.messageProvider = messageProvider;
     }
 
-    public String getCurrentUser(String idToken) {
-        return (String) ninjaCache.get(idToken);
+    public User getCurrentUser(String idToken) {
+        Gson gson = new Gson();
+        return gson.fromJson((String) ninjaCache.get(idToken), User.class);
     }
 
     public void refreshUserProfileInCache(Session session) {
@@ -73,12 +79,15 @@ public class UserService {
         JsonObject userAsJsonObject = userRepository.findUsersToBeNotified(start, length);
         Integer totalRecords = userAsJsonObject.get("total").getAsInt();
 
+        length = 100;
         Double lengthAsDouble = length.doubleValue();
         Double pages = totalRecords / lengthAsDouble;
         Integer pagesAsInt = (int) Math.ceil(pages);
 
+        logger.info("Pages of users to send notifications: " + pagesAsInt);
+
         for (int i = 0; i < pagesAsInt; i++) {
-            JsonObject usersAsJsonObject = userRepository.findUsersToBeNotified(i, 40);
+            JsonObject usersAsJsonObject = userRepository.findUsersToBeNotified(i, length);
             JsonArray userJsonList = usersAsJsonObject.getAsJsonArray("users");
             Gson gson = new Gson();
 
@@ -104,12 +113,12 @@ public class UserService {
      * Reformat query results to what DataTables expects. Ensure fields are added to the
      * array in the same order as the columns headings are displayed.
      *
-     * @param usersJsonList
+     * @param userList
      * @return
      */
-    public List<String[]> generateDataTableResults(JsonArray usersJsonList) throws IllegalArgumentException {
+    public List<String[]> generateDataTableResults(List<User> userList) throws IllegalArgumentException {
 
-        if (usersJsonList == null || usersJsonList.size() == 0) {
+        if (userList == null || userList.isEmpty()) {
             logger.warn("User tried to generate a table data set without a json array.");
             throw new IllegalArgumentException("JsonArray must contain at least one element.");
         }
@@ -117,36 +126,19 @@ public class UserService {
         List<String[]> usersData = new ArrayList<>();
         String[] userFields;
 
-        for (JsonElement user : usersJsonList) {
+        for (User user : userList) {
             String name;
-            List<String> rolesList = new ArrayList<>();
-            try {
-                name = user.getAsJsonObject().get("user_metadata").getAsJsonObject().get("name").getAsString();
-            } catch (NullPointerException npe) {
-                name = user.getAsJsonObject().get("name").getAsString();
-            }
+            name = user.getName();
 
-            try {
-                JsonArray rolesArray = user.getAsJsonObject().get(APP_METADATA)
-                        .getAsJsonObject()
-                        .get("roles")
-                        .getAsJsonArray();
-
-                for (JsonElement role : rolesArray) {
-                    rolesList.add(role.getAsString());
-                }
-
-            } catch (NullPointerException npe) {
-                //do nothing data table will get empty roles list
-            }
+            List<String> rolesList = user.getRoles();
 
             userFields = new String[]{name,
-                    user.getAsJsonObject().get("email").getAsString(),
+                    user.getEmail(),
                     utils.formatListToHtml(rolesList),
-                    user.getAsJsonObject().get("last_login").getAsString(),
-                    user.getAsJsonObject().get("created_at").getAsString(),
+                    user.getLast_login(),
+                    user.getCreated_at(),
                     "<a id=\"editrole\" style=\"cursor:pointer;\" class=\"material-icons\" aria-hidden=\"true\" " +
-                            "data-toggle=\"modal\" data-userid=\"" + user.getAsJsonObject().get("user_id").getAsString() + "\" data-username=\"" + name + "\"" +
+                            "data-toggle=\"modal\" data-userid=\"" + user.getUser_id() + "\" data-username=\"" + name + "\"" +
                             " data-target=\"#updateRolesModal\">mode_edit</a>"};
 
             usersData.add(userFields);
@@ -234,6 +226,11 @@ public class UserService {
     public boolean hasRole(String idTokenString, String role) {
 
         String userJsonString = (String) ninjaCache.get(idTokenString);
+
+        if (StringUtils.isEmpty(userJsonString)) {
+            return false;
+        }
+
         JsonParser jsonParser = new JsonParser();
 
         JsonObject userProfile = jsonParser.parse(userJsonString).getAsJsonObject();
@@ -250,6 +247,22 @@ public class UserService {
         }
 
         return false;
+    }
+
+    public String getHighestRole(String idToken) {
+        if (hasRole(idToken, "admin")) {
+            return "admin";
+        }
+
+        if (hasRole(idToken, config.getPublisherRole())) {
+            return config.getPublisherRole();
+        }
+
+        if (hasRole(idToken, config.getContributorRole())) {
+            return config.getContributorRole();
+        } else {
+            return config.getMemberRole();
+        }
     }
 
     /**
@@ -434,7 +447,7 @@ public class UserService {
     }
 
     /**
-     * Find all email addresses for contributors
+     * Find all email addresses for a given role
      *
      * @param role
      * @return

@@ -4,7 +4,6 @@ package repositories;
 import com.google.gson.*;
 import com.google.inject.Inject;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
-import org.glassfish.jersey.message.internal.StringBuilderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.Config;
@@ -82,9 +81,10 @@ public class UserRepository {
         params.put("per_page", length);
         params.put("page", start);
         params.put("include_totals", "true");
-        params.put("fields", "name,email,user_id");
+        params.put("fields", "name,email,user_id,user_metadata,app_metadata");
         params.put("include_fields", "true");
         params.put("search_engine", "v2");
+        params.put("sort", "app_metadata.settings.version:1");
         params.put("q", queryString);
 
         return auth0ApiQueryWithMgmtToken(params, config.getAuth0UserApi());
@@ -97,7 +97,7 @@ public class UserRepository {
         params.put("per_page", length);
         params.put("page", start);
         params.put("include_totals", "true");
-        params.put("fields", "nam,email");
+        params.put("fields", "name,email");
         params.put("include_fields", "true");
         params.put("search_engine", "v2");
         params.put("q", queryString);
@@ -204,7 +204,7 @@ public class UserRepository {
      * @param code
      * @return
      */
-    public Map<String, String> getAuthToken(String code) throws JsonSyntaxException, IllegalStateException {
+    public Map<String, String> getAuthToken(String code) throws JsonSyntaxException, IllegalStateException, NullPointerException {
         Client client = ClientBuilder.newClient();
 
         Map<String, String> auth0TokenRequest = new HashMap<>();
@@ -220,10 +220,8 @@ public class UserRepository {
                 .request()
                 .post(Entity.entity(auth0TokenRequestString, MediaType.APPLICATION_JSON));
 
-        JsonObject jsonResponse;
-
         JsonParser parser = new JsonParser();
-        jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
+        JsonObject jsonResponse = parser.parse(response.readEntity(String.class)).getAsJsonObject();
 
         String accessToken = jsonResponse
                 .getAsJsonObject()

@@ -39,9 +39,6 @@ public class Votd {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Theme> themes;
 
-    public Votd() {
-    }
-
     public Long getId() {
         return this.id;
     }

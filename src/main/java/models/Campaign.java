@@ -1,19 +1,8 @@
 package models;
 
-import java.io.Serializable;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
 
 /**
@@ -34,16 +23,13 @@ public class Campaign {
 	private Timestamp endDate;
 	private String sendTime;
 	private String campaignName;
+	@Column(length = 10000)
 	private String campaignDescription;
 	private int campaignDays;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "CampaignTheme", joinColumns = @JoinColumn(name = "campaignId", referencedColumnName = "campaignId") , inverseJoinColumns = @JoinColumn(name = "themeId", referencedColumnName = "id") )
 	private List<Theme> themeList;
-
-	public Campaign() {
-		super();
-	}
 
 	public Long getCampaignId() {
 		return this.campaignId;

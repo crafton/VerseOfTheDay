@@ -1,63 +1,62 @@
 package controllers;
 
+import com.google.inject.Provider;
+import exceptions.CampaignException;
+import filters.LoginFilter;
+import filters.MemberFilter;
+import filters.PublisherFilter;
+import models.*;
+import ninja.Context;
+import ninja.FilterWith;
+import ninja.Result;
+import ninja.Results;
+import ninja.params.PathParam;
+import ninja.session.FlashScope;
+import ninja.session.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import repositories.AdminSettingsRepository;
+import repositories.CampaignRepository;
+import repositories.ThemeRepository;
+import services.UserService;
+import utilities.Config;
+
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.inject.Provider;
-import filters.LoginFilter;
-import filters.MemberFilter;
-import filters.PublisherFilter;
-import models.Message;
-import models.User;
-import ninja.*;
-import ninja.session.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Singleton;
-
-import services.CampaignService;
-import services.ThemeService;
-import exceptions.CampaignException;
-import models.Campaign;
-import models.Theme;
-import ninja.params.PathParam;
-import ninja.session.FlashScope;
-import services.UserService;
-import utilities.Config;
 
 @FilterWith(LoginFilter.class)
 public class CampaignController {
 
     private final static Logger logger = LoggerFactory.getLogger(CampaignController.class);
 
-    private final CampaignService campaignService;
-    private final ThemeService themeService;
+    private final CampaignRepository campaignRepository;
+    private final ThemeRepository themeRepository;
     private final Config config;
     private final UserService userService;
     private final Provider<Message> messageProvider;
+    private final AdminSettingsRepository adminSettingsRepository;
+    private final Messenger messenger;
+    private AdminSettings adminSettings;
+    private static final String CAMPAIGN_ID = "campaignId";
 
     @Inject
-    public CampaignController(CampaignService campaignService, ThemeService themeService,
-                              Config config, UserService userService, Provider<Message> messageProvider) {
-        this.campaignService = campaignService;
-        this.themeService = themeService;
+    public CampaignController(CampaignRepository campaignRepository, ThemeRepository themeRepository,
+                              Config config, UserService userService, Provider<Message> messageProvider,
+                              AdminSettingsRepository adminSettingsRepository, Messenger messenger) {
+        this.campaignRepository = campaignRepository;
+        this.themeRepository = themeRepository;
         this.config = config;
         this.userService = userService;
         this.messageProvider = messageProvider;
+        this.adminSettingsRepository = adminSettingsRepository;
+        this.messenger = messenger;
+        this.adminSettings = this.adminSettingsRepository.findSettings();
     }
 
     /**
@@ -66,19 +65,17 @@ public class CampaignController {
     @FilterWith(MemberFilter.class)
     public Result campaignList(Context context) {
 
-        String userAsJsonString = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
-        Gson gson = new Gson();
-        User user = gson.fromJson(userAsJsonString, User.class);
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
         //Re-sort campaign list to move subscribed items to the front
-        List<Campaign> campaignList = campaignService.getCampaignList();
+        List<Campaign> campaignList = campaignRepository.findAll();
         List<Long> subscribedCampaignIds = user.getSubscriptions();
         List<Campaign> subscribedCampaigns = new ArrayList<>();
 
         if (!subscribedCampaignIds.isEmpty()) {
             for (Long id : subscribedCampaignIds) {
                 Optional<Campaign> optionalCampaign = campaignList.stream()
-                        .filter(item -> item.getCampaignId() == id)
+                        .filter(item -> item.getCampaignId().equals(id))
                         .findFirst();
 
                 if (optionalCampaign.isPresent()) {
@@ -88,29 +85,40 @@ public class CampaignController {
             }
         }
 
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
+
         return Results.html().render("campaignList", campaignList)
-                .render("themeList", themeService.findAllThemes())
+                .render("themeList", themeRepository.findAll())
                 .render("dateFormat", config.DATE_FORMAT)
-                .render("subscribedCampaignList", subscribedCampaigns);
+                .render("subscribedCampaignList", subscribedCampaigns)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     @FilterWith(MemberFilter.class)
-    public Result subscribe(@PathParam("campaignId") Long campaignId, Context context, Session session) {
+    public Result subscribe(@PathParam(CAMPAIGN_ID) Long campaignId, Context context, Session session) {
         if (campaignId == null) {
             return Results.badRequest().text();
         }
 
-        String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if (user == null || user.isEmpty()) {
+        if (user == null) {
             return Results.badRequest().text();
         }
 
-        JsonParser parser = new JsonParser();
-        JsonObject userObject = parser.parse(user).getAsJsonObject();
-        if (userService.subscribe(userObject.get("user_id").getAsString(), campaignId)) {
+        if (userService.subscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
-            //TODO: Send notification
+            if (adminSettings != null && adminSettings.getId() == 1L) {
+                Message message = messageProvider.get();
+                message.setRecipient(user.getEmail());
+                message.setSubject(adminSettings.getSubscribedSubject());
+                message.setSalutation(user.getName());
+                message.setBodyHtml(adminSettings.getSubscribedMessage());
+                messenger.sendMessage(message);
+            } else {
+                logger.error("Admin settings not setup, campaign emails not set.");
+            }
             return Results.ok().text();
         }
 
@@ -118,22 +126,29 @@ public class CampaignController {
     }
 
     @FilterWith(MemberFilter.class)
-    public Result unsubscribe(@PathParam("campaignId") Long campaignId, Context context, Session session) {
+    public Result unsubscribe(@PathParam(CAMPAIGN_ID) Long campaignId, Context context, Session session) {
         if (campaignId == null) {
             return Results.badRequest().text();
         }
 
-        String user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
 
-        if (user == null || user.isEmpty()) {
+        if (user == null) {
             return Results.badRequest().text();
         }
 
-        JsonParser parser = new JsonParser();
-        JsonObject userObject = parser.parse(user).getAsJsonObject();
-        if (userService.unsubscribe(userObject.get("user_id").getAsString(), campaignId)) {
+        if (userService.unsubscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
-            //TODO: Send notification
+            if (adminSettings != null && adminSettings.getId() == 1L) {
+                Message message = messageProvider.get();
+                message.setRecipient(user.getEmail());
+                message.setSubject(adminSettings.getUnsubscribedSubject());
+                message.setSalutation(user.getName());
+                message.setBodyHtml(adminSettings.getUnsubscribedMessage());
+                messenger.sendMessage(message);
+            } else {
+                logger.error("Admin settings not setup, campaign emails not set.");
+            }
             return Results.ok().text();
         }
 
@@ -145,10 +160,15 @@ public class CampaignController {
      * Adding new campaign
      **/
     @FilterWith(PublisherFilter.class)
-    public Result addCampaign() {
+    public Result addCampaign(Context context) {
+
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
+
         return Results.html()
-                .render("themes", themeService.findAllThemes())
-                .render("dateFormat", config.DATE_FORMAT);
+                .render("themes", themeRepository.findAll())
+                .render("dateFormat", config.DATE_FORMAT)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**
@@ -179,15 +199,23 @@ public class CampaignController {
 
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIds) {
-            Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+            Theme theme = themeRepository.findById(Long.parseLong(themeId));
             themeList.add(theme);
         }
         campaign.setThemeList(themeList);
 
         try {
-            campaignService.save(campaign);
-            //TODO: Send notification
-            flashScope.success("Campaign succesfully created");
+            campaignRepository.save(campaign);
+
+            if (adminSettings != null && adminSettings.getId() == 1L) {
+                Message message = messageProvider.get();
+                message.setSubject(adminSettings.getNewCampaignSubject());
+                message.setBodyHtml(adminSettings.getNewCampaignMessage());
+                userService.sendNotificationToUsers(message);
+            } else {
+                logger.error("Admin settings not setup, campaign emails not set.");
+            }
+            flashScope.success("Campaign successfully created");
         } catch (CampaignException e) {
             flashScope.error("Error creating campaign. Contact the administrator.");
             logger.error("Error in save campaign" + e.getMessage());
@@ -200,13 +228,17 @@ public class CampaignController {
      * Rendering campaign for a particular campaign Id which needs to be updated
      **/
     @FilterWith(PublisherFilter.class)
-    public Result updateCampaign(@PathParam("campaignId") Long campaignId) {
+    public Result updateCampaign(@PathParam(CAMPAIGN_ID) Long campaignId, Context context) {
         logger.info("Updating campaign details of campaign: " + campaignId);
 
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
+
         return Results.html()
-                .render("campaign", campaignService.getCampaignById(campaignId))
-                .render("themes", themeService.findAllThemes())
-                .render("dateFormat", config.DATE_FORMAT);
+                .render("campaign", campaignRepository.findCampaignById(campaignId))
+                .render("themes", themeRepository.findAll())
+                .render("dateFormat", config.DATE_FORMAT)
+                .render("loggedIn", true)
+                .render("role", role);
     }
 
     /**
@@ -236,12 +268,12 @@ public class CampaignController {
 
         if (!themeIds.isEmpty()) {
             for (String themeId : themeIds) {
-                Theme theme = themeService.findThemeById(Long.parseLong(themeId));
+                Theme theme = themeRepository.findById(Long.parseLong(themeId));
                 themeList.add(theme);
             }
         }
         try {
-            campaignService.update(Long.parseLong(context.getParameter("campaignId")), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
+            campaignRepository.update(Long.parseLong(context.getParameter(CAMPAIGN_ID)), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
                     startDate, endDate, days, themeList, context.getParameter("sendTime"));
             flashScope.success("Campaign updated");
         } catch (CampaignException e) {
@@ -252,10 +284,10 @@ public class CampaignController {
     }
 
     @FilterWith(PublisherFilter.class)
-    public Result deleteCampaign(@PathParam("campaignId") Long campaignId, FlashScope flashScope) {
+    public Result deleteCampaign(@PathParam(CAMPAIGN_ID) Long campaignId, FlashScope flashScope) {
 
         try {
-            campaignService.deleteCampaign(campaignId);
+            campaignRepository.deleteCampaign(campaignId);
             flashScope.success("Campaign deleted successfully.");
             //TODO: Send notification
 

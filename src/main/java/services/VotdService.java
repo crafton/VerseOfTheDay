@@ -2,28 +2,17 @@ package services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.persist.Transactional;
 import exceptions.EntityDoesNotExistException;
 import models.Theme;
 import models.Votd;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repositories.VotdRepository;
 import utilities.Config;
 
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,10 +66,10 @@ public class VotdService {
         return votdRepository.findAllWithLimit(start, length);
     }
 
-    public void update(Long votdId, List<Theme> themes, boolean votdStatus)
+    public void update(Long votdId, List<Theme> themes, boolean votdStatus, String updatedBy)
             throws IllegalArgumentException, EntityDoesNotExistException {
 
-        votdRepository.update(votdId, themes, votdStatus);
+        votdRepository.update(votdId, themes, votdStatus, updatedBy);
     }
 
     public void approve(Long votdId) throws IllegalArgumentException, EntityDoesNotExistException {
@@ -137,9 +126,9 @@ public class VotdService {
      * @param verseRange
      * @return Verse text.
      */
-    public String restGetVerses(String verseRange) throws JsonSyntaxException {
+    public String restGetVerses(String verseRange, String version) throws JsonSyntaxException {
 
-        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange);
+        JsonObject verseJsonObject = votdRepository.findVersesByRange(verseRange, version);
 
         JsonArray passages = verseJsonObject
                 .getAsJsonObject("response")
@@ -200,7 +189,7 @@ public class VotdService {
             return "You can only select a maximum of " + maxVerses + " verses.";
         }
 
-        if (restGetVerses(versesTrimmed).isEmpty()) {
+        if (restGetVerses(versesTrimmed, "").isEmpty()) {
             return "Verse(s) not found. Please ensure Book, Chapter and Verse are valid.";
         }
 
@@ -289,11 +278,8 @@ public class VotdService {
             range2Lower = Integer.parseInt(range2Array[0]);
             range2Upper = Integer.parseInt(range2Array[1]);
 
-            if (range1Lower <= range2Upper && range2Lower <= range1Upper) {
-                return true;
-            } else {
-                return false;
-            }
+            return range1Lower <= range2Upper && range2Lower <= range1Upper;
+
         } catch (NumberFormatException nex) {
             logger.error("Problem with number range format. Verses don't appear to be integers.");
             return false;

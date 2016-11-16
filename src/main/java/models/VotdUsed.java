@@ -1,8 +1,6 @@
 package models;
 
 
-import org.eclipse.jetty.util.annotation.Name;
-
 import javax.persistence.*;
 
 @Entity
@@ -18,8 +16,6 @@ public class VotdUsed {
     private Long id;
     private Long campaignId;
     private Long votdId;
-
-    public VotdUsed(){}
 
     public Long getId() {
         return id;

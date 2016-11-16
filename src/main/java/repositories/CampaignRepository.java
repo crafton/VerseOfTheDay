@@ -7,13 +7,13 @@ import models.Campaign;
 import models.Theme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utilities.Config;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -23,10 +23,12 @@ public class CampaignRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignRepository.class);
     private final Provider<EntityManager> entityManagerProvider;
+    private final Config config;
 
     @Inject
-    public CampaignRepository(Provider<EntityManager> entityManagerProvider) {
+    public CampaignRepository(Provider<EntityManager> entityManagerProvider, Config config) {
         this.entityManagerProvider = entityManagerProvider;
+        this.config = config;
     }
 
     /**
@@ -43,8 +45,10 @@ public class CampaignRepository {
         Query q = getEntityManager().createNamedQuery("Campaign.findActive");
         q.setParameter("now", new Timestamp(System.currentTimeMillis()));
         LocalTime localTime = LocalTime.now();
-        String currentTime = localTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
+        String currentTime = localTime.format(DateTimeFormatter.ofPattern(config.TIME_FORMAT));
         q.setParameter("currentTime", currentTime);
+
+        logger.info("query time "+ currentTime);
 
         return (List<Campaign>) q.getResultList();
     }
@@ -55,7 +59,12 @@ public class CampaignRepository {
      * @throws IllegalArgumentException
      */
     @Transactional
-    public Campaign findCampaignById(Long campaignId) {
+    public Campaign findCampaignById(Long campaignId) throws IllegalArgumentException {
+
+        if (campaignId == null) {
+            throw new IllegalArgumentException("Parameter must be of type 'Long'.");
+        }
+
         return getEntityManager().find(Campaign.class, campaignId);
     }
 

@@ -2,7 +2,6 @@ package models;
 
 
 import com.google.inject.Inject;
-
 import ninja.postoffice.Postoffice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,6 +4,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import filters.LoginFilter;
 import filters.MemberFilter;
+import models.User;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
@@ -68,7 +69,7 @@ public class LoginController {
 
         try {
             userService.createSession(session, code);
-        } catch (JsonSyntaxException | IllegalStateException e) {
+        } catch (JsonSyntaxException | IllegalStateException | NullPointerException e) {
             logger.error(e.getMessage());
             Results.redirect("/servererror");
         }

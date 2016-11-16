@@ -6,11 +6,17 @@
             <fieldset>
                 <legend>General Settings</legend>
                 <div class="form-group">
-                    <label for="translation" class="col-sm-2 control-label">Translation</label>
+                    <label for="version" class="col-sm-2 control-label">Version</label>
                     <div class="col-sm-2">
-                        <select class="form-control" id="translation" name="translation" required>
-                            <option>1</option>
-                            </select>
+                        <select class="form-control" id="version" name="version" required>
+                            <#list versions as version>
+                                <#if (adminSettings.getVersion())! == version>
+                                    <option value="${(version)!}" selected>${(version)!}</option>
+                                    <#else>
+                                        <option value="${(version)!}">${(version)!}</option>
+                                </#if>
+                            </#list>
+                        </select>
                     </div>
                 </div>
             </fieldset>
@@ -19,84 +25,89 @@
         <div class="well">
             <fieldset>
                 <legend>Message Templates</legend>
-                <div class="form-group">
-                    <label for="welcomeSubject" class="col-sm-2 control-label">Welcome Message Subject</label>
-                    <div class="col-sm-2">
-                        <input class="form-control" id="welcomeSubject" name="welcomeSubject" value="${(adminSettings.welcomeSubject)!}" required />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="welcomeMessage" class="col-sm-2 control-label">Welcome Message</label>
-                    <div class="col-sm-2">
-                        <textarea class="form-control" id="welcomeMessage" name="welcomeMessage" value="${(adminSettings.welcomeMessage)!}" required></textarea>
-                    </div>
-                </div>
 
                 <div class="form-group">
                     <label for="newCampaignSubject" class="col-sm-2 control-label">New Campaign Subject</label>
-                    <div class="col-sm-2">
-                        <input class="form-control" id="newCampaignSubject" name="newCampaignSubject" value="${(adminSettings.newCampaignSubject)!}" required />
+                    <div class="col-sm-4">
+                        <input class="form-control" id="newCampaignSubject" name="newCampaignSubject"
+                               value="${(adminSettings.getNewCampaignSubject())!}" required/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="newCampaignMessage" class="col-sm-2 control-label">New Campaign Message</label>
-                    <div class="col-sm-2">
-                        <textarea class="form-control" id="newCampaignMessage" name="newCampaignMessage" value="${(adminSettings.newCampaignMessage)!}" required></textarea>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" id="newCampaignMessage" name="newCampaignMessage" required>${(adminSettings.getNewCampaignMessage())!}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="subscribedSubject" class="col-sm-2 control-label">Subscribed Subject</label>
-                    <div class="col-sm-2">
-                        <input class="form-control" id="subscribedSubject" name="subscribedSubject" value="${(adminSettings.subscribedSubject)!}" required />
+                    <div class="col-sm-4">
+                        <input class="form-control" id="subscribedSubject" name="subscribedSubject"
+                               value="${(adminSettings.getSubscribedSubject())!}" required/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="subscribedMessage" class="col-sm-2 control-label">Subscribed Message</label>
-                    <div class="col-sm-2">
-                        <textarea class="form-control" id="subscribedMessage" name="subscribedMessage" value="${(adminSettings.subscribedMessage)!}" required></textarea>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" id="subscribedMessage" name="subscribedMessage" required>${(adminSettings.getSubscribedMessage())!}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="unsubscribedSubject" class="col-sm-2 control-label">Unsubscribed Subject</label>
-                    <div class="col-sm-2">
-                        <input class="form-control" id="unsubscribedSubject" name="unsubscribedSubject" value="${(adminSettings.unsubscribedSubject)!}" required />
+                    <div class="col-sm-4">
+                        <input class="form-control" id="unsubscribedSubject" name="unsubscribedSubject"
+                               value="${(adminSettings.getUnsubscribedSubject())!}" required/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="unsubscribedMessage" class="col-sm-2 control-label">Unsubscribed Message</label>
-                    <div class="col-sm-2">
-                        <textarea class="form-control" id="unsubscribedMessage" name="unsubscribedMessage" value="${(adminSettings.unsubscribedMessage)!}" required></textarea>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" id="unsubscribedMessage" name="unsubscribedMessage" required>${(adminSettings.getUnsubscribedMessage())!}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="newVotdSubmittedSubject" class="col-sm-2 control-label">New VOTD Submitted Subject</label>
-                    <div class="col-sm-2">
-                        <input class="form-control" id="newVotdSubmittedSubject" name="newVotdSubmittedSubject" value="${(adminSettings.newVotdSubmittedSubject)!}" required />
+                    <label for="newVotdSubmittedSubject" class="col-sm-2 control-label">New VOTD Submitted
+                        Subject</label>
+                    <div class="col-sm-4">
+                        <input class="form-control" id="newVotdSubmittedSubject" name="newVotdSubmittedSubject"
+                               value="${(adminSettings.getNewVotdSubmittedSubject())!}" required/>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="newVotdSubmittedMessage" class="col-sm-2 control-label">New VOTD Submitted Message</label>
-                    <div class="col-sm-2">
-                        <textarea class="form-control" id="newVotdSubmittedMessage" name="newVotdSubmittedMessage" value="${(adminSettings.newVotdSubmittedMessage)!}" required></textarea>
+                    <label for="newVotdSubmittedMessage" class="col-sm-2 control-label">New VOTD Submitted
+                        Message</label>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" id="newVotdSubmittedMessage" name="newVotdSubmittedMessage"
+                                  required>${(adminSettings.getNewVotdSubmittedMessage())!}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="genericMessageFooter" class="col-sm-2 control-label">Generic Message Footer</label>
-                    <div class="col-sm-2">
-                        <input class="form-control" id="genericMessageFooter" name="genericMessageFooter" value="${(adminSettings.genericMessageFooter)!}" required />
+                    <div class="col-sm-4">
+                        <input class="form-control" id="genericMessageFooter" name="genericMessageFooter"
+                               value="${(adminSettings.getGenericMessageFooter())!}" required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input hidden name="id" id="settingsid" value="${(adminSettings.getId())!}">
+                        <button id="formSubmitButton" class="btn btn-raised btn-default" type="submit">Save</button>
                     </div>
                 </div>
             </fieldset>
         </div>
     </form>
+
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script>tinymce.init({selector: 'textarea'});</script>
 
 </@layout.myLayout>
