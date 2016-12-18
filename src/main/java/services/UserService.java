@@ -8,6 +8,7 @@ import models.Messenger;
 import models.User;
 import ninja.cache.NinjaCache;
 import ninja.session.Session;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -438,11 +439,12 @@ public class UserService {
         Map<String, String> tokens = userRepository.getAuthToken(code);
         JsonObject userObject = findUser(tokens.get("access_token"));
 
-            /*Cache user profile so we don't have to query information again for the session*/
-        ninjaCache.set(tokens.get("id_token"), userObject.toString());
+        /*Cache user profile so we don't have to query information again for the session*/
+        String cacheKey = DigestUtils.sha1Hex(tokens.get("id_token"));
+        ninjaCache.set(cacheKey, userObject.toString());
 
-            /*Store only tokens in the session cookie*/
-        session.put(config.IDTOKEN_NAME, tokens.get("id_token"));
+        /*Store only tokens in the session cookie*/
+        session.put(config.IDTOKEN_NAME, cacheKey);
         session.put(config.ACCESSTOKEN_NAME, tokens.get("access_token"));
     }
 
