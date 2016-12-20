@@ -102,6 +102,7 @@ public class CampaignController {
         }
 
         User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        Campaign campaign = campaignRepository.findCampaignById(campaignId);
 
         if (user == null) {
             return Results.badRequest().text();
@@ -114,7 +115,9 @@ public class CampaignController {
                 message.setRecipient(user.getEmail());
                 message.setSubject(adminSettings.getSubscribedSubject());
                 message.setSalutation(user.getName());
-                message.setBodyHtml(adminSettings.getSubscribedMessage());
+                message.setBodyHtml(adminSettings.getSubscribedMessage() +
+                        "<p>Name: " + campaign.getCampaignName() + "<br />" +
+                        "Description: " + campaign.getCampaignDescription() + "</p>");
                 messenger.sendMessage(message);
             } else {
                 logger.error("Admin settings not setup, campaign emails not set.");
@@ -132,6 +135,7 @@ public class CampaignController {
         }
 
         User user = userService.getCurrentUser(context.getSession().get(config.IDTOKEN_NAME));
+        Campaign campaign = campaignRepository.findCampaignById(campaignId);
 
         if (user == null) {
             return Results.badRequest().text();
@@ -144,7 +148,7 @@ public class CampaignController {
                 message.setRecipient(user.getEmail());
                 message.setSubject(adminSettings.getUnsubscribedSubject());
                 message.setSalutation(user.getName());
-                message.setBodyHtml(adminSettings.getUnsubscribedMessage());
+                message.setBodyHtml(adminSettings.getUnsubscribedMessage() + "<p>Name: " + campaign.getCampaignName() + "</p>");
                 messenger.sendMessage(message);
             } else {
                 logger.error("Admin settings not setup, campaign emails not set.");
@@ -210,7 +214,9 @@ public class CampaignController {
             if (adminSettings != null && adminSettings.getId() == 1L) {
                 Message message = messageProvider.get();
                 message.setSubject(adminSettings.getNewCampaignSubject());
-                message.setBodyHtml(adminSettings.getNewCampaignMessage());
+                message.setBodyHtml(adminSettings.getNewCampaignMessage() +
+                        "<p>Name: " + campaign.getCampaignName() + "<br />" +
+                        "Description: " + campaign.getCampaignDescription() + "</p>");
                 userService.sendNotificationToUsers(message);
             } else {
                 logger.error("Admin settings not setup, campaign emails not set.");
