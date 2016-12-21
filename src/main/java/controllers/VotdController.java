@@ -227,7 +227,7 @@ public class VotdController {
      * @return
      */
     @FilterWith(PublisherFilter.class)
-    public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope) {
+    public Result updateVotd(@PathParam("verseid") Long verseid, FlashScope flashScope, Context context) {
 
         if (verseid == null) {
             flashScope.error("You must supply a valid verse Id.");
@@ -247,13 +247,16 @@ public class VotdController {
         try {
             //Get verse text
             String verseText = votdService.restGetVerses(votd.getVerses(), "");
+            String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
             return Results
                     .ok()
                     .html()
                     .render("votd", votd)
                     .render(THEMES, themes)
-                    .render("verseText", verseText);
+                    .render("verseText", verseText)
+                    .render("loggedIn", true)
+                    .render("role", role);
         } catch (JsonSyntaxException e) {
             flashScope.error("Could not retrieve the requested votd.");
             logger.error("Failed web service call to retrieve verses.");
