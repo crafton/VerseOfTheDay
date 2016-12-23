@@ -4,7 +4,6 @@ import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import filters.LoginFilter;
 import filters.MemberFilter;
-import models.User;
 import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;

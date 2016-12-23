@@ -13,8 +13,6 @@ import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
-import ninja.postoffice.Mail;
-import ninja.postoffice.Postoffice;
 import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.slf4j.Logger;
