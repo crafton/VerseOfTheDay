@@ -344,7 +344,7 @@ public class VotdService {
             }
         }
 
-        return verseRange.matches("(\\d\\s)?\\w+\\s(\\d{1,2}):(\\d{1,3})(\\S?-\\S?\\d{1,3})?");
+        return verseRange.matches("(\\d\\s)?\\w+\\s(\\d{1,3}):(\\d{1,3})(\\S?-\\S?\\d{1,3})?");
     }
 
     /**
