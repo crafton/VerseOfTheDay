@@ -143,6 +143,7 @@ public class CampaignController {
 
         if (userService.unsubscribe(user.getUser_id(), campaignId)) {
             userService.refreshUserProfileInCache(session);
+            //this notification should actually be in unsubscribe function of the userservice
             if (adminSettings != null && adminSettings.getId() == 1L) {
                 Message message = messageProvider.get();
                 message.setRecipient(user.getEmail());
