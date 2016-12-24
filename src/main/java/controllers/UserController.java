@@ -238,6 +238,12 @@ public class UserController {
         userService.refreshUserProfileInCache(session);
         flashScope.success("Updated settings");
 
+        String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
+
+        if(role.contentEquals("member")){
+            return Results.redirect("/campaign/list");
+        }
+
         return Results.redirect("/user/list");
     }
 
