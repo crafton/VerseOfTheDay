@@ -1,7 +1,10 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> <@layout.myLayout
     "List Campaign">
 
+    <#if role?? && (role == "publisher" || role == "admin")>
     <a class="btn btn-raised btn-primary" href="/campaign/add" role="button">New Campaign</a>
+    </#if>
+
 
     <div class="well">
         <table id="campaignListTbl" class="table table-responsive" data-page-length='10'>

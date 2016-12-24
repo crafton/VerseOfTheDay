@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
 import filters.LoginFilter;
+import filters.MemberFilter;
 import filters.PublisherFilter;
 import models.AdminSettings;
 import models.User;
@@ -67,6 +68,7 @@ public class UserController {
                 .render("role", role);
     }
 
+    @FilterWith(MemberFilter.class)
     public Result viewProfile(Session session, Context context) {
 
         User user = userService.getCurrentUser(session.get(config.IDTOKEN_NAME));
@@ -187,6 +189,7 @@ public class UserController {
         }
     }
 
+    @FilterWith(MemberFilter.class)
     public Result updateUserSettings(FlashScope flashScope, Session session, Context context) {
 
         String shouldReceiveCampaignNotifications = context.getParameter("notifications");
