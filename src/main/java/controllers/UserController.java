@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@FilterWith({LoginFilter.class, PublisherFilter.class})
+@FilterWith(LoginFilter.class)
 public class UserController {
 
     private final static Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -57,6 +57,7 @@ public class UserController {
      *
      * @return
      */
+    @FilterWith(PublisherFilter.class)
     public Result viewUsers(Context context) {
 
         String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
@@ -91,6 +92,7 @@ public class UserController {
      * @param userId
      * @return html checkboxes associated with available roles
      */
+    @FilterWith(PublisherFilter.class)
     public Result displayUserRoles(@PathParam("userid") String userId) {
 
         if (StringUtils.isEmpty(userId)) {
@@ -112,6 +114,7 @@ public class UserController {
      * @param roles
      * @return
      */
+    @FilterWith(PublisherFilter.class)
     public Result updateUserRoles(@PathParam("userid") String userId, @PathParam("roles") String roles, Session session) {
 
         if (StringUtils.isEmpty(userId)) {
@@ -132,6 +135,7 @@ public class UserController {
      * @param context
      * @return a map containing all query results
      */
+    @FilterWith(PublisherFilter.class)
     public Result displayUserData(Context context) {
         try {
             Integer draw = Integer.parseInt(context.getParameter("draw"));
@@ -173,6 +177,7 @@ public class UserController {
      * @param session
      * @return
      */
+    @FilterWith(PublisherFilter.class)
     public Result updateUser(FlashScope flashScope, Session session) {
 
         String idTokenString = session.get("idToken");
@@ -243,6 +248,7 @@ public class UserController {
      * @param session
      * @return
      */
+    @FilterWith(PublisherFilter.class)
     public Result saveUpdate(Context context, Session session) {
         return Results.ok();
     }
