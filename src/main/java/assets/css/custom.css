@@ -6,6 +6,7 @@ body {
 
 #campaignListTbl {
 	width: 100%;
+    overflow: auto;
 }
 
 #campaignListTbl.table>tbody>tr>td {

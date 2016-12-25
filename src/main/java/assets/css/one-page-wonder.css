@@ -22,6 +22,10 @@ body {
     margin-left: -120px;
 }
 
+.mobile-header {
+    display: none;
+}
+
 .headline {
     padding-top: 40px;
     text-align: left;
@@ -118,6 +122,10 @@ footer {
 }
 
 @media(max-width:768px) {
+    .headline {
+        padding: 75px 0 25px 363px;
+    }
+
     .container {
         margin: 0 15px;
     }
@@ -156,6 +164,16 @@ footer {
 
     .headline h2 {
         font-size: 30px;
+    }
+
+    .header-image {
+        display: none;
+    }
+
+    .mobile-header {
+        display: block;
+        font-size: large;
+        font-weight: bold;
     }
 }
 
