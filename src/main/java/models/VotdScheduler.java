@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import services.UserService;
 import services.VotdDispatchService;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +36,16 @@ public class VotdScheduler {
     @Inject
     private UserService userService;
 
-    @Schedule(delay = 60, initialDelay = 10, timeUnit = TimeUnit.MINUTES)
+    @Schedule(delay = 60, initialDelay = 10, timeUnit = TimeUnit.SECONDS)
     public void dispatchAvailableCampaigns() {
+
+        LocalTime localTime = LocalTime.now();
+        String currentTimeMinutes = localTime.format(DateTimeFormatter.ofPattern("mm"));
+
+        //Only run every hour on the hour
+        if(!currentTimeMinutes.contentEquals("00")){
+            return;
+        }
 
         List<Campaign> activeCampaigns = votdDispatchService.getActiveCampaigns();
 
