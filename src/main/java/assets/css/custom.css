@@ -9,6 +9,10 @@ body {
     overflow: auto;
 }
 
+.well {
+    overflow: auto;
+}
+
 #campaignListTbl.table>tbody>tr>td {
     line-height: 5;
 }
