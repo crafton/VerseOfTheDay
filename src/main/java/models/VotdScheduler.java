@@ -108,7 +108,7 @@ public class VotdScheduler {
                                 String verseToSendText = votdDispatchService.getVerseText(votdDispatch.getVotdToBeDispatched(), k);
                                 message.setBodyHtml(verseToSendText);
                                 recipients.addAll(v.stream().map(User::getEmail).collect(Collectors.toList()));
-                                logger.info("version: " + k + " users: " + recipients);
+                                logger.debug("version: " + k + " users: " + recipients);
                                 message.setRecipients(recipients);
                                 messages.add(message);
                             }
