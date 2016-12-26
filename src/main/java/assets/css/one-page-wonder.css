@@ -13,13 +13,14 @@ body {
     width: 125%;
     height: 280px;
     text-align: left;
-    background: url('/assets/img/ebc.jpg') no-repeat center center scroll;
+    background: url('/assets/img/banner1.jpg') no-repeat center center scroll;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
     -o-background-size: cover;
     margin-top: -50px;
     margin-left: -120px;
+    color: #FFFFFF;
 }
 
 .mobile-header {
@@ -34,9 +35,10 @@ body {
 
 .headline p{
     font-size: large;
-    font-weight: bold;
-    width: 250px;
-    text-align: left;
+    width: 550px;
+    text-align: center;
+    padding-top: 60px;
+    margin: auto;
 }
 
 .headline h2 {
