@@ -124,8 +124,8 @@ footer {
 }
 
 @media(max-width:768px) {
-    .headline {
-        padding: 75px 0 25px 363px;
+    .headline p {
+        padding-left: 120px;
     }
 
     .container {
