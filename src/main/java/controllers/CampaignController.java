@@ -117,7 +117,8 @@ public class CampaignController {
                 message.setSalutation(user.getName());
                 message.setBodyHtml(adminSettings.getSubscribedMessage() +
                         "<p>Name: " + campaign.getCampaignName() + "<br />" +
-                        "Description: " + campaign.getCampaignDescription() + "</p>");
+                        "Description: " + campaign.getCampaignDescription() + "</p><p></p>" +
+                        adminSettings.getGenericMessageFooter());
                 messenger.sendMessage(message);
             } else {
                 logger.error("Admin settings not setup, campaign emails not set.");
@@ -149,7 +150,7 @@ public class CampaignController {
                 message.setRecipient(user.getEmail());
                 message.setSubject(adminSettings.getUnsubscribedSubject());
                 message.setSalutation(user.getName());
-                message.setBodyHtml(adminSettings.getUnsubscribedMessage() + "<p>Name: " + campaign.getCampaignName() + "</p>");
+                message.setBodyHtml(adminSettings.getUnsubscribedMessage() + "<p>Name: " + campaign.getCampaignName() + "</p><p></p>" + adminSettings.getGenericMessageFooter());
                 messenger.sendMessage(message);
             } else {
                 logger.error("Admin settings not setup, campaign emails not set.");
@@ -217,7 +218,8 @@ public class CampaignController {
                 message.setSubject(adminSettings.getNewCampaignSubject());
                 message.setBodyHtml(adminSettings.getNewCampaignMessage() +
                         "<p>Name: " + campaign.getCampaignName() + "<br />" +
-                        "Description: " + campaign.getCampaignDescription() + "</p>");
+                        "Description: " + campaign.getCampaignDescription() + "</p><p></p>" +
+                        adminSettings.getGenericMessageFooter());
                 userService.sendNotificationToUsers(message);
             } else {
                 logger.error("Admin settings not setup, campaign emails not set.");

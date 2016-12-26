@@ -41,6 +41,7 @@ public class VotdController {
     private final Messenger messenger;
     private final UserService userService;
     private final Config config;
+    private final AdminSettings adminSettings;
     private static final String THEMES = "themes";
     private static final String listPath = "/votd/list";
 
@@ -48,7 +49,7 @@ public class VotdController {
     public VotdController(Utils utils, VotdService votdService,
                           ThemeRepository themeRepository,
                           Provider<Message> messageProvider, Messenger messenger,
-                          UserService userService, Config config) {
+                          UserService userService, Config config, AdminSettings adminSettings) {
         this.utils = utils;
         this.votdService = votdService;
         this.themeRepository = themeRepository;
@@ -56,6 +57,7 @@ public class VotdController {
         this.messenger = messenger;
         this.userService = userService;
         this.config = config;
+        this.adminSettings = adminSettings;
     }
 
     /**
@@ -358,7 +360,7 @@ public class VotdController {
         message.setRecipients(publishers);
         message.setSubject("New VoTD Contributed");
         message.setSalutation("Publisher");
-        message.setBodyHtml("<p>" + sender + " has just submitted a new VoTD for approval. Log in and have a look!</p>Cheers!");
+        message.setBodyHtml("<p>" + sender + " has just submitted a new VoTD for approval. Log in and have a look!</p>Cheers!<p></p>" + adminSettings.getGenericMessageFooter());
         messenger.sendMessage(message);
     }
 
