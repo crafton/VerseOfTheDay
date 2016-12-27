@@ -9,8 +9,8 @@ body {
     overflow: auto;
 }
 
-#campaign .well {
-    overflow: scroll;
+#campaign {
+    overflow: auto;
 }
 
 #campaignListTbl.table>tbody>tr>td {

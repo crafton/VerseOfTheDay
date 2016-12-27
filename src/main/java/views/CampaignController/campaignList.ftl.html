@@ -2,7 +2,7 @@
     "List Campaign">
 
     <#if role?? && (role == "publisher" || role == "admin")>
-    <a class="btn btn-raised btn-primary" href="/campaign/add" role="button">New Campaign</a>
+        <a class="btn btn-raised btn-primary" href="/campaign/add" role="button">New Campaign</a>
     </#if>
 
 
@@ -15,6 +15,7 @@
                 <th>Theme(s)</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Send Time</th>
                 <th>Duration</th>
                 <th></th>
                 <th></th>
@@ -38,6 +39,7 @@
                     </td>
                     <td>${subscribedCampaign.startDate?string(dateFormat)}</td>
                     <td>${subscribedCampaign.endDate?string(dateFormat)}</td>
+                    <td>${subscribedCampaign.sendTime}</td>
                     <td>${subscribedCampaign.campaignDays}
                         <#if subscribedCampaign.campaignDays == 1>
                             day
@@ -49,12 +51,14 @@
                            data-toggle="campaigninfo" data-trigger="click"
                            data-html="true" data-content="${subscribedCampaign.campaignDescription}"
                            class="material-icons campaignDetails" aria-hidden="true">info</i></td>
+                    <#if role?? && (role == "publisher" || role == "admin")>
                     <td><a class="material-icons" data-placement="top"
                            data-toggle="confirmation" aria-hidden="true"
                            data-title="Delete campaign"
                            href="/campaign/delete/${subscribedCampaign.getCampaignId()}">delete</a></td>
                     <td><a class="material-icons" aria-hidden="true"
                            href="/campaign/update/${subscribedCampaign.getCampaignId()}">mode_edit</a></td>
+                    </#if>
                 </tr>
                 <#else>
                     <tr>
@@ -77,6 +81,7 @@
                     </td>
                     <td>${campaign.startDate?string(dateFormat)}</td>
                     <td>${campaign.endDate?string(dateFormat)}</td>
+                    <td>${campaign.sendTime}</td>
                     <td>${campaign.campaignDays}
                         <#if campaign.campaignDays == 1>
                             day
@@ -88,12 +93,14 @@
                            data-toggle="campaigninfo" data-trigger="click"
                            data-html="true" data-content="${campaign.campaignDescription}"
                            class="material-icons campaignDetails" aria-hidden="true">info</i></td>
-                    <td><a class="material-icons" data-placement="top"
-                           data-toggle="confirmation" aria-hidden="true"
-                           data-title="Delete campaign"
-                           href="/campaign/delete/${campaign.getCampaignId()}">delete</a></td>
-                    <td><a class="material-icons" aria-hidden="true"
-                           href="/campaign/update/${campaign.getCampaignId()}">mode_edit</a></td>
+                    <#if role?? && (role == "publisher" || role == "admin")>
+                        <td><a class="material-icons" data-placement="top"
+                               data-toggle="confirmation" aria-hidden="true"
+                               data-title="Delete campaign"
+                               href="/campaign/delete/${campaign.getCampaignId()}">delete</a></td>
+                        <td><a class="material-icons" aria-hidden="true"
+                               href="/campaign/update/${campaign.getCampaignId()}">mode_edit</a></td>
+                    </#if>
                 </tr>
                 <#else>
                     <tr>
