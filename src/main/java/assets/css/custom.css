@@ -13,8 +13,12 @@ body {
     overflow: auto;
 }
 
+#campaign .well {
+    overflow: scroll;
+}
+
 #campaignListTbl.table>tbody>tr>td {
-    line-height: 5;
+    line-height: 3;
 }
 
 .panel {
