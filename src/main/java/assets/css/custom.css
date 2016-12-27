@@ -9,10 +9,6 @@ body {
     overflow: auto;
 }
 
-.well {
-    overflow: auto;
-}
-
 #campaign .well {
     overflow: scroll;
 }
