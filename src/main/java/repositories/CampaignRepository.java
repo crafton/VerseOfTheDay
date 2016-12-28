@@ -92,6 +92,7 @@ public class CampaignRepository {
 
         if (themeList == null) {
             themeList = new ArrayList<>();
+            logger.info("No themes present");
         }
 
         Campaign campaign = findCampaignById(campaignId);
