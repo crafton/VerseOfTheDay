@@ -281,7 +281,7 @@ public class CampaignController {
                 themeList.add(theme);
             }
         }
-        logger.info("Themes: " + themeList.toString());
+
         try {
             campaignRepository.update(Long.parseLong(context.getParameter(CAMPAIGN_ID)), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
                     startDate, endDate, days, themeList, context.getParameter("sendTime"));
