@@ -25,6 +25,8 @@ public class User {
     private Map<String, Object> app_metadata;
     private static final Logger logger = LoggerFactory.getLogger(User.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
+
     public String getEmail() {
         return email;
     }
