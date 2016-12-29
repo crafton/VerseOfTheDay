@@ -10,6 +10,7 @@ import com.google.inject.Singleton;
 import ninja.scheduler.Schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import repositories.AdminSettingsRepository;
 import services.UserService;
 import services.VotdDispatchService;
 
@@ -35,6 +36,8 @@ public class VotdScheduler {
     private Provider<Message> messageProvider;
     @Inject
     private UserService userService;
+    @Inject
+    private AdminSettingsRepository adminSettingsRepository;
 
     @Schedule(delay = 60, initialDelay = 10, timeUnit = TimeUnit.SECONDS)
     public void dispatchAvailableCampaigns() {
@@ -43,7 +46,7 @@ public class VotdScheduler {
         String currentTimeMinutes = localTime.format(DateTimeFormatter.ofPattern("mm"));
 
         //Only run every hour on the hour
-        if(!currentTimeMinutes.contentEquals("00")){
+        if (!currentTimeMinutes.contentEquals("00")) {
             return;
         }
 
@@ -98,7 +101,7 @@ public class VotdScheduler {
                     List<User> userList = Arrays.asList(userArray);
 
                     Map<String, List<User>> userVersion = userList.stream()
-                            .collect(Collectors.groupingBy(u -> u.getSettings().get("version")));
+                            .collect(Collectors.groupingBy(this::getUserVersion));
 
                     userVersion.forEach((k, v) -> {
                                 List<String> recipients = new ArrayList<>();
@@ -132,4 +135,22 @@ public class VotdScheduler {
         }
 
     }
+
+    /**
+     * Get the bible version the user has set or the default version if not set.
+     *
+     * @param user
+     * @return
+     */
+    private String getUserVersion(User user) {
+        String defaultVersion = adminSettingsRepository.findSettings().getVersion();
+        if (user.getSettings().isEmpty()) {
+            return defaultVersion;
+        } else if (user.getSettings().get("version") == null) {
+            return defaultVersion;
+        } else {
+            return user.getSettings().get("version");
+        }
+    }
+
 }
