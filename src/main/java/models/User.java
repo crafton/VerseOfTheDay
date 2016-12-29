@@ -4,6 +4,8 @@ package models;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import repositories.AdminSettingsRepository;
 
 import java.util.ArrayList;
@@ -21,8 +23,7 @@ public class User {
     private String created_at;
     private Map<String, String> user_metadata;
     private Map<String, Object> app_metadata;
-    @Inject
-    private AdminSettingsRepository adminSettingsRepository;
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
     public String getEmail() {
         return email;
@@ -95,7 +96,7 @@ public class User {
         //if user doesn't have settings, set default version
         if (settings == null) {
             settings = new HashMap<>();
-            settings.put("version", adminSettingsRepository.findSettings().getVersion());
+            settings.put("version", "eng-ESV");
         }
 
         return settings;
