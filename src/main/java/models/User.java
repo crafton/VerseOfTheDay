@@ -2,7 +2,9 @@ package models;
 
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import org.apache.commons.lang.StringUtils;
+import repositories.AdminSettingsRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +21,8 @@ public class User {
     private String created_at;
     private Map<String, String> user_metadata;
     private Map<String, Object> app_metadata;
+    @Inject
+    private AdminSettingsRepository adminSettingsRepository;
 
     public String getEmail() {
         return email;
@@ -88,8 +92,10 @@ public class User {
     public Map<String, String> getSettings() {
         Map<String, String> settings = (Map<String, String>) this.getApp_metadata().get("settings");
 
+        //if user doesn't have settings, set default version
         if (settings == null) {
-            return new HashMap<>();
+            settings = new HashMap<>();
+            settings.put("version", adminSettingsRepository.findSettings().getVersion());
         }
 
         return settings;
