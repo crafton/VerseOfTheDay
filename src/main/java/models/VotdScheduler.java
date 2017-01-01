@@ -92,7 +92,6 @@ public class VotdScheduler {
             try {
                 List<Message> messages = new ArrayList<>();
 
-
                 for (Integer i = 0; i < pages; i++) {
                     JsonObject users = votdDispatchService.getUsers(i, numberOfUsersPerPage, campaign.getCampaignId());
                     JsonArray userJsonList = users.getAsJsonArray("users");
@@ -100,9 +99,11 @@ public class VotdScheduler {
                     User[] userArray = gson.fromJson(userJsonList, User[].class);
                     List<User> userList = Arrays.asList(userArray);
 
+                    //Group users by the bible version they want
                     Map<String, List<User>> userVersion = userList.stream()
                             .collect(Collectors.groupingBy(this::getUserVersion));
 
+                    //For each bible version send an email to all associated recipients
                     userVersion.forEach((k, v) -> {
                                 List<String> recipients = new ArrayList<>();
                                 Message message = messageProvider.get();
