@@ -272,7 +272,7 @@ public class CampaignController {
         long duration = endDate.getTime() - startDate.getTime();
         int days = (int) (duration / (1000 * 60 * 60 * 24));
 
-        List<String> themeIds = context.getParameterValues("themeList");
+        List<String> themeIds = context.getParameterValues("themes");
         List<Theme> themeList = new ArrayList<>();
 
         if (!themeIds.isEmpty()) {
@@ -281,6 +281,7 @@ public class CampaignController {
                 themeList.add(theme);
             }
         }
+
         try {
             campaignRepository.update(Long.parseLong(context.getParameter(CAMPAIGN_ID)), context.getParameter("campaignName"), context.getParameter("campaignDescription"),
                     startDate, endDate, days, themeList, context.getParameter("sendTime"));
