@@ -152,7 +152,12 @@ public class VotdService {
                 .get("text")
                 .getAsString();
 
-        return "<h3>" + verseTitle + "</h3>" + verseText;
+        String verseCopyright = passages.get(0)
+                .getAsJsonObject()
+                .get("copyright")
+                .getAsString();
+
+        return "<h3>" + verseTitle + "</h3>" + verseText + "<span id=\"versecopyright\">"+verseCopyright+"</span>";
 
     }
 
