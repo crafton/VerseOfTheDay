@@ -38,7 +38,11 @@
                         </#list>
                     </td>
                     <td>${subscribedCampaign.startDate?string(dateFormat)}</td>
-                    <td>${subscribedCampaign.endDate?string(dateFormat)}</td>
+                    <#if subscribedCampaign.hasCampaignExpired() >
+                        <td class="text-warning">${subscribedCampaign.endDate?string(dateFormat)}</td>
+                        <#else>
+                            <td>${subscribedCampaign.endDate?string(dateFormat)}</td>
+                    </#if>
                     <td>${subscribedCampaign.sendTime}</td>
                     <td>${subscribedCampaign.campaignDays}
                         <#if subscribedCampaign.campaignDays == 1>
@@ -52,12 +56,12 @@
                            data-html="true" data-content="${subscribedCampaign.campaignDescription}"
                            class="material-icons campaignDetails" aria-hidden="true">info</i></td>
                     <#if role?? && (role == "publisher" || role == "admin")>
-                    <td><a class="material-icons" data-placement="top"
-                           data-toggle="confirmation" aria-hidden="true"
-                           data-title="Delete campaign"
-                           href="/campaign/delete/${subscribedCampaign.getCampaignId()}">delete</a></td>
-                    <td><a class="material-icons" aria-hidden="true"
-                           href="/campaign/update/${subscribedCampaign.getCampaignId()}">mode_edit</a></td>
+                        <td><a class="material-icons" data-placement="top"
+                               data-toggle="confirmation" aria-hidden="true"
+                               data-title="Delete campaign"
+                               href="/campaign/delete/${subscribedCampaign.getCampaignId()}">delete</a></td>
+                        <td><a class="material-icons" aria-hidden="true"
+                               href="/campaign/update/${subscribedCampaign.getCampaignId()}">mode_edit</a></td>
                     </#if>
                 </tr>
                 <#else>
@@ -80,7 +84,11 @@
                         </#list>
                     </td>
                     <td>${campaign.startDate?string(dateFormat)}</td>
-                    <td>${campaign.endDate?string(dateFormat)}</td>
+                    <#if campaign.hasCampaignExpired() >
+                        <td class="text-warning">${campaign.endDate?string(dateFormat)}</td>
+                        <#else>
+                            <td>${campaign.endDate?string(dateFormat)}</td>
+                    </#if>
                     <td>${campaign.sendTime}</td>
                     <td>${campaign.campaignDays}
                         <#if campaign.campaignDays == 1>
