@@ -157,7 +157,7 @@ public class VotdService {
                 .get("copyright")
                 .getAsString();
 
-        return "<h3>" + verseTitle + "</h3>" + verseText + "<span id=\"versecopyright\">"+verseCopyright+"</span>";
+        return "<h3>" + verseTitle + "</h3>" + verseText + "<p style=\"padding-top:40px\"></p><span style=\"font-size:7px\">"+verseCopyright+"</span>";
 
     }
 
