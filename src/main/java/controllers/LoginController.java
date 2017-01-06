@@ -92,6 +92,6 @@ public class LoginController {
         session.clear();
 
         /*IdP logout and redirect*/
-        return Results.redirect("https://" + config.getAuth0Domain() + "/v2/logout?returnTo=http%3A%2F%2F128.199.115.200/");
+        return Results.redirect("https://" + config.getAuth0Domain() + "/v2/logout?returnTo=http%3A%2F%2Fdailyverses.faith/");
     }
 }
