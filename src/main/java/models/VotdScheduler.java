@@ -82,7 +82,8 @@ public class VotdScheduler {
                 return;
             }
 
-            String messageSubject = verseToSend.getVerses();
+            //String messageSubject = verseToSend.getVerses();
+            String messageSubject = "Daily Verse(s) from campaign: " + campaign.getCampaignName();
 
             votdDispatch.setVotdToBeDispatched(verseToSend);
             Integer pages = votdDispatch.getVotdDispatchUserPages(numberOfUsersPerPage);
