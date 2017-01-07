@@ -358,9 +358,9 @@ public class VotdController {
         String sender = user.getName();
         Message message = messageProvider.get();
         message.setRecipients(publishers);
-        message.setSubject("New VoTD Contributed");
+        message.setSubject("New Verse Contributed");
         message.setSalutation("Publisher");
-        message.setBodyHtml("<p>" + sender + " has just submitted a new VoTD for approval. Log in and have a look!</p>Cheers!<p></p>" + adminSettings.getGenericMessageFooter());
+        message.setBodyHtml("<p>" + sender + " has just submitted a new verse for approval. Log in and have a look!</p>Cheers!<p></p>" + adminSettings.getGenericMessageFooter());
         messenger.sendMessage(message);
     }
 
