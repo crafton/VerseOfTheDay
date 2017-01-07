@@ -87,10 +87,6 @@ h4#clash{
     animation-iteration-count: infinite;
 }
 
-.popover-title {
-    background-color: #808080
-}
-
 @keyframes pulsate {
     0% {
         transform: scale(.1);
