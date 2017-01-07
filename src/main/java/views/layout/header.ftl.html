@@ -20,10 +20,15 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" data-target="#">Setup <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a href="/votd/list">Verses</a>
-                            </li>
+                            <#if role == "contibutor">
+                                <li>
+                                    <a href="/votd/create">Submit Verses</a>
+                                </li>
+                            </#if>
                             <#if role == "publisher" || role == "admin">
+                                <li>
+                                    <a href="/votd/list">Verses</a>
+                                </li>
                                 <li>
                                     <a href="/theme/list">Themes</a>
                                 </li>
@@ -52,9 +57,9 @@
             <ul class="nav navbar-nav navbar-right">
                 <#if loggedIn??>
                     <#if role?? && (role == "member")>
-                    <li>
-                        <a href="/campaign/list">Campaigns</a>
-                    </li>
+                        <li>
+                            <a href="/campaign/list">Campaigns</a>
+                        </li>
                     </#if>
                     <li>
                         <a href="/user/profile">My Profile</a>
