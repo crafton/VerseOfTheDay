@@ -63,8 +63,8 @@ public class UserService {
      * @return
      * @throws JsonSyntaxException
      */
-    public JsonObject findUserRecordsWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
-        return userRepository.findUsersWithPaging(start, length, search);
+    public JsonObject findUserRecordsWithPaging(Integer page, Integer length, String search) throws JsonSyntaxException {
+        return userRepository.findUsersWithPaging(page, length, search);
     }
 
     public JsonObject findUserById(String id) throws JsonSyntaxException {

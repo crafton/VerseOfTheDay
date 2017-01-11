@@ -44,19 +44,19 @@ public class UserRepository {
     /**
      * Retrieve user records for the data table based on specified query
      *
-     * @param start
+     * @param page
      * @param length
      * @param search
      * @return JsonObject containing returned records
      * @throws JsonSyntaxException
      */
-    public JsonObject findUsersWithPaging(Integer start, Integer length, String search) throws JsonSyntaxException {
+    public JsonObject findUsersWithPaging(Integer page, Integer length, String search) throws JsonSyntaxException {
         String queryString = "name:" + search + "* OR user_metadata.name:" + search + "* OR email:" + search + "* " +
                 "OR app_metadata.roles:" + search + "*";
 
         Map<String, Object> params = new HashMap<>();
         params.put("per_page", length);
-        params.put("page", start);
+        params.put("page", page);
         params.put("include_totals", "true");
         params.put("fields", "name,user_metadata.name,email,last_login,created_at,user_id,app_metadata.roles,app_metadata.subscriptions");
         params.put("include_fields", "true");
