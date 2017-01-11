@@ -17,6 +17,7 @@ import ninja.session.FlashScope;
 import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import repositories.AdminSettingsRepository;
 import repositories.ThemeRepository;
 import services.UserService;
 import services.VotdService;
@@ -41,7 +42,7 @@ public class VotdController {
     private final Messenger messenger;
     private final UserService userService;
     private final Config config;
-    private final AdminSettings adminSettings;
+    private final AdminSettingsRepository adminSettingsRepository;
     private static final String THEMES = "themes";
     private static final String listPath = "/votd/list";
 
@@ -49,7 +50,8 @@ public class VotdController {
     public VotdController(Utils utils, VotdService votdService,
                           ThemeRepository themeRepository,
                           Provider<Message> messageProvider, Messenger messenger,
-                          UserService userService, Config config, AdminSettings adminSettings) {
+                          UserService userService, Config config,
+                          AdminSettingsRepository adminSettingsRepository) {
         this.utils = utils;
         this.votdService = votdService;
         this.themeRepository = themeRepository;
@@ -57,7 +59,7 @@ public class VotdController {
         this.messenger = messenger;
         this.userService = userService;
         this.config = config;
-        this.adminSettings = adminSettings;
+        this.adminSettingsRepository = adminSettingsRepository;
     }
 
     /**
@@ -354,13 +356,14 @@ public class VotdController {
 
     private void sendVotdContributedEmail(User user) {
         List<String> publishers = userService.findEmailsByRole(config.getPublisherRole());
+        AdminSettings adminSettings = adminSettingsRepository.findSettings();
 
         String sender = user.getName();
         Message message = messageProvider.get();
         message.setRecipients(publishers);
-        message.setSubject("New VoTD Contributed");
+        message.setSubject("New Verse Contributed");
         message.setSalutation("Publisher");
-        message.setBodyHtml("<p>" + sender + " has just submitted a new VoTD for approval. Log in and have a look!</p>Cheers!<p></p>" + adminSettings.getGenericMessageFooter());
+        message.setBodyHtml("<p>" + sender + " has just submitted a new verse for approval. Log in and have a look!</p>Cheers!<p></p>" + adminSettings.getGenericMessageFooter());
         messenger.sendMessage(message);
     }
 

@@ -56,7 +56,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <#if loggedIn??>
-                    <#if role?? && (role == "member")>
+                    <#if role?? && (role == "member" || role == "contributor")>
                         <li>
                             <a href="/campaign/list">Campaigns</a>
                         </li>
