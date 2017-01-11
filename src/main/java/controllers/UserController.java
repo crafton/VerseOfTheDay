@@ -145,12 +145,14 @@ public class UserController {
 
             Integer recordsTotal = userService.getTotalRecords();
 
-            JsonObject usersJson = userService.findUserRecordsWithPaging(start, length, search);
+            Integer page = start/length;
+            JsonObject usersJson = userService.findUserRecordsWithPaging(page, length, search);
             Integer recordsFiltered = usersJson.get("total")
                     .getAsInt();
             Gson gson = new Gson();
             User[] users = gson.fromJson(usersJson.getAsJsonArray("users"), User[].class);
             List<User> userList = Arrays.asList(users);
+            logger.info(userList.toString());
             List<String[]> usersData = userService.generateDataTableResults(userList);
 
         /*Format data for ajax callback processing*/
@@ -204,7 +206,7 @@ public class UserController {
             shouldReceiveCampaignNotifications = "no";
         }
 
-        if(StringUtils.isEmpty(version)){
+        if (StringUtils.isEmpty(version)) {
             AdminSettings adminSettings = adminSettingsRepository.findSettings();
             version = adminSettings.getVersion();
         }
@@ -240,7 +242,7 @@ public class UserController {
 
         String role = userService.getHighestRole(context.getSession().get(config.IDTOKEN_NAME));
 
-        if(role.contentEquals("member")){
+        if (role.contentEquals("member")) {
             return Results.redirect("/campaign/list");
         }
 
