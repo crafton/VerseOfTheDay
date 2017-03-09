@@ -21,10 +21,12 @@ public class VotdUsedRepository {
         this.entityManagerProvider = entityManagerProvider;
     }
 
+    @Transactional
     public void save(VotdUsed votdUsed){
         getEntityManager().persist(votdUsed);
     }
 
+    @Transactional
     public List<Long> findVotdUsedByCampaign(Campaign campaign){
         Query q = getEntityManager().createNamedQuery("Used.findByCampaign");
         q.setParameter("campaignid", campaign.getCampaignId());
@@ -32,6 +34,7 @@ public class VotdUsedRepository {
         return (List<Long>) q.getResultList();
     }
 
+    @Transactional
     public List<VotdUsed> findVotdUsedByVotd(Votd votd){
         Query q = getEntityManager().createNamedQuery("Used.findByVotd");
         q.setParameter("votdid", votd.getId());
